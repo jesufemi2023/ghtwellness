@@ -53,6 +53,7 @@ export function Home({
   onOpenChat
 }: HomeProps) {
   const [recentBlogs, setRecentBlogs] = useState<BlogPost[]>([]);
+  const trendingScrollRef = useRef<HTMLDivElement>(null);
   const recScrollRef = useRef<HTMLDivElement>(null);
   const comboScrollRef = useRef<HTMLDivElement>(null);
 
@@ -70,6 +71,22 @@ export function Home({
     };
     fetchBlogs();
   }, []);
+
+  // Auto-scroll for Trending Products
+  useEffect(() => {
+    if (products.length <= 4) return;
+    const timer = setInterval(() => {
+      if (trendingScrollRef.current) {
+        const { scrollLeft, scrollWidth, clientWidth } = trendingScrollRef.current;
+        if (scrollLeft + clientWidth >= scrollWidth - 10) {
+          trendingScrollRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+          trendingScrollRef.current.scrollBy({ left: clientWidth, behavior: 'smooth' });
+        }
+      }
+    }, 30000);
+    return () => clearInterval(timer);
+  }, [products.length]);
 
   // Auto-scroll for Recommended Packages
   useEffect(() => {
@@ -299,19 +316,53 @@ export function Home({
             <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter uppercase">Trending Now</h2>
             <div className="h-2 w-24 bg-emerald-500 rounded-full"></div>
           </div>
-          <button onClick={() => onNavigate('products')} className="hidden md:flex text-emerald-600 font-black text-lg items-center gap-2 hover:gap-4 transition-all uppercase tracking-widest">
-            View All <ArrowRight size={24} />
-          </button>
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={() => onNavigate('products')} 
+              className="hidden md:flex text-emerald-600 font-black text-lg items-center gap-2 hover:gap-4 transition-all uppercase tracking-widest mr-4"
+            >
+              View All <ArrowRight size={24} />
+            </button>
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={() => scrollPrev(trendingScrollRef)}
+                className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white shadow-md flex items-center justify-center text-slate-600 hover:bg-emerald-600 hover:text-white transition-all"
+              >
+                <ChevronLeft size={24} />
+              </button>
+              <button 
+                onClick={() => scrollNext(trendingScrollRef)}
+                className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white shadow-md flex items-center justify-center text-slate-600 hover:bg-emerald-600 hover:text-white transition-all"
+              >
+                <ChevronRight size={24} />
+              </button>
+            </div>
+          </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {bestSellers.map(product => (
-            <ProductCard 
-              key={product.id}
-              product={product}
-              onQuickView={onViewProduct}
-              onOrder={() => onOrderProduct(product)}
-            />
+        <div 
+          ref={trendingScrollRef}
+          className="flex overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar gap-6 pb-4"
+        >
+          {products.map(product => (
+            <div 
+              key={product.id} 
+              className="snap-start flex-shrink-0 w-[280px] sm:w-[320px] md:w-[calc(33.333%-1rem)] lg:w-[calc(25%-1.125rem)]"
+            >
+              <ProductCard 
+                product={product}
+                onQuickView={onViewProduct}
+                onOrder={() => onOrderProduct(product)}
+              />
+            </div>
           ))}
+        </div>
+        <div className="mt-6 text-center md:hidden">
+          <button 
+            onClick={() => onNavigate('products')}
+            className="bg-emerald-600 text-white px-8 py-3 rounded-full font-black uppercase tracking-widest text-sm shadow-lg"
+          >
+            View All Products
+          </button>
         </div>
       </section>
 
@@ -326,17 +377,25 @@ export function Home({
               </div>
               <div className="flex items-center gap-4">
                 <button 
-                  onClick={() => scrollPrev(recScrollRef)}
-                  className="w-14 h-14 rounded-full bg-white shadow-lg flex items-center justify-center text-slate-600 hover:bg-emerald-600 hover:text-white transition-all"
+                  onClick={() => onNavigate('recommended')} 
+                  className="hidden md:flex text-emerald-600 font-black text-lg items-center gap-2 hover:gap-4 transition-all uppercase tracking-widest mr-4"
                 >
-                  <ChevronLeft size={28} />
+                  View All <ArrowRight size={24} />
                 </button>
-                <button 
-                  onClick={() => scrollNext(recScrollRef)}
-                  className="w-14 h-14 rounded-full bg-white shadow-lg flex items-center justify-center text-slate-600 hover:bg-emerald-600 hover:text-white transition-all"
-                >
-                  <ChevronRight size={28} />
-                </button>
+                <div className="flex items-center gap-2">
+                  <button 
+                    onClick={() => scrollPrev(recScrollRef)}
+                    className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white shadow-md flex items-center justify-center text-slate-600 hover:bg-emerald-600 hover:text-white transition-all"
+                  >
+                    <ChevronLeft size={24} />
+                  </button>
+                  <button 
+                    onClick={() => scrollNext(recScrollRef)}
+                    className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white shadow-md flex items-center justify-center text-slate-600 hover:bg-emerald-600 hover:text-white transition-all"
+                  >
+                    <ChevronRight size={24} />
+                  </button>
+                </div>
               </div>
             </div>
             <div 
@@ -356,6 +415,14 @@ export function Home({
                   />
                 </div>
               ))}
+            </div>
+            <div className="mt-4 text-center md:hidden">
+              <button 
+                onClick={() => onNavigate('recommended')}
+                className="bg-emerald-600 text-white px-8 py-3 rounded-full font-black uppercase tracking-widest text-sm shadow-lg"
+              >
+                View All Solutions
+              </button>
             </div>
           </div>
         </section>
