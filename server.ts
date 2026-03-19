@@ -379,7 +379,7 @@ export async function createServer() {
 
     // Handle junction table for packages
     if (table === 'recommended_packages' && Array.isArray(product_ids)) {
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
       const validProductIds = product_ids.filter(pid => pid && typeof pid === 'string' && uuidRegex.test(pid));
       
       if (validProductIds.length > 0) {
