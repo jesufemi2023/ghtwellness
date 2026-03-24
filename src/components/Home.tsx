@@ -25,6 +25,7 @@ import { CONFIG } from '../config';
 import { ProductCard } from './ProductCard';
 import { PackageCard } from './PackageCard';
 import { ComboCard } from './ComboCard';
+import { Testimonials } from './Testimonials';
 import { getOptimizedImageUrl } from '../utils/cloudinary';
 
 interface HomeProps {
@@ -466,6 +467,9 @@ export function Home({
           </div>
         </section>
       )}
+
+      {/* 6. Testimonials Section */}
+      <Testimonials onViewAll={() => onNavigate('testimonials')} />
 
       {/* 7. Ask Virtual Guide Teaser */}
       <section className="max-w-7xl mx-auto px-4 md:px-6 py-12 md:py-16">

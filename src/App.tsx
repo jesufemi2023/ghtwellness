@@ -46,6 +46,7 @@ import { PackageQuickView } from "./components/PackageQuickView";
 import { AIChatBot } from "./components/chat/AIChatBot";
 import { SearchResults } from "./components/SearchResults";
 import AdminDashboard from "./components/AdminDashboard";
+import { TestimonialsPage } from "./components/TestimonialsPage";
 import { Product, PackageData } from "./types";
 
 interface Consultation {
@@ -60,7 +61,7 @@ interface Consultation {
 }
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<"home" | "about" | "products" | "recommended" | "combo" | "consultation" | "history" | "product-detail" | "admin" | "blog" | "blog-post" | "search">("home");
+  const [activeTab, setActiveTab] = useState<"home" | "about" | "products" | "recommended" | "combo" | "consultation" | "history" | "product-detail" | "admin" | "blog" | "blog-post" | "search" | "testimonials">("home");
   const [previousTab, setPreviousTab] = useState<typeof activeTab>("home");
 
   const navigateTo = (tab: typeof activeTab) => {
@@ -367,9 +368,9 @@ export default function App() {
 
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center justify-center gap-4 xl:gap-6 flex-1 px-4">
-              {CONFIG.navigation.filter(item => ["home", "about", "products", "recommended", "combo", "blog"].includes(item.id)).map((item) => {
+              {CONFIG.navigation.filter(item => ["home", "testimonials", "products", "recommended", "combo", "blog"].includes(item.id)).map((item) => {
                 const Icon = item.id === "home" ? HomeIcon :
-                             item.id === "about" ? Info :
+                             item.id === "testimonials" ? MessageSquare :
                              item.id === "products" ? ShoppingBag : 
                              item.id === "recommended" ? LayoutGrid :
                              item.id === "combo" ? Package :
@@ -395,7 +396,7 @@ export default function App() {
                 <button
                   onClick={() => setIsMoreMenuOpen(!isMoreMenuOpen)}
                   className={`flex items-center gap-1.5 xl:gap-2 text-xs xl:text-sm font-bold transition-all whitespace-nowrap py-2 px-1 border-b-2 ${
-                    ["consultation", "history", "admin"].includes(activeTab)
+                    ["consultation", "history", "admin", "about"].includes(activeTab)
                       ? "text-emerald-600 border-emerald-600"
                       : "text-slate-500 border-transparent hover:text-emerald-500 hover:border-emerald-200"
                   }`}
@@ -411,7 +412,7 @@ export default function App() {
                       exit={{ opacity: 0, y: 10 }}
                       className="absolute top-full right-0 mt-2 w-48 bg-white rounded-2xl shadow-2xl border border-slate-100 py-2 z-50"
                     >
-                      {CONFIG.navigation.filter(item => !["home", "about", "products", "recommended", "combo", "blog"].includes(item.id)).map((item) => {
+                      {CONFIG.navigation.filter(item => !["home", "testimonials", "products", "recommended", "combo", "blog"].includes(item.id)).map((item) => {
                         const Icon = item.id === "about" ? Info :
                                      item.id === "consultation" ? Stethoscope : 
                                      item.id === "history" ? History :
@@ -565,7 +566,7 @@ export default function App() {
       </div>
 
       <main className={`mx-auto transition-all duration-500 ${
-        activeTab === "home" || activeTab === "about" || activeTab === "search"
+        activeTab === "home" || activeTab === "about" || activeTab === "search" || activeTab === "testimonials"
           ? "max-w-none px-0 py-0" 
           : activeTab === "combo" 
             ? "max-w-[1440px] px-4 py-8 md:py-12" 
@@ -593,6 +594,16 @@ export default function App() {
                 onOrderProduct={(p) => openOrderDrawer(p, "product")}
                 onOrderPackage={(pkg) => openOrderDrawer(pkg, "package")}
               />
+            </motion.div>
+          )}
+          {activeTab === "testimonials" && (
+            <motion.div
+              key="testimonials"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+            >
+              <TestimonialsPage onBack={() => navigateTo("home")} />
             </motion.div>
           )}
           {activeTab === "home" && (
