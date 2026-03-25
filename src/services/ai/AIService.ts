@@ -54,9 +54,9 @@ export class AIService {
         break;
       }
       // 2. Get Key & Initialize AI (Inside loop to allow key rotation on retry)
-      const key = this.keyManager.getNextKey();
+      const key = await this.keyManager.getNextKey();
       if (!key) {
-        throw new Error("AI is currently unavailable (No API keys configured).");
+        throw new Error("AI is currently unavailable (All API keys are exhausted). Please try again later.");
       }
       const ai = new GoogleGenAI({ apiKey: key });
 
@@ -110,6 +110,14 @@ export class AIService {
         if (isRetryable) {
           retries--;
           const reason = isQuota ? "Quota Exceeded" : (errStatus || 'Busy');
+          
+          // Mark key as exhausted if it's a quota or rate limit error
+          if (isQuota) {
+            await this.keyManager.markKeyAsExhausted(key, 'quota');
+          } else if (errStatus === 429 || errStr.includes('429')) {
+            await this.keyManager.markKeyAsExhausted(key, 'rate');
+          }
+
           console.warn(`AI Service ${reason}. Retrying with next key in ${delay}ms... (${retries} retries left)`);
           
           if (retries === 0) {
@@ -138,7 +146,7 @@ export class AIService {
     let delay = 2000;
 
     while (retries > 0) {
-      const key = this.keyManager.getNextKey();
+      const key = await this.keyManager.getNextKey();
       if (!key) return null;
       
       const ai = new GoogleGenAI({ apiKey: key });
@@ -167,13 +175,18 @@ export class AIService {
         
         const isQuota = errStr.includes('quota') || errMsg.includes('quota') || errStr.includes('exhausted') || errMsg.includes('exhausted');
         if (isQuota) {
+          await this.keyManager.markKeyAsExhausted(key, 'quota');
           console.error("API Quota Exceeded for image generation.");
-          return null;
+          retries--;
+          continue;
         }
 
         const isRetryable = errStatus === 429 || errStatus === 503 || errMsg.includes('high demand') || errMsg.includes('unavailable');
         
         if (isRetryable) {
+          if (errStatus === 429) {
+            await this.keyManager.markKeyAsExhausted(key, 'rate');
+          }
           retries--;
           console.warn(`AI Image Service Busy. Retrying in ${delay}ms...`);
           await new Promise(res => setTimeout(res, delay));

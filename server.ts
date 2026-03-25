@@ -4,6 +4,7 @@ import { fileURLToPath } from "url";
 import { getSupabaseAdmin } from "./src/services/supabaseAdmin.js";
 import { NotificationService } from "./src/services/notificationService.js";
 import { getAIService } from "./src/services/ai/AIService.js";
+import { getCloudinaryService } from "./src/services/cloudinary/CloudinaryService.js";
 import { CONFIG } from "./src/config.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -681,12 +682,24 @@ export async function createServer() {
   });
 
   app.post("/api/upload-receipt", async (req, res) => {
-    if (!supabase) return res.status(503).json({ error: "Database not configured" });
-    
     const { fileData, fileName, mimeType } = req.body;
     if (!fileData || !fileName) return res.status(400).json({ error: "Missing file data" });
 
     try {
+      // 1. Try Cloudinary first if configured
+      const cloudinary = getCloudinaryService();
+      if (process.env.CLOUDINARY_ACCOUNTS || process.env.CLOUDINARY_URL) {
+        console.log("Using Cloudinary for receipt upload...");
+        const result = await cloudinary.uploadImage(fileData, 'receipts');
+        if (result) {
+          return res.json({ publicUrl: result.url });
+        }
+      }
+
+      // 2. Fallback to Supabase Storage
+      if (!supabase) return res.status(503).json({ error: "Cloudinary failed and Supabase not configured" });
+      
+      console.log("Falling back to Supabase Storage for receipt upload...");
       // Decode base64
       const base64Data = fileData.replace(/^data:image\/\w+;base64,/, "");
       const buffer = Buffer.from(base64Data, 'base64');
@@ -708,6 +721,35 @@ export async function createServer() {
     } catch (error: any) {
       console.error("Upload Error:", error);
       res.status(500).json({ error: error.message || "Failed to upload file" });
+    }
+  });
+
+  // New Cloudinary Specific Upload Route (for Admin/Products)
+  app.post("/api/cloudinary-upload", adminAuth, async (req, res) => {
+    const { fileData, folder } = req.body;
+    if (!fileData) return res.status(400).json({ error: "Missing file data" });
+
+    try {
+      const result = await getCloudinaryService().uploadImage(fileData, folder || 'products');
+      if (!result) throw new Error("Cloudinary upload failed");
+      res.json(result);
+    } catch (error: any) {
+      console.error("Cloudinary Upload Error:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // New Cloudinary Specific Delete Route
+  app.delete("/api/cloudinary-delete", adminAuth, async (req, res) => {
+    const { url } = req.body;
+    if (!url) return res.status(400).json({ error: "URL is required" });
+
+    try {
+      const success = await getCloudinaryService().deleteImage(url);
+      res.json({ success });
+    } catch (error: any) {
+      console.error("Cloudinary Delete Error:", error);
+      res.status(500).json({ error: error.message });
     }
   });
 

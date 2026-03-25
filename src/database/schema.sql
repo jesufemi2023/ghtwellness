@@ -184,18 +184,33 @@ CREATE TABLE package_products (
     PRIMARY KEY (package_id, product_id)
 );
 
+-- 9. API KEYS STATUS (For rotation and recycling)
+CREATE TABLE api_keys_status (
+    api_key TEXT PRIMARY KEY,
+    service TEXT NOT NULL, -- 'gemini', 'cloudinary', etc.
+    status TEXT NOT NULL, -- 'active', 'exhausted', 'rate_limited'
+    reset_at TIMESTAMPTZ NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- Trigger for updated_at
 CREATE TRIGGER update_recommended_packages_modtime 
 BEFORE UPDATE ON recommended_packages 
 FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
 
+CREATE TRIGGER update_api_keys_status_modtime 
+BEFORE UPDATE ON api_keys_status 
+FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+
 -- Enable RLS
 ALTER TABLE recommended_packages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE package_products ENABLE ROW LEVEL SECURITY;
+ALTER TABLE api_keys_status ENABLE ROW LEVEL SECURITY;
 
 -- Public Read Policies
 CREATE POLICY "Anyone can view recommended packages" ON recommended_packages FOR SELECT USING (true);
 CREATE POLICY "Anyone can view package products" ON package_products FOR SELECT USING (true);
+CREATE POLICY "Admin can view api keys status" ON api_keys_status FOR ALL USING (true);
 
 
 );

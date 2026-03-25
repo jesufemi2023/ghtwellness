@@ -33,7 +33,7 @@ export const TESTIMONIALS: TestimonialData[] = [
     location: "From Nigeria",
     productUsed: "",
     videoUrl: "https://21310571.s21v.faiusr.com/58/ABUIABA6GAAgmpPLiwYolJfyEA.mp4",
-    thumbnailUrl: "/images/testimonials/image1.png",
+    thumbnailUrl: "https://res.cloudinary.com/drizgfofw/image/upload/v1774455643/image1_qkq4x5.png",
   },
   {
     id: 'w-diabetes',
@@ -57,7 +57,7 @@ export const TESTIMONIALS: TestimonialData[] = [
     location: "From Nigeria",
     productUsed: "Constifree Tea",
     videoUrl: "https://21310571.s21v.faiusr.com/58/ABUIABA6GAAgkZPLiwYor7SnmAc.mp4",
-    thumbnailUrl: "/images/testimonials/image2.png",
+    thumbnailUrl: "https://res.cloudinary.com/drizgfofw/image/upload/v1774455637/image2_sp5qwg.png",
   },
   {
     id: 'w-prostate',
@@ -81,7 +81,7 @@ export const TESTIMONIALS: TestimonialData[] = [
     location: "Kano, Nigeria",
     productUsed: "Female Care",
     videoUrl: "https://21310571.s21v.faiusr.com/58/ABUIABA6GAAgi5PLiwYo6v614gI.mp4",
-    thumbnailUrl: "/images/testimonials/image3.png",
+    thumbnailUrl: "https://res.cloudinary.com/drizgfofw/image/upload/v1774455635/image3_p2cpqf.png",
   },
   {
     id: 'w-men-health',
@@ -104,7 +104,7 @@ export const TESTIMONIALS: TestimonialData[] = [
     location: "From Nigeria",
     productUsed: "B-Clear",
     videoUrl: "https://21310571.s21v.faiusr.com/58/ABUIABA6GAAg-ZLLiwYomNCCpwI.mp4",
-    thumbnailUrl: "/images/testimonials/image4.png",
+    thumbnailUrl: "https://res.cloudinary.com/drizgfofw/image/upload/v1774455635/image4_yxzgkd.png",
   },
   {
     id: 'w-fibroid',
@@ -128,7 +128,7 @@ export const TESTIMONIALS: TestimonialData[] = [
     location: "From Nigeria",
     productUsed: "Dialase, Longzit, Constifree tea, Myco-Balance ",
     videoUrl: "https://21310571.s21v.faiusr.com/58/ABUIABA6GAAg9pLLiwYohYPT7Ac.mp4",
-    thumbnailUrl: "/images/testimonials/image5.png",
+    thumbnailUrl: "https://res.cloudinary.com/drizgfofw/image/upload/v1774455634/image5_ugsky3.png",
   },
   {
     id: 'w-infertility',
@@ -151,7 +151,7 @@ export const TESTIMONIALS: TestimonialData[] = [
     location: "From Nigeria",
     productUsed: "Sto Care, Constifree Tea",
     videoUrl: "https://21310571.s21v.faiusr.com/58/ABUIABA6GAAg55LLiwYomKXJ_QY.mp4",
-    thumbnailUrl: "/images/testimonials/image6.png",
+    thumbnailUrl: "https://res.cloudinary.com/drizgfofw/image/upload/v1774455635/image6_zrtnpc.png",
   },
   {
     id: 'v7',
@@ -160,7 +160,7 @@ export const TESTIMONIALS: TestimonialData[] = [
     location: "From Nigeria",
     productUsed: "Sto Care",
     videoUrl: "https://21310571.s21v.faiusr.com/58/ABUIABA6GAAgv5LLiwYo9KT2qgI.mp4",
-    thumbnailUrl: "/images/testimonials/image7.png",
+    thumbnailUrl: "https://res.cloudinary.com/drizgfofw/image/upload/v1774455637/image7_diuyeq.png",
   },
   {
     id: 'v10',
@@ -169,7 +169,7 @@ export const TESTIMONIALS: TestimonialData[] = [
     location: "Kogi, Nigeria",
     productUsed: "Female packs",
     videoUrl: "https://21310571.s21v.faiusr.com/58/ABUIABA6GAAg85LLiwYoz9mBvAI.mp4",
-    thumbnailUrl: "/images/testimonials/image10.png",
+    thumbnailUrl: "https://res.cloudinary.com/drizgfofw/image/upload/v1774455637/image10_xco52g.png",
   },
 
 ];
