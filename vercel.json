@@ -11,6 +11,11 @@
       "dest": "/api/index.ts"
     },
     {
+      "src": "/images/(.*)",
+      "dest": "/images/$1",
+      "check": true
+    },
+    {
       "handle": "filesystem"
     },
     {

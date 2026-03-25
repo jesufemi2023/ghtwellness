@@ -814,7 +814,15 @@ export async function createServer() {
     const vite = await createViteServer({ server: { middlewareMode: true }, appType: "spa" });
     app.use(vite.middlewares);
   } else {
-    app.use(express.static(path.join(process.cwd(), "dist")));
+    // Serve static files from 'dist' folder
+    const distPath = path.resolve(process.cwd(), "dist");
+    app.use(express.static(distPath));
+    
+    // Fallback for SPA routing
+    app.get("*", (req, res, next) => {
+      if (req.path.startsWith("/api/")) return next();
+      res.sendFile(path.join(distPath, "index.html"));
+    });
   }
 
   return app;
