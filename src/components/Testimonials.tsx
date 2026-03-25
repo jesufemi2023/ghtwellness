@@ -297,7 +297,7 @@ export const Testimonials = ({ onViewAll }: { onViewAll?: () => void }) => {
           whileInView={{ opacity: 1, y: 0 }}
           className="mt-16 p-12 bg-emerald-900 rounded-[48px] text-center relative overflow-hidden"
         >
-          <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/leaf.png')] pointer-events-none" />
+          <div className="absolute inset-0 opacity-10 leaf-pattern pointer-events-none" />
           <h3 className="text-3xl md:text-4xl font-serif italic text-white mb-6 relative z-10">
             Ready to start your own success story?
           </h3>
