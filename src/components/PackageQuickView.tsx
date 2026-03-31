@@ -78,7 +78,7 @@ export const PackageQuickView: React.FC<PackageQuickViewProps> = ({
                 <div className="p-8 md:p-12 flex items-center justify-center relative overflow-hidden shrink-0">
                   <div className="relative w-full h-full flex items-center justify-center">
                     <img 
-                      src={data.package_image_url || (data.products[0]?.image_url)} 
+                      src={data.package_image_url || (data.products?.[0]?.image_url)} 
                       alt={data.name} 
                       className="w-full max-h-[400px] object-contain mix-blend-multiply drop-shadow-[0_20px_50px_rgba(0,0,0,0.1)]" 
                       referrerPolicy="no-referrer"
@@ -94,7 +94,7 @@ export const PackageQuickView: React.FC<PackageQuickViewProps> = ({
                 <div className="p-6 md:p-8 space-y-6 bg-white/50 border-t border-slate-100">
                   <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] border-b border-slate-200/50 pb-2">Included in this Package</h4>
                   <div className="grid grid-cols-1 gap-3">
-                    {data.products.map((product) => (
+                    {(data.products || []).map((product) => (
                       <div 
                         key={product.id}
                         className="flex items-center gap-4 p-3 bg-white rounded-xl border border-slate-100 group/prod hover:shadow-md hover:border-emerald-200 transition-all duration-300"

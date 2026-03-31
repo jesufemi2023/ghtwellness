@@ -219,7 +219,7 @@ export default function AdminDashboard({ adminPassword }: AdminDashboardProps) {
     setEditingId(item.id);
     const form = { ...item };
     if (activeTable === "recommended_packages" && item.package_products) {
-      form.product_ids = item.package_products.map((pp: any) => pp.product_id);
+      form.product_ids = (item.package_products || []).map((pp: any) => pp.product_id);
     }
     setEditForm(form);
     setIsAdding(false);

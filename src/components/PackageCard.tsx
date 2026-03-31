@@ -29,7 +29,7 @@ export const PackageCard: React.FC<PackageCardProps> = ({ data, allPackages, onO
         {/* Image Section - Optimized Aspect Ratio */}
         <div className="relative aspect-[2/1] bg-slate-50/30 flex items-center justify-center overflow-hidden border-b border-slate-100">
           <img 
-            src={getOptimizedImageUrl(data.package_image_url || (data.products[0]?.image_url), 600)} 
+            src={getOptimizedImageUrl(data.package_image_url || (data.products?.[0]?.image_url), 600)} 
             alt={data.name}
             className="w-full h-full object-contain group-hover:scale-150 transition-transform duration-700 p-4 mix-blend-multiply cursor-zoom-in group-hover:drop-shadow-2xl"
             referrerPolicy="no-referrer"

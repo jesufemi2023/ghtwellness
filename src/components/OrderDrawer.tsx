@@ -142,7 +142,7 @@ export const OrderDrawer: React.FC<OrderDrawerProps> = ({
       if (type === 'package') {
         const pkg = item as PackageData;
         // If it's a package, we send all its products
-        orderItems = pkg.products.map(p => ({
+        orderItems = (pkg.products || []).map(p => ({
           id: p.id,
           name: p.name,
           quantity: quantity,

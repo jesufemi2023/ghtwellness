@@ -20,7 +20,7 @@ export const ComboCard: React.FC<ComboCardProps> = ({ data, onOrder, onProductCl
   const discountPrice = data.price * (1 - data.discount / 100);
 
   const itemsPerPage = 3;
-  const maxIndex = Math.max(0, data.products.length - itemsPerPage);
+  const maxIndex = Math.max(0, (data.products?.length || 0) - itemsPerPage);
 
   const nextSlide = () => {
     setCarouselIndex((prev) => (prev >= maxIndex ? 0 : prev + 1));
