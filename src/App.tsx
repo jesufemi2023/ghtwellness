@@ -181,6 +181,9 @@ export default function App() {
     };
 
     initApp();
+  }, []); // Only on mount
+
+  useEffect(() => {
     if (activeTab === "history") fetchHistory();
   }, [activeTab]);
 
@@ -247,47 +250,62 @@ export default function App() {
   useEffect(() => {
     // Deep Linking Logic: Check for buy_product, buy_package, product, package, or blog in URL
     const handleDeepLinking = () => {
+      if (loading) return;
+
       const params = new URLSearchParams(window.location.search);
+      const keys = ['buy_product', 'buy_package', 'product', 'package', 'blog'];
+      const presentKeys = keys.filter(k => params.has(k));
       
-      // Order Form Links
-      const buyProductId = params.get('buy_product');
-      const buyPackageId = params.get('buy_package');
+      if (presentKeys.length === 0) return;
 
-      // Detail View Links
-      const productId = params.get('product');
-      const packageId = params.get('package');
+      // 1. Handle Blog (Immediate)
       const blogId = params.get('blog');
-
-      if (buyProductId && products.length > 0) {
-        const product = products.find(p => p.id === buyProductId || p.product_code === buyProductId);
-        if (product) {
-          openOrderDrawer(product, 'product');
-        }
-      } else if (buyPackageId && (recommendedPackages.length > 0 || comboPackages.length > 0)) {
-        const pkg = [...recommendedPackages, ...comboPackages].find(p => p.id === buyPackageId || p.package_code === buyPackageId);
-        if (pkg) {
-          openOrderDrawer(pkg, 'package');
-        }
-      } else if (productId && products.length > 0) {
-        const product = products.find(p => p.id === productId || p.product_code === productId);
-        if (product) {
-          setViewingProduct(product);
-          setActiveTab("product-detail");
-        }
-      } else if (packageId && (recommendedPackages.length > 0 || comboPackages.length > 0)) {
-        const pkg = [...recommendedPackages, ...comboPackages].find(p => p.id === packageId || p.package_code === packageId);
-        if (pkg) {
-          setSelectedPackage(pkg);
-        }
-      } else if (blogId) {
+      if (blogId !== null && blogId) {
         setSelectedBlogId(blogId);
         setActiveTab("blog-post");
       }
+
+      // 2. Handle Products/Packages (Needs Data)
+      const hasProductParams = presentKeys.some(k => k !== 'blog');
+      const dataReady = products.length > 0 || recommendedPackages.length > 0;
+
+      if (hasProductParams && !dataReady) {
+        return; // Wait for data
+      }
+
+      if (dataReady) {
+        const buyProductId = params.get('buy_product');
+        const buyPackageId = params.get('buy_package');
+        const productId = params.get('product');
+        const packageId = params.get('package');
+
+        if (buyProductId) {
+          const product = products.find(p => p.id === buyProductId || p.product_code === buyProductId);
+          if (product) openOrderDrawer(product, 'product');
+        }
+        if (buyPackageId) {
+          const pkg = [...recommendedPackages, ...comboPackages].find(p => p.id === buyPackageId || p.package_code === buyPackageId);
+          if (pkg) openOrderDrawer(pkg, 'package');
+        }
+        if (productId) {
+          const product = products.find(p => p.id === productId || p.product_code === productId);
+          if (product) {
+            setViewingProduct(product);
+            setActiveTab("product-detail");
+          }
+        }
+        if (packageId) {
+          const pkg = [...recommendedPackages, ...comboPackages].find(p => p.id === packageId || p.package_code === packageId);
+          if (pkg) setSelectedPackage(pkg);
+        }
+      }
+
+      // 3. Clear URL parameters to prevent "sticky" state
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, '', newUrl);
     };
 
-    if (!loading && (products.length > 0 || recommendedPackages.length > 0)) {
-      handleDeepLinking();
-    }
+    handleDeepLinking();
   }, [products, recommendedPackages, comboPackages, loading]);
 
   const handleConsultation = async (e: React.FormEvent) => {

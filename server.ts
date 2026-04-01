@@ -510,6 +510,19 @@ export async function createServer() {
     const { data, error } = await query.maybeSingle();
     
     if (error) return res.status(500).json({ error: error.message });
+    
+    // Fallback: If not found by slug, try searching by title (case-insensitive)
+    if (!data && !uuidRegex.test(id)) {
+      const { data: titleData, error: titleError } = await supabase
+        .from('blog_posts')
+        .select('*, recommended_package:recommended_packages(*)')
+        .ilike('title', id.replace(/-/g, ' '))
+        .maybeSingle();
+      
+      if (titleError) return res.status(500).json({ error: titleError.message });
+      if (titleData) return res.json(titleData);
+    }
+
     if (!data) return res.status(404).json({ error: "Blog not found" });
     
     res.json(data);
