@@ -244,6 +244,33 @@ export default function App() {
     }
   }, [activeTab]);
 
+  useEffect(() => {
+    // Deep Linking Logic: Check for buy_product or buy_package in URL
+    const handleDeepLinking = () => {
+      const params = new URLSearchParams(window.location.search);
+      const buyProductId = params.get('buy_product');
+      const buyPackageId = params.get('buy_package');
+
+      if (buyProductId && products.length > 0) {
+        const product = products.find(p => p.id === buyProductId || p.product_code === buyProductId);
+        if (product) {
+          openOrderDrawer(product, 'product');
+          // Clean up URL to prevent re-opening on refresh if desired, 
+          // or just leave it for bookmarkability.
+        }
+      } else if (buyPackageId && (recommendedPackages.length > 0 || comboPackages.length > 0)) {
+        const pkg = [...recommendedPackages, ...comboPackages].find(p => p.id === buyPackageId || p.package_code === buyPackageId);
+        if (pkg) {
+          openOrderDrawer(pkg, 'package');
+        }
+      }
+    };
+
+    if (!loading && (products.length > 0 || recommendedPackages.length > 0)) {
+      handleDeepLinking();
+    }
+  }, [products, recommendedPackages, comboPackages, loading]);
+
   const handleConsultation = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
