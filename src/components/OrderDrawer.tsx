@@ -257,9 +257,23 @@ Payment: ${formData.payment_method === 'pod' ? 'Pay on Delivery' : 'Bank Transfe
                       <MessageSquare size={28} />
                       Confirm on WhatsApp
                     </button>
+                    
+                    <div className="pt-4 border-t border-slate-100">
+                      <p className="text-slate-500 text-sm font-medium mb-4">
+                        Your health journey doesn't stop here! Explore our other natural solutions to complete your wellness kit.
+                      </p>
+                      <button 
+                        onClick={onClose}
+                        className="w-full h-16 bg-slate-100 text-slate-900 rounded-2xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-slate-200 transition-all"
+                      >
+                        <ChevronRight size={20} className="text-emerald-600" />
+                        Shop More Products
+                      </button>
+                    </div>
+
                     <button 
                       onClick={onClose}
-                      className="text-slate-400 font-black uppercase tracking-widest text-sm hover:text-slate-600"
+                      className="text-slate-400 font-black uppercase tracking-widest text-sm hover:text-slate-600 pt-2"
                     >
                       Back to Home
                     </button>
