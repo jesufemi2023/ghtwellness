@@ -29,6 +29,39 @@ export async function createServer() {
     supabase = getSupabaseAdmin();
     if (supabase) {
       console.log("Supabase Admin Initialized Successfully");
+      
+      // One-time Migration: Ensure all blog posts have slugs
+      (async () => {
+        try {
+          const { data: posts, error } = await supabase
+            .from('blog_posts')
+            .select('id, title, slug');
+          
+          if (error) {
+            if (error.message.includes('column "slug" does not exist')) {
+              console.warn("MIGRATION WARNING: 'slug' column is missing in 'blog_posts' table. Please run the SQL migration in Supabase.");
+            } else {
+              console.error("Migration Fetch Error:", error);
+            }
+            return;
+          }
+
+          const postsToUpdate = posts?.filter((p: any) => !p.slug) || [];
+          if (postsToUpdate.length > 0) {
+            console.log(`MIGRATION: Updating ${postsToUpdate.length} blog posts with slugs...`);
+            for (const post of postsToUpdate) {
+              const slug = slugify(post.title);
+              await supabase
+                .from('blog_posts')
+                .update({ slug })
+                .eq('id', post.id);
+            }
+            console.log("MIGRATION: Blog slugs updated successfully.");
+          }
+        } catch (migErr) {
+          console.error("Migration Logic Error:", migErr);
+        }
+      })();
     }
   } catch (e) {
     console.error("Supabase Initialization Error:", e);

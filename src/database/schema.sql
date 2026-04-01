@@ -62,6 +62,7 @@ CREATE INDEX idx_consultations_token ON consultations (access_token);
 CREATE TABLE blog_posts (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     title TEXT NOT NULL,
+    slug TEXT UNIQUE,
     content TEXT NOT NULL,
     meta_description TEXT,
     category TEXT,
