@@ -245,24 +245,43 @@ export default function App() {
   }, [activeTab]);
 
   useEffect(() => {
-    // Deep Linking Logic: Check for buy_product or buy_package in URL
+    // Deep Linking Logic: Check for buy_product, buy_package, product, package, or blog in URL
     const handleDeepLinking = () => {
       const params = new URLSearchParams(window.location.search);
+      
+      // Order Form Links
       const buyProductId = params.get('buy_product');
       const buyPackageId = params.get('buy_package');
+
+      // Detail View Links
+      const productId = params.get('product');
+      const packageId = params.get('package');
+      const blogId = params.get('blog');
 
       if (buyProductId && products.length > 0) {
         const product = products.find(p => p.id === buyProductId || p.product_code === buyProductId);
         if (product) {
           openOrderDrawer(product, 'product');
-          // Clean up URL to prevent re-opening on refresh if desired, 
-          // or just leave it for bookmarkability.
         }
       } else if (buyPackageId && (recommendedPackages.length > 0 || comboPackages.length > 0)) {
         const pkg = [...recommendedPackages, ...comboPackages].find(p => p.id === buyPackageId || p.package_code === buyPackageId);
         if (pkg) {
           openOrderDrawer(pkg, 'package');
         }
+      } else if (productId && products.length > 0) {
+        const product = products.find(p => p.id === productId || p.product_code === productId);
+        if (product) {
+          setViewingProduct(product);
+          setActiveTab("product-detail");
+        }
+      } else if (packageId && (recommendedPackages.length > 0 || comboPackages.length > 0)) {
+        const pkg = [...recommendedPackages, ...comboPackages].find(p => p.id === packageId || p.package_code === packageId);
+        if (pkg) {
+          setSelectedPackage(pkg);
+        }
+      } else if (blogId) {
+        setSelectedBlogId(blogId);
+        setActiveTab("blog-post");
       }
     };
 

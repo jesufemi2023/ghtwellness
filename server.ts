@@ -9,6 +9,16 @@ import { CONFIG } from "./src/config.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+function slugify(text: string) {
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')     // Replace spaces with -
+    .replace(/[^\w\-]+/g, '') // Remove all non-word chars
+    .replace(/\-\-+/g, '-');   // Replace multiple - with single -
+}
+
 export async function createServer() {
   const app = express();
   app.use(express.json({ limit: '10mb' }));
@@ -336,6 +346,7 @@ export async function createServer() {
       // 2. Save to Database
       const { data, error } = await supabase.from('blog_posts').insert([{
         title: blogData.title,
+        slug: slugify(blogData.title),
         content: blogData.content,
         meta_description: blogData.meta_description,
         category: category,
@@ -408,6 +419,11 @@ export async function createServer() {
     delete cleanBody.order_items;
     delete cleanBody.products; // Remove flattened products if present
 
+    // Auto-generate slug for blog posts if title is present but slug is missing
+    if (table === 'blog_posts' && cleanBody.title && !cleanBody.slug) {
+      cleanBody.slug = slugify(cleanBody.title);
+    }
+
     const { data, error } = await supabase.from(table).update(cleanBody).eq('id', id).select().single();
     
     if (error) {
@@ -478,12 +494,24 @@ export async function createServer() {
   app.get("/api/blogs/:id", async (req, res) => {
     if (!supabase) return res.status(404).json({ error: "Blog not found" });
     const { id } = req.params;
-    const { data, error } = await supabase
+    
+    // Try to find by ID first, then by slug
+    let query = supabase
       .from('blog_posts')
-      .select('*, recommended_package:recommended_packages(*)')
-      .eq('id', id)
-      .single();
+      .select('*, recommended_package:recommended_packages(*)');
+    
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (uuidRegex.test(id)) {
+      query = query.eq('id', id);
+    } else {
+      query = query.eq('slug', id);
+    }
+
+    const { data, error } = await query.maybeSingle();
+    
     if (error) return res.status(500).json({ error: error.message });
+    if (!data) return res.status(404).json({ error: "Blog not found" });
+    
     res.json(data);
   });
 

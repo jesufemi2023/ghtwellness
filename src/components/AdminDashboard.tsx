@@ -27,7 +27,9 @@ import {
   Filter,
   Download,
   MoreVertical,
-  ChevronRight
+  ChevronRight,
+  Link as LinkIcon,
+  Check
 } from "lucide-react";
 import OrdersAdminView from "./OrdersAdminView";
 import ConsultationsAdminView from "./ConsultationsAdminView";
@@ -59,6 +61,15 @@ export default function AdminDashboard({ adminPassword }: AdminDashboardProps) {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
+
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const copyBlogLink = (slug: string, id: string) => {
+    const url = `${window.location.origin}/?blog=${slug || id}`;
+    navigator.clipboard.writeText(url);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
 
   const tables: { id: TableName; label: string; icon: any; color: string }[] = [
     { id: "overview", label: "Overview", icon: LayoutDashboard, color: "bg-blue-500" },
@@ -857,27 +868,34 @@ export default function AdminDashboard({ adminPassword }: AdminDashboardProps) {
                                 )}
                               </td>
                               <td className="py-8 px-6 text-right align-top">
-                                <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-x-2 group-hover:translate-x-0">
-                                  {editingId === item.id ? (
-                                    <>
-                                      <button onClick={() => handleSave(item.id)} className="p-2.5 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 shadow-lg shadow-emerald-100">
-                                        <Save size={18} />
-                                      </button>
-                                      <button onClick={() => setEditingId(null)} className="p-2.5 bg-slate-200 text-slate-600 rounded-xl hover:bg-slate-300">
-                                        <X size={18} />
-                                      </button>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <button onClick={() => startEdit(item)} className="p-2.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all">
-                                        <Edit2 size={18} />
-                                      </button>
-                                      <button onClick={() => handleDelete(item.id)} className="p-2.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all">
-                                        <Trash2 size={18} />
-                                      </button>
-                                    </>
-                                  )}
-                                </div>
+                                  <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-x-2 group-hover:translate-x-0">
+                                    {editingId === item.id ? (
+                                      <>
+                                        <button onClick={() => handleSave(item.id)} className="p-2.5 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 shadow-lg shadow-emerald-100">
+                                          <Save size={18} />
+                                        </button>
+                                        <button onClick={() => setEditingId(null)} className="p-2.5 bg-slate-200 text-slate-600 rounded-xl hover:bg-slate-300">
+                                          <X size={18} />
+                                        </button>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <button 
+                                          onClick={() => copyBlogLink(item.slug, item.id)} 
+                                          className={`p-2.5 rounded-xl transition-all ${copiedId === item.id ? 'bg-emerald-50 text-emerald-600' : 'text-slate-400 hover:text-emerald-600 hover:bg-emerald-50'}`}
+                                          title="Copy Article Link"
+                                        >
+                                          {copiedId === item.id ? <Check size={18} /> : <LinkIcon size={18} />}
+                                        </button>
+                                        <button onClick={() => startEdit(item)} className="p-2.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all">
+                                          <Edit2 size={18} />
+                                        </button>
+                                        <button onClick={() => handleDelete(item.id)} className="p-2.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all">
+                                          <Trash2 size={18} />
+                                        </button>
+                                      </>
+                                    )}
+                                  </div>
                               </td>
                             </tr>
                           ))}
