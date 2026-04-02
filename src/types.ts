@@ -68,6 +68,7 @@ export interface Consultation {
 export interface BlogPost {
   id: string;
   title: string;
+  slug?: string;
   content: string;
   meta_description?: string;
   category?: string;

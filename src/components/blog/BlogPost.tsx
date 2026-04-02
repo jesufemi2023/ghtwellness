@@ -15,6 +15,35 @@ interface BlogPostProps {
 export function BlogPost({ id, onBack, onOrderPackage }: BlogPostProps) {
   const [post, setPost] = useState<BlogPostType | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isCopied, setIsCopied] = useState(false);
+
+  const handleShare = async () => {
+    if (!post) return;
+    const shareUrl = `${window.location.origin}/?blog=${post.slug || post.id}`;
+    const shareData = {
+      title: post.title,
+      text: post.meta_description || post.title,
+      url: shareUrl,
+    };
+
+    if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        if ((err as Error).name !== 'AbortError') {
+          console.error("Error sharing:", err);
+        }
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        setIsCopied(true);
+        setTimeout(() => setIsCopied(false), 2000);
+      } catch (err) {
+        console.error("Error copying to clipboard:", err);
+      }
+    }
+  };
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -295,8 +324,15 @@ export function BlogPost({ id, onBack, onOrderPackage }: BlogPostProps) {
                   </span>
                 ))}
               </div>
-              <button className="flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-emerald-600 transition-colors bg-slate-50 px-4 py-2 rounded-full border border-slate-200">
-                <Share2 size={16} /> Share Article
+              <button 
+                onClick={handleShare}
+                className="flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-emerald-600 transition-colors bg-slate-50 px-4 py-2 rounded-full border border-slate-200"
+              >
+                {isCopied ? (
+                  <><CheckCircle2 size={16} className="text-emerald-500" /> Copied!</>
+                ) : (
+                  <><Share2 size={16} /> Share Article</>
+                )}
               </button>
             </div>
           </div>

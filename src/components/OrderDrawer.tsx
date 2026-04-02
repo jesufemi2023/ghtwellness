@@ -26,6 +26,7 @@ import { supabase } from '../lib/supabase';
 interface OrderDrawerProps {
   isOpen: boolean;
   onClose: () => void;
+  onShopMore?: () => void;
   item: PackageData | Product;
   type: 'package' | 'product';
   distributorId?: string;
@@ -35,6 +36,7 @@ interface OrderDrawerProps {
 export const OrderDrawer: React.FC<OrderDrawerProps> = ({ 
   isOpen, 
   onClose, 
+  onShopMore,
   item, 
   type, 
   distributorId,
@@ -263,7 +265,10 @@ Payment: ${formData.payment_method === 'pod' ? 'Pay on Delivery' : 'Bank Transfe
                         Your health journey doesn't stop here! Explore our other natural solutions to complete your wellness kit.
                       </p>
                       <button 
-                        onClick={onClose}
+                        onClick={() => {
+                          onClose();
+                          if (onShopMore) onShopMore();
+                        }}
                         className="w-full h-16 bg-slate-100 text-slate-900 rounded-2xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-slate-200 transition-all"
                       >
                         <ChevronRight size={20} className="text-emerald-600" />

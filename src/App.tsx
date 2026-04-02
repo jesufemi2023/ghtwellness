@@ -1655,6 +1655,10 @@ export default function App() {
             setIsOrderDrawerOpen(false);
             setTimeout(() => setOrderItem(null), 500); // Wait for slide-out animation
           }}
+          onShopMore={() => {
+            setActiveTab('products');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
           item={orderItem.item}
           type={orderItem.type}
           distributorId={distributorId}
