@@ -5,6 +5,7 @@ import { CONFIG } from '../../config';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { getOptimizedImageUrl } from '../../utils/cloudinary';
+import { trackBlogView } from '../../lib/analytics';
 
 interface BlogPostProps {
   id: string;
@@ -50,7 +51,9 @@ export function BlogPost({ id, onBack, onOrderPackage }: BlogPostProps) {
       try {
         const res = await fetch(`/api/blogs/${id}`);
         if (res.ok) {
-          setPost(await res.json());
+          const data = await res.json();
+          setPost(data);
+          trackBlogView(data.title);
         }
       } catch (e) {
         console.error("Failed to fetch blog post", e);

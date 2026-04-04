@@ -22,6 +22,7 @@ import {
 import { PackageData, Product, PaymentMethod } from '../types';
 import { CONFIG } from '../config';
 import { supabase } from '../lib/supabase';
+import { trackOrderStart, trackOrderComplete, trackWhatsAppClick } from '../lib/analytics';
 
 interface OrderDrawerProps {
   isOpen: boolean;
@@ -77,8 +78,9 @@ export const OrderDrawer: React.FC<OrderDrawerProps> = ({
       setIsSuccess(false);
       setLoading(false);
       setIsUploading(false);
+      trackOrderStart(item.name, type);
     }
-  }, [isOpen, initialQuantity]);
+  }, [isOpen, initialQuantity, item.name, type]);
 
   const [formData, setFormData] = useState({
     full_name: '',
@@ -203,6 +205,7 @@ export const OrderDrawer: React.FC<OrderDrawerProps> = ({
 
       if (res.ok) {
         console.log("Order submitted successfully");
+        trackOrderComplete(item.name, totalPrice);
         setIsSuccess(true);
       } else {
         const errData = await res.json();
@@ -218,6 +221,7 @@ export const OrderDrawer: React.FC<OrderDrawerProps> = ({
   };
 
   const openWhatsApp = () => {
+    trackWhatsAppClick("Order Confirmation");
     const message = `Hello SD GHT Health Care, I just placed an order for ${item.name}. 
 Name: ${formData.full_name}
 Delivery Date: ${formData.delivery_date}

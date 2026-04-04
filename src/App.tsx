@@ -48,6 +48,7 @@ import { SearchResults } from "./components/SearchResults";
 import AdminDashboard from "./components/AdminDashboard";
 import { TestimonialsPage } from "./components/TestimonialsPage";
 import { Product, PackageData } from "./types";
+import { trackPageView, trackConsultation, trackWhatsAppClick, trackBlogView } from "./lib/analytics";
 
 interface Consultation {
   id: string;
@@ -185,7 +186,25 @@ export default function App() {
 
   useEffect(() => {
     if (activeTab === "history") fetchHistory();
-  }, [activeTab]);
+    
+    // Track Page View
+    const titles: Record<string, string> = {
+      home: "Home",
+      about: "About Us",
+      products: "All Products",
+      recommended: "Expert Solutions",
+      combo: "Combo Packs",
+      consultation: "AI Consultation",
+      history: "Consultation History",
+      "product-detail": `Product: ${viewingProduct?.name || "Detail"}`,
+      admin: "Admin Dashboard",
+      blog: "Health Blog",
+      "blog-post": "Blog Article",
+      search: `Search: ${searchQuery}`,
+      testimonials: "Success Stories"
+    };
+    trackPageView(activeTab, titles[activeTab]);
+  }, [activeTab, viewingProduct, searchQuery]);
 
   const fetchProducts = async () => {
     try {
@@ -334,6 +353,7 @@ export default function App() {
           alert(`Error: ${data.error}`);
         } else {
           alert(`Consultation Submitted!\n\nExpert Recommendation: ${data.ai_recommendation}`);
+          trackConsultation(formData.illness);
           setFormData({ ...formData, patient_name: "", phone: "", illness: "", symptoms: "" });
           navigateTo("history");
         }
@@ -400,6 +420,11 @@ export default function App() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleWhatsAppClick = (location: string) => {
+    trackWhatsAppClick(location);
+    window.open(`https://wa.me/${CONFIG.whatsapp.number.replace(/\D/g, '')}?text=${encodeURIComponent(CONFIG.whatsapp.defaultMessage)}`, '_blank');
   };
 
   return (
