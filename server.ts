@@ -179,13 +179,15 @@ export async function createServer() {
   const getAccessToken = (req: express.Request) => req.headers['x-access-token'] as string;
 
   // Admin Auth Middleware
-  const adminAuth = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  const adminAuth = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const password = req.headers['x-admin-password'];
     const expectedPassword = process.env.ADMIN_PASSWORD || "your-secure-admin-password";
     
     if (password === expectedPassword) {
       next();
     } else {
+      // Add a small delay to mitigate brute force
+      await new Promise(resolve => setTimeout(resolve, 1000));
       console.warn(`Unauthorized Admin Access Attempt. Provided: ${password ? '***' : 'none'}, Expected: ${expectedPassword ? 'set' : 'not set'}`);
       res.status(401).json({ error: "Unauthorized Admin Access" });
     }

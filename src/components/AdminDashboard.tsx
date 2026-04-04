@@ -40,11 +40,12 @@ import { getOptimizedImageUrl } from "../utils/cloudinary";
 
 interface AdminDashboardProps {
   adminPassword: string;
+  onLogout: () => void;
 }
 
 type TableName = "overview" | "products" | "recommended_packages" | "consultations" | "profiles" | "orders" | "blog_posts" | "settings";
 
-export default function AdminDashboard({ adminPassword }: AdminDashboardProps) {
+export default function AdminDashboard({ adminPassword, onLogout }: AdminDashboardProps) {
   const [activeTable, setActiveTable] = useState<TableName>("overview");
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -627,10 +628,18 @@ export default function AdminDashboard({ adminPassword }: AdminDashboardProps) {
           
           <button 
             onClick={() => window.location.href = '/'}
-            className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs hover:bg-slate-900 hover:text-white transition-all duration-300"
+            className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs hover:bg-slate-50 transition-all"
           >
             <Eye size={14} />
             View Website
+          </button>
+
+          <button 
+            onClick={onLogout}
+            className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-red-50 text-red-600 font-black uppercase tracking-widest text-[10px] hover:bg-red-600 hover:text-white transition-all duration-300 shadow-sm"
+          >
+            <LockIcon size={14} />
+            Logout Securely
           </button>
         </div>
       </aside>

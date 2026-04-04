@@ -70,7 +70,7 @@ export default function App() {
     setActiveTab(tab);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-  const [adminPassword, setAdminPassword] = useState(() => localStorage.getItem("ght_admin_password") || "");
+  const [adminPassword, setAdminPassword] = useState("");
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [recommendedPackages, setRecommendedPackages] = useState<PackageData[]>([]);
@@ -385,7 +385,6 @@ export default function App() {
       });
       
       if (res.ok) {
-        localStorage.setItem("ght_admin_password", adminPassword);
         setIsAdminAuthenticated(true);
       } else {
         const data = await res.json();
@@ -396,6 +395,12 @@ export default function App() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleAdminLogout = () => {
+    setIsAdminAuthenticated(false);
+    setAdminPassword("");
+    navigateTo("home");
   };
 
   const fetchHistory = async () => {
@@ -1426,7 +1431,7 @@ export default function App() {
                   </div>
                 </div>
               ) : (
-                <AdminDashboard adminPassword={adminPassword} />
+                <AdminDashboard adminPassword={adminPassword} onLogout={handleAdminLogout} />
               )}
             </motion.div>
           )}
