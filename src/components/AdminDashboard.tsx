@@ -148,13 +148,15 @@ export default function AdminDashboard({ adminPassword }: AdminDashboardProps) {
         headers: { "x-admin-password": adminPassword }
       });
       if (!res.ok) {
-        const text = await res.text();
-        if (text.includes("Rate exceeded")) {
+        const errorData = await res.json().catch(() => ({}));
+        const errorMessage = errorData.error || errorData.message || `HTTP error! status: ${res.status}`;
+        
+        if (errorMessage.includes("Rate exceeded")) {
           console.warn("Rate limit exceeded for admin data, retrying in 2s...");
           setTimeout(fetchData, 2000);
           return;
         }
-        throw new Error(`HTTP error! status: ${res.status}`);
+        throw new Error(errorMessage);
       }
       const result = await res.json();
       if (Array.isArray(result)) {
@@ -1114,7 +1116,8 @@ const SettingsAdminView = ({ adminPassword }: { adminPassword: string }) => {
         setMessage("Settings saved successfully!");
         setTimeout(() => setMessage(""), 3000);
       } else {
-        setMessage("Failed to save settings.");
+        const err = await res.json();
+        setMessage(`Error: ${err.error || err.message || "Failed to save settings."}`);
       }
     } catch (e) {
       console.error("Error saving settings:", e);

@@ -10,6 +10,7 @@ import { CONFIG } from "./src/config.js";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 function slugify(text: string) {
+  if (!text) return "";
   return text
     .toString()
     .toLowerCase()
@@ -109,7 +110,7 @@ export async function createServer() {
         }
 
         // Fetch blog posts for context
-        const { data: blogs } = await supabase.from('blogs').select('title, excerpt').limit(5);
+        const { data: blogs } = await supabase.from('blog_posts').select('title, excerpt').limit(5);
 
         let context = "";
         
@@ -263,12 +264,49 @@ export async function createServer() {
   });
 
   // --- Admin CRUD Routes ---
+  
+  // Settings API (Must be before generic admin routes)
+  app.get("/api/settings", async (req, res) => {
+    if (!supabase) return res.status(500).json({ error: "Database not initialized" });
+    const { data, error } = await supabase.from('settings').select('*');
+    if (error) return res.status(500).json({ error: error.message });
+    
+    // Convert array to object for easier frontend use
+    const settings = data.reduce((acc: any, curr: any) => {
+      acc[curr.key] = curr.value;
+      return acc;
+    }, {});
+    
+    res.json(settings);
+  });
+
+  app.post("/api/admin/settings", adminAuth, async (req, res) => {
+    if (!supabase) return res.status(500).json({ error: "Database not initialized" });
+    const { settings } = req.body; // Expecting { key: value }
+    
+    if (!settings || typeof settings !== 'object') {
+      return res.status(400).json({ error: "Invalid settings format" });
+    }
+
+    const updates = Object.entries(settings).map(([key, value]) => ({
+      key,
+      value: String(value)
+    }));
+
+    const { error } = await supabase.from('settings').upsert(updates);
+    if (error) return res.status(500).json({ error: error.message });
+    
+    res.json({ success: true });
+  });
 
   // Generic Admin GET
   app.get("/api/admin/:table", adminAuth, async (req, res) => {
+    if (!supabase) return res.status(503).json({ error: "Database not configured" });
     const { table } = req.params;
-    let query = supabase.from(table).select('*').order('created_at', { ascending: false });
     
+    let query;
+    
+    // Special handling for some tables to include joined data
     if (table === 'orders') {
       query = supabase.from(table).select(`
         *,
@@ -293,10 +331,19 @@ export async function createServer() {
           products ( name, product_code )
         )
       `).order('created_at', { ascending: false });
+    } else {
+      query = supabase.from(table).select('*');
+      // Only order by created_at if it's likely to exist (not settings or junction tables)
+      if (!["settings", "package_products", "api_keys_status", "app_metadata"].includes(table)) {
+        query = query.order('created_at', { ascending: false });
+      }
     }
     
     const { data, error } = await query;
-    if (error) return res.status(500).json({ error: error.message });
+    if (error) {
+      console.error(`Database Error fetching ${table}:`, error);
+      return res.status(500).json({ error: error.message, details: error.hint });
+    }
     res.json(data);
   });
 
@@ -409,6 +456,7 @@ export async function createServer() {
 
   // Generic Admin POST
   app.post("/api/admin/:table", adminAuth, async (req, res) => {
+    if (!supabase) return res.status(503).json({ error: "Database not configured" });
     const { table } = req.params;
     const { product_ids, ...body } = req.body;
     
@@ -452,6 +500,7 @@ export async function createServer() {
 
   // Generic Admin PUT
   app.put("/api/admin/:table/:id", adminAuth, async (req, res) => {
+    if (!supabase) return res.status(503).json({ error: "Database not configured" });
     const { table, id } = req.params;
     const { product_ids, ...body } = req.body;
     
@@ -513,6 +562,7 @@ export async function createServer() {
 
   // Generic Admin DELETE
   app.delete("/api/admin/:table/:id", adminAuth, async (req, res) => {
+    if (!supabase) return res.status(503).json({ error: "Database not configured" });
     const { table, id } = req.params;
     const { error } = await supabase.from(table).delete().eq('id', id);
     if (error) return res.status(500).json({ error: error.message });
@@ -643,40 +693,6 @@ export async function createServer() {
     }
   });
 
-  // Settings API
-  app.get("/api/settings", async (req, res) => {
-    if (!supabase) return res.status(500).json({ error: "Database not initialized" });
-    const { data, error } = await supabase.from('settings').select('*');
-    if (error) return res.status(500).json({ error: error.message });
-    
-    // Convert array to object for easier frontend use
-    const settings = data.reduce((acc: any, curr: any) => {
-      acc[curr.key] = curr.value;
-      return acc;
-    }, {});
-    
-    res.json(settings);
-  });
-
-  app.post("/api/admin/settings", adminAuth, async (req, res) => {
-    if (!supabase) return res.status(500).json({ error: "Database not initialized" });
-    const { settings } = req.body; // Expecting { key: value }
-    
-    if (!settings || typeof settings !== 'object') {
-      return res.status(400).json({ error: "Invalid settings format" });
-    }
-
-    const updates = Object.entries(settings).map(([key, value]) => ({
-      key,
-      value: String(value)
-    }));
-
-    const { error } = await supabase.from('settings').upsert(updates);
-    if (error) return res.status(500).json({ error: error.message });
-    
-    res.json({ success: true });
-  });
-
   app.post("/api/consultations", async (req, res) => {
     if (!supabase) return res.status(503).json({ error: "Database not configured" });
     const { patient_name, phone, illness, symptoms, distributor_id } = req.body;
@@ -768,6 +784,7 @@ export async function createServer() {
   });
 
   app.get("/api/my-consultations", async (req, res) => {
+    if (!supabase) return res.json([]);
     const access_token = getAccessToken(req);
     if (!access_token) return res.json([]);
 
@@ -781,6 +798,7 @@ export async function createServer() {
   });
 
   app.get("/api/my-orders", async (req, res) => {
+    if (!supabase) return res.json([]);
     const access_token = getAccessToken(req);
     if (!access_token) return res.json([]);
 
@@ -969,6 +987,16 @@ export async function createServer() {
     res.json(order);
   });
 
+  // Error handling middleware
+  app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    console.error("Unhandled Server Error:", err);
+    res.status(500).json({
+      error: "Internal Server Error",
+      message: err.message,
+      path: req.path
+    });
+  });
+
   if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
     const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({ server: { middlewareMode: true }, appType: "spa" });
@@ -988,12 +1016,14 @@ export async function createServer() {
   return app;
 }
 
-// Start the server
+// Start the server only if run directly (not imported as a module)
 const PORT = 3000;
-createServer().then(app => {
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  createServer().then(app => {
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+    });
+  }).catch(err => {
+    console.error("Failed to start server:", err);
   });
-}).catch(err => {
-  console.error("Failed to start server:", err);
-});
+}
