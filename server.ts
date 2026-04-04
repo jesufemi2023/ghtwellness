@@ -33,6 +33,7 @@ export async function createServer() {
       // One-time Migration: Ensure all blog posts have slugs
       (async () => {
         try {
+          // Check blog slugs
           const { data: posts, error } = await supabase
             .from('blog_posts')
             .select('id, title, slug');
@@ -43,20 +44,29 @@ export async function createServer() {
             } else {
               console.error("Migration Fetch Error:", error);
             }
-            return;
+          } else {
+            const postsToUpdate = posts?.filter((p: any) => !p.slug) || [];
+            if (postsToUpdate.length > 0) {
+              console.log(`MIGRATION: Updating ${postsToUpdate.length} blog posts with slugs...`);
+              for (const post of postsToUpdate) {
+                const slug = slugify(post.title);
+                await supabase
+                  .from('blog_posts')
+                  .update({ slug })
+                  .eq('id', post.id);
+              }
+              console.log("MIGRATION: Blog slugs updated successfully.");
+            }
           }
 
-          const postsToUpdate = posts?.filter((p: any) => !p.slug) || [];
-          if (postsToUpdate.length > 0) {
-            console.log(`MIGRATION: Updating ${postsToUpdate.length} blog posts with slugs...`);
-            for (const post of postsToUpdate) {
-              const slug = slugify(post.title);
-              await supabase
-                .from('blog_posts')
-                .update({ slug })
-                .eq('id', post.id);
-            }
-            console.log("MIGRATION: Blog slugs updated successfully.");
+          // Check settings table
+          const { error: settingsError } = await supabase
+            .from('settings')
+            .select('key')
+            .limit(1);
+          
+          if (settingsError && settingsError.message.includes('relation "settings" does not exist')) {
+            console.warn("MIGRATION WARNING: 'settings' table is missing. Please run the SQL migration in Supabase to enable dynamic bank details.");
           }
         } catch (migErr) {
           console.error("Migration Logic Error:", migErr);
@@ -631,6 +641,40 @@ export async function createServer() {
     } catch (e: any) {
       res.status(500).json({ error: e.message });
     }
+  });
+
+  // Settings API
+  app.get("/api/settings", async (req, res) => {
+    if (!supabase) return res.status(500).json({ error: "Database not initialized" });
+    const { data, error } = await supabase.from('settings').select('*');
+    if (error) return res.status(500).json({ error: error.message });
+    
+    // Convert array to object for easier frontend use
+    const settings = data.reduce((acc: any, curr: any) => {
+      acc[curr.key] = curr.value;
+      return acc;
+    }, {});
+    
+    res.json(settings);
+  });
+
+  app.post("/api/admin/settings", adminAuth, async (req, res) => {
+    if (!supabase) return res.status(500).json({ error: "Database not initialized" });
+    const { settings } = req.body; // Expecting { key: value }
+    
+    if (!settings || typeof settings !== 'object') {
+      return res.status(400).json({ error: "Invalid settings format" });
+    }
+
+    const updates = Object.entries(settings).map(([key, value]) => ({
+      key,
+      value: String(value)
+    }));
+
+    const { error } = await supabase.from('settings').upsert(updates);
+    if (error) return res.status(500).json({ error: error.message });
+    
+    res.json({ success: true });
   });
 
   app.post("/api/consultations", async (req, res) => {

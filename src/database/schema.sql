@@ -194,6 +194,18 @@ CREATE TABLE api_keys_status (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- 10. APP SETTINGS (Configurable at runtime)
+CREATE TABLE settings (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Initial bank details
+INSERT INTO settings (key, value) VALUES ('bank_name', 'ZENITH BANK');
+INSERT INTO settings (key, value) VALUES ('account_number', '1234567890');
+INSERT INTO settings (key, value) VALUES ('account_name', 'SD GHT HEALTH CARE LTD');
+
 -- Trigger for updated_at
 CREATE TRIGGER update_recommended_packages_modtime 
 BEFORE UPDATE ON recommended_packages 
@@ -201,6 +213,10 @@ FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
 
 CREATE TRIGGER update_api_keys_status_modtime 
 BEFORE UPDATE ON api_keys_status 
+FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+
+CREATE TRIGGER update_settings_modtime 
+BEFORE UPDATE ON settings 
 FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
 
 -- Enable RLS

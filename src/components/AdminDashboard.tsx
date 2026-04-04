@@ -29,7 +29,8 @@ import {
   MoreVertical,
   ChevronRight,
   Link as LinkIcon,
-  Check
+  Check,
+  Settings
 } from "lucide-react";
 import OrdersAdminView from "./OrdersAdminView";
 import ConsultationsAdminView from "./ConsultationsAdminView";
@@ -41,7 +42,7 @@ interface AdminDashboardProps {
   adminPassword: string;
 }
 
-type TableName = "overview" | "products" | "recommended_packages" | "consultations" | "profiles" | "orders" | "blog_posts";
+type TableName = "overview" | "products" | "recommended_packages" | "consultations" | "profiles" | "orders" | "blog_posts" | "settings";
 
 export default function AdminDashboard({ adminPassword }: AdminDashboardProps) {
   const [activeTable, setActiveTable] = useState<TableName>("overview");
@@ -79,6 +80,7 @@ export default function AdminDashboard({ adminPassword }: AdminDashboardProps) {
     { id: "recommended_packages", label: "Packages", icon: Layers, color: "bg-purple-500" },
     { id: "blog_posts", label: "Blog Posts", icon: FileText, color: "bg-pink-500" },
     { id: "profiles", label: "Profiles", icon: Users, color: "bg-slate-500" },
+    { id: "settings", label: "Settings", icon: Settings, color: "bg-slate-700" },
   ];
 
   useEffect(() => {
@@ -904,6 +906,8 @@ export default function AdminDashboard({ adminPassword }: AdminDashboardProps) {
                     </div>
                   </div>
                 </div>
+              ) : activeTable === "settings" ? (
+                <SettingsAdminView adminPassword={adminPassword} />
               ) : (
                 <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
                   <div className="overflow-x-auto">
@@ -1064,3 +1068,134 @@ const QuickAction = ({ icon: Icon, label }: any) => (
     <span className="text-[9px] font-black uppercase tracking-widest text-white/40 group-hover:text-white/80 transition-colors">{label}</span>
   </button>
 );
+
+const SettingsAdminView = ({ adminPassword }: { adminPassword: string }) => {
+  const [settings, setSettings] = useState<any>({
+    bank_name: "",
+    account_number: "",
+    account_name: ""
+  });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    fetchSettings();
+  }, []);
+
+  const fetchSettings = async () => {
+    try {
+      const res = await fetch("/api/settings");
+      if (res.ok) {
+        const data = await res.json();
+        setSettings(data);
+      }
+    } catch (e) {
+      console.error("Error fetching settings:", e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    setMessage("");
+    try {
+      const res = await fetch("/api/admin/settings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-password": adminPassword
+        },
+        body: JSON.stringify({ settings })
+      });
+
+      if (res.ok) {
+        setMessage("Settings saved successfully!");
+        setTimeout(() => setMessage(""), 3000);
+      } else {
+        setMessage("Failed to save settings.");
+      }
+    } catch (e) {
+      console.error("Error saving settings:", e);
+      setMessage("Error saving settings.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) return <div className="flex justify-center p-12"><RefreshCw className="animate-spin text-slate-400" /></div>;
+
+  return (
+    <div className="max-w-2xl mx-auto space-y-8">
+      <div className="bg-white rounded-3xl border border-slate-200 p-8 shadow-sm space-y-8">
+        <div className="flex items-center justify-between">
+          <h3 className="text-xl font-black text-slate-900 tracking-tight">Bank Transfer Details</h3>
+          <Settings className="text-slate-300" size={24} />
+        </div>
+
+        <div className="space-y-6">
+          <div className="space-y-2">
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Bank Name</label>
+            <input 
+              type="text"
+              value={settings.bank_name}
+              onChange={e => setSettings({ ...settings, bank_name: e.target.value })}
+              className="w-full h-14 bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 font-bold text-slate-900 focus:border-emerald-500 outline-none transition-all"
+              placeholder="e.g. ZENITH BANK"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Account Number</label>
+            <input 
+              type="text"
+              value={settings.account_number}
+              onChange={e => setSettings({ ...settings, account_number: e.target.value })}
+              className="w-full h-14 bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 font-bold text-slate-900 focus:border-emerald-500 outline-none transition-all"
+              placeholder="e.g. 1234567890"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Account Name</label>
+            <input 
+              type="text"
+              value={settings.account_name}
+              onChange={e => setSettings({ ...settings, account_name: e.target.value })}
+              className="w-full h-14 bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 font-bold text-slate-900 focus:border-emerald-500 outline-none transition-all"
+              placeholder="e.g. SD GHT HEALTH CARE LTD"
+            />
+          </div>
+        </div>
+
+        <div className="pt-4 flex items-center justify-between">
+          <p className={`text-xs font-bold transition-opacity ${message ? 'opacity-100' : 'opacity-0'} ${message.includes('success') ? 'text-emerald-600' : 'text-red-600'}`}>
+            {message}
+          </p>
+          <button 
+            onClick={handleSave}
+            disabled={saving}
+            className="bg-slate-900 text-white px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest flex items-center gap-3 hover:bg-emerald-600 transition-all shadow-xl shadow-slate-100 disabled:opacity-50"
+          >
+            {saving ? <RefreshCw className="animate-spin" size={16} /> : <Save size={16} />}
+            Save Settings
+          </button>
+        </div>
+      </div>
+
+      <div className="bg-amber-50 border border-amber-100 rounded-3xl p-6 flex gap-4">
+        <div className="p-2 bg-amber-100 text-amber-600 rounded-xl h-fit">
+          <Activity size={20} />
+        </div>
+        <div className="space-y-1">
+          <h4 className="text-sm font-black text-amber-900">Important Note</h4>
+          <p className="text-xs text-amber-700 font-medium leading-relaxed">
+            Changing these details will immediately update the checkout form for all customers. 
+            Ensure the account details are correct to avoid payment verification issues.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};

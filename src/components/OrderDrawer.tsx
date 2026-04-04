@@ -48,6 +48,27 @@ export const OrderDrawer: React.FC<OrderDrawerProps> = ({
   const [isSuccess, setIsSuccess] = useState(false);
   const [copied, setCopied] = useState(false);
   const [quantity, setQuantity] = useState(initialQuantity);
+  const [settings, setSettings] = useState<any>({
+    bank_name: CONFIG.company.bankDetails.bankName,
+    account_number: CONFIG.company.bankDetails.accountNumber,
+    account_name: CONFIG.company.bankDetails.accountName
+  });
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const res = await fetch("/api/settings");
+        if (res.ok) {
+          const data = await res.json();
+          // Map snake_case from DB to camelCase if needed, or just use snake_case
+          setSettings((prev: any) => ({ ...prev, ...data }));
+        }
+      } catch (e) {
+        console.error("Error fetching settings:", e);
+      }
+    };
+    fetchSettings();
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -78,7 +99,7 @@ export const OrderDrawer: React.FC<OrderDrawerProps> = ({
   const totalPrice = basePrice * quantity;
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(CONFIG.company.bankDetails.accountNumber);
+    navigator.clipboard.writeText(settings.account_number);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -506,17 +527,17 @@ Payment: ${formData.payment_method === 'pod' ? 'Pay on Delivery' : 'Bank Transfe
                               <div className="flex justify-between items-center">
                                 <div className="space-y-1">
                                   <p className="text-xs text-slate-400 font-bold uppercase">Bank Name</p>
-                                  <p className="text-lg font-black">{CONFIG.company.bankDetails.bankName}</p>
+                                  <p className="text-lg font-black">{settings.bank_name}</p>
                                 </div>
                                 <div className="text-right space-y-1">
                                   <p className="text-xs text-slate-400 font-bold uppercase">Account Name</p>
-                                  <p className="text-lg font-black">{CONFIG.company.bankDetails.accountName}</p>
+                                  <p className="text-lg font-black">{settings.account_name}</p>
                                 </div>
                               </div>
                               <div className="bg-white/5 p-6 rounded-2xl flex items-center justify-between border border-white/10">
                                 <div className="space-y-1">
                                   <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Account Number</p>
-                                  <p className="text-3xl font-black tracking-wider">{CONFIG.company.bankDetails.accountNumber}</p>
+                                  <p className="text-3xl font-black tracking-wider">{settings.account_number}</p>
                                 </div>
                                 <button 
                                   onClick={handleCopy}
