@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Star, ShieldCheck, ChevronRight, CheckCircle2, Globe, Truck, Info, MessageSquare, Plus, Minus, ShoppingBag, Phone } from 'lucide-react';
+import { X, Star, ShieldCheck, ChevronRight, CheckCircle2, Globe, Truck, Info, MessageSquare, Plus, Minus, ShoppingBag, Phone, Share2, Check } from 'lucide-react';
 import { CONFIG } from '../config';
 import { PackageData, Product } from '../types';
 
@@ -35,11 +35,40 @@ export const PackageQuickView: React.FC<PackageQuickViewProps> = ({
 }) => {
   const theme = themeColors.emerald;
   const [quantity, setQuantity] = React.useState(1);
+  const [isCopied, setIsCopied] = React.useState(false);
   const discountedPrice = data.price * (1 - (data.discount / 100));
 
   React.useEffect(() => {
-    if (isOpen) setQuantity(1);
+    if (isOpen) {
+      setQuantity(1);
+      setIsCopied(false);
+    }
   }, [isOpen]);
+
+  const handleShare = async () => {
+    const shareUrl = `${window.location.origin}/?buy_package=${data.id}`;
+    const shareData = {
+      title: data.name,
+      text: data.description,
+      url: shareUrl,
+    };
+
+    if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        if ((err as Error).name !== 'AbortError') console.error("Error sharing:", err);
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        setIsCopied(true);
+        setTimeout(() => setIsCopied(false), 2000);
+      } catch (err) {
+        console.error("Error copying:", err);
+      }
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -64,13 +93,28 @@ export const PackageQuickView: React.FC<PackageQuickViewProps> = ({
               transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
               className="bg-white w-full max-w-6xl max-h-[90vh] rounded-2xl shadow-2xl overflow-hidden pointer-events-auto flex flex-col lg:flex-row relative"
             >
-              {/* Close Button */}
-              <button 
-                onClick={onClose}
-                className="absolute top-5 right-5 z-50 bg-white p-2 rounded-full border border-slate-100 text-slate-400 hover:text-slate-900 hover:rotate-90 transition-all duration-300 shadow-sm"
-              >
-                <X size={20} />
-              </button>
+              {/* Action Buttons Top Right */}
+              <div className="absolute top-5 right-5 z-50 flex items-center gap-2">
+                <button 
+                  onClick={handleShare}
+                  className={`p-2 rounded-full border transition-all duration-300 shadow-sm flex items-center justify-center gap-2 px-4 ${
+                    isCopied 
+                      ? 'bg-emerald-500 border-emerald-500 text-white' 
+                      : 'bg-white border-slate-100 text-slate-400 hover:text-emerald-600 hover:border-emerald-100'
+                  }`}
+                >
+                  {isCopied ? <Check size={18} /> : <Share2 size={18} />}
+                  <span className="text-[10px] font-black uppercase tracking-widest hidden md:block">
+                    {isCopied ? 'Copied' : 'Share'}
+                  </span>
+                </button>
+                <button 
+                  onClick={onClose}
+                  className="bg-white p-2 rounded-full border border-slate-100 text-slate-400 hover:text-slate-900 hover:rotate-90 transition-all duration-300 shadow-sm"
+                >
+                  <X size={20} />
+                </button>
+              </div>
 
               {/* Left Side: Visuals & Browsing */}
               <div className="lg:w-[45%] bg-slate-50/50 flex flex-col border-b lg:border-b-0 lg:border-r border-slate-100 overflow-y-auto custom-scrollbar">

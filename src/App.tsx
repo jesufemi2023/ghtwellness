@@ -27,6 +27,8 @@ import {
   Plus,
   Minus,
   Package,
+  Share2,
+  Check,
   FileText,
   Home as HomeIcon
 } from "lucide-react";
@@ -103,6 +105,32 @@ export default function App() {
     setOrderItem({ item, type, qty });
     setIsOrderDrawerOpen(true);
     setSelectedProduct(null); // Close quick view modal if open
+  };
+
+  const [isProductCopied, setIsProductCopied] = useState(false);
+  const handleShareProduct = async (product: any) => {
+    const shareUrl = `${window.location.origin}/?buy_product=${product.id}`;
+    const shareData = {
+      title: product.name,
+      text: product.short_desc,
+      url: shareUrl,
+    };
+
+    if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        if ((err as Error).name !== 'AbortError') console.error("Error sharing:", err);
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        setIsProductCopied(true);
+        setTimeout(() => setIsProductCopied(false), 2000);
+      } catch (err) {
+        console.error("Error copying:", err);
+      }
+    }
   };
   const [viewingProduct, setViewingProduct] = useState<Product | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -1554,12 +1582,27 @@ export default function App() {
                 <div className="w-12 h-1.5 bg-slate-200 rounded-full" />
               </div>
 
-              <button 
-                onClick={() => setSelectedProduct(null)}
-                className="absolute top-4 right-4 z-50 p-2 bg-white/90 backdrop-blur-md rounded-full shadow-lg hover:bg-slate-100 transition-colors border border-slate-200"
-              >
-                <X size={20} />
-              </button>
+              <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
+                <button 
+                  onClick={() => handleShareProduct(selectedProduct)}
+                  className={`p-2 rounded-full border transition-all duration-300 shadow-lg flex items-center justify-center gap-2 px-4 ${
+                    isProductCopied 
+                      ? 'bg-emerald-500 border-emerald-500 text-white' 
+                      : 'bg-white/90 backdrop-blur-md border-slate-200 text-slate-500 hover:text-emerald-600'
+                  }`}
+                >
+                  {isProductCopied ? <Check size={18} /> : <Share2 size={18} />}
+                  <span className="text-[10px] font-black uppercase tracking-widest hidden md:block">
+                    {isProductCopied ? 'Copied' : 'Share'}
+                  </span>
+                </button>
+                <button 
+                  onClick={() => setSelectedProduct(null)}
+                  className="p-2 bg-white/90 backdrop-blur-md rounded-full shadow-lg hover:bg-slate-100 transition-colors border border-slate-200"
+                >
+                  <X size={20} />
+                </button>
+              </div>
 
               {/* Modal Image Section */}
               <div className="w-full lg:w-1/2 bg-slate-50 flex items-center justify-center p-6 lg:p-12 border-b lg:border-b-0 lg:border-r border-slate-100 h-[55vh] lg:h-auto shrink-0 overflow-y-auto custom-scrollbar">

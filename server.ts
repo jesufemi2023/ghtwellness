@@ -1,5 +1,6 @@
 import express from "express";
 import path from "path";
+import fs from "fs";
 import { fileURLToPath } from "url";
 import { getSupabaseAdmin } from "./src/services/supabaseAdmin.js";
 import { NotificationService } from "./src/services/notificationService.js";
@@ -623,6 +624,74 @@ export async function createServer() {
     res.json(data);
   });
 
+  async function getMetadataForRequest(req: express.Request) {
+    const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+    const productId = url.searchParams.get('product') || url.searchParams.get('buy_product');
+    const packageId = url.searchParams.get('package') || url.searchParams.get('buy_package');
+    const blogIdOrSlug = url.searchParams.get('blog');
+    const activeTab = url.searchParams.get('activeTab') || url.searchParams.get('tab');
+
+    // Default Homepage Metadata
+    let metadata = {
+      title: "GHT wellness supplement | 100% herbal supplement",
+      description: "the best natural supplement that works for prostate enlargement, female/male infertility, erectile dysfunction, premature ejaculation, diabetes, stroke and so on",
+      image: "https://res.cloudinary.com/drizgfofw/image/upload/v1773906809/compressed_70kb_ox1i8j.jpg",
+      url: `https://ghtwellness.vercel.app${req.url}`
+    };
+
+    if (!supabase) return metadata;
+
+    try {
+      if (productId) {
+        const { data } = await supabase.from('products').select('name, short_desc, image_url').or(`id.eq.${productId},product_code.eq.${productId}`).maybeSingle();
+        if (data) {
+          metadata.title = `${data.name} | Order Now`;
+          metadata.description = data.short_desc || metadata.description;
+          if (data.image_url) metadata.image = data.image_url;
+        }
+      } else if (packageId) {
+        const { data } = await supabase.from('recommended_packages').select('name, description, package_image_url').or(`id.eq.${packageId},package_code.eq.${packageId}`).maybeSingle();
+        if (data) {
+          metadata.title = `${data.name} | Order Now`;
+          metadata.description = data.description || metadata.description;
+          if (data.package_image_url) metadata.image = data.package_image_url;
+        }
+      } else if (blogIdOrSlug) {
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        let query = supabase.from('blog_posts').select('title, meta_description, image_url');
+        if (uuidRegex.test(blogIdOrSlug)) {
+          query = query.eq('id', blogIdOrSlug);
+        } else {
+          query = query.eq('slug', blogIdOrSlug);
+        }
+        const { data } = await query.maybeSingle();
+        if (data) {
+          metadata.title = `${data.title} | Order Now`;
+          metadata.description = data.meta_description || metadata.description;
+          if (data.image_url) metadata.image = data.image_url;
+        }
+      } else if (activeTab) {
+        const tabTitles: Record<string, string> = {
+          about: "About Us",
+          consultation: "Free AI Health Consultation",
+          products: "Our Health Products",
+          recommended: "Expert Health Solutions",
+          combo: "Combo Savings Packs",
+          blog: "Health & Wellness Blog",
+          history: "Your Health Records",
+          testimonials: "Customer Success Stories"
+        };
+        if (tabTitles[activeTab]) {
+          metadata.title = `${tabTitles[activeTab]} | Order Now`;
+          metadata.description = `Explore our ${tabTitles[activeTab].toLowerCase()} at GHT Wellness. Premium health supplements and professional consultations. Order Now.`;
+        }
+      }
+    } catch (e) {
+      console.error("Metadata generation error:", e);
+    }
+    return metadata;
+  }
+
   // --- Public Routes ---
   app.post("/api/chat", async (req, res) => {
     try {
@@ -1001,6 +1070,66 @@ export async function createServer() {
       message: err.message,
       path: req.path
     });
+  });
+
+  // Dynamic Social Sharing Logic
+  app.get("*", async (req, res, next) => {
+    // Skip API, static files, and other non-HTML requests
+    if (req.path.startsWith("/api/") || req.path.includes(".")) return next();
+    if (req.headers.accept && !req.headers.accept.includes("text/html")) return next();
+
+    try {
+      const metadata = await getMetadataForRequest(req);
+      
+      const isProduction = process.env.NODE_ENV === "production" || !!process.env.VERCEL;
+      let indexPath = path.resolve(process.cwd(), isProduction ? "dist/index.html" : "index.html");
+      
+      if (!fs.existsSync(indexPath)) return next();
+
+      let html = fs.readFileSync(indexPath, "utf-8");
+
+      // Dynamic meta tags using OG and Twitter Card standards
+      const metaTags = `
+    <!-- Social Preview Tags (Dynamic) -->
+    <meta name="description" content="${metadata.description.replace(/"/g, '&quot;')}" />
+    <meta property="og:title" content="${metadata.title.replace(/"/g, '&quot;')}" />
+    <meta property="og:description" content="${metadata.description.replace(/"/g, '&quot;')}" />
+    <meta property="og:image" content="${metadata.image}" />
+    <meta property="og:url" content="${metadata.url}" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="${metadata.title.replace(/"/g, '&quot;')}" />
+    <meta name="twitter:description" content="${metadata.description.replace(/"/g, '&quot;')}" />
+    <meta name="twitter:image" content="${metadata.image}" />
+    <meta name="twitter:label1" content="CTA" />
+    <meta name="twitter:data1" content="Order Now" />
+      `;
+
+      // Update Title tag
+      if (html.includes("<title>")) {
+        html = html.replace(/<title>.*?<\/title>/, `<title>${metadata.title}</title>`);
+      } else {
+        html = html.replace("</head>", `<title>${metadata.title}</title></head>`);
+      }
+      
+      // Inject meta tags before closing head
+      html = html.replace("</head>", `${metaTags}</head>`);
+
+      // Important: Social media scrapers ignore JS, so we serve the static HTML with meta tags
+      const userAgent = req.headers['user-agent'] || '';
+      const isBot = /bot|googlebot|facebookexternalhit|twitterbot|slackbot|linkedinbot|whatsapp|telegram/i.test(userAgent);
+      
+      if (isBot || isProduction) {
+        res.set("Content-Type", "text/html");
+        return res.send(html);
+      }
+      
+      // Otherwise continue to static serving or Vite
+      next();
+    } catch (e) {
+      console.error("Social Meta Middleware Error:", e);
+      next();
+    }
   });
 
   if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
