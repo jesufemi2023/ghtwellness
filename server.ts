@@ -631,10 +631,10 @@ export async function createServer() {
     const blogIdOrSlug = url.searchParams.get('blog');
     const activeTab = url.searchParams.get('activeTab') || url.searchParams.get('tab');
 
-    // Default Homepage Metadata
+    // Default Homepage Metadata (from user request)
     let metadata = {
       title: "GHT wellness supplement | 100% herbal supplement",
-      description: "the best natural supplement that works for prostate enlargement, female/male infertility, erectile dysfunction, premature ejaculation, diabetes, stroke and so on",
+      description: "the best natural supplement that works for prostate enlargement, female/male infertility, erectile dysfunction, premature ejaculation, diabetes, stroke and so on. Order Now.",
       image: "https://res.cloudinary.com/drizgfofw/image/upload/v1773906809/compressed_70kb_ox1i8j.jpg",
       url: `https://ghtwellness.vercel.app${req.url}`
     };
@@ -642,22 +642,28 @@ export async function createServer() {
     if (!supabase) return metadata;
 
     try {
+      const makeAbsolute = (url: string) => {
+        if (!url) return metadata.image;
+        if (url.startsWith('http')) return url;
+        return `https://ghtwellness.vercel.app${url.startsWith('/') ? '' : '/'}${url}`;
+      };
+
       if (productId) {
         const { data } = await supabase.from('products').select('name, short_desc, image_url').or(`id.eq.${productId},product_code.eq.${productId}`).maybeSingle();
         if (data) {
           metadata.title = `${data.name} | Order Now`;
-          metadata.description = data.short_desc || metadata.description;
-          if (data.image_url) metadata.image = data.image_url;
+          metadata.description = `${data.short_desc || metadata.description} Order Now.`;
+          metadata.image = makeAbsolute(data.image_url);
         }
       } else if (packageId) {
         const { data } = await supabase.from('recommended_packages').select('name, description, package_image_url').or(`id.eq.${packageId},package_code.eq.${packageId}`).maybeSingle();
         if (data) {
           metadata.title = `${data.name} | Order Now`;
-          metadata.description = data.description || metadata.description;
-          if (data.package_image_url) metadata.image = data.package_image_url;
+          metadata.description = `${data.description || metadata.description} Order Now.`;
+          metadata.image = makeAbsolute(data.package_image_url);
         }
       } else if (blogIdOrSlug) {
-        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
         let query = supabase.from('blog_posts').select('title, meta_description, image_url');
         if (uuidRegex.test(blogIdOrSlug)) {
           query = query.eq('id', blogIdOrSlug);
@@ -667,8 +673,8 @@ export async function createServer() {
         const { data } = await query.maybeSingle();
         if (data) {
           metadata.title = `${data.title} | Order Now`;
-          metadata.description = data.meta_description || metadata.description;
-          if (data.image_url) metadata.image = data.image_url;
+          metadata.description = `${data.meta_description || metadata.description} Order Now.`;
+          metadata.image = makeAbsolute(data.image_url);
         }
       } else if (activeTab) {
         const tabTitles: Record<string, string> = {
@@ -683,12 +689,13 @@ export async function createServer() {
         };
         if (tabTitles[activeTab]) {
           metadata.title = `${tabTitles[activeTab]} | Order Now`;
-          metadata.description = `Explore our ${tabTitles[activeTab].toLowerCase()} at GHT Wellness. Premium health supplements and professional consultations. Order Now.`;
+          metadata.description = `Explore our ${tabTitles[activeTab].toLowerCase()} at GHT Wellness. Premium herbal supplements and professional health consultations. Order Now.`;
         }
       }
     } catch (e) {
       console.error("Metadata generation error:", e);
     }
+
     return metadata;
   }
 
@@ -1075,57 +1082,63 @@ export async function createServer() {
   // Dynamic Social Sharing Logic
   app.get("*", async (req, res, next) => {
     // Skip API, static files, and other non-HTML requests
-    if (req.path.startsWith("/api/") || req.path.includes(".")) return next();
-    if (req.headers.accept && !req.headers.accept.includes("text/html")) return next();
+    const isStaticFile = req.path.includes(".");
+    if (req.path.startsWith("/api/") || isStaticFile) return next();
 
     try {
-      const metadata = await getMetadataForRequest(req);
-      
+      const userAgent = req.headers['user-agent'] || '';
+      const isBot = /bot|googlebot|facebookexternalhit|twitterbot|slackbot|linkedinbot|whatsapp|telegram|pinterest|discord/i.test(userAgent);
       const isProduction = process.env.NODE_ENV === "production" || !!process.env.VERCEL;
-      let indexPath = path.resolve(process.cwd(), isProduction ? "dist/index.html" : "index.html");
+      
+      // If NOT a bot and NOT production, continue to Vite in dev
+      if (!isBot && !isProduction) return next();
+
+      const metadata = await getMetadataForRequest(req);
+      const indexPath = path.resolve(process.cwd(), isProduction ? "dist/index.html" : "index.html");
       
       if (!fs.existsSync(indexPath)) return next();
 
       let html = fs.readFileSync(indexPath, "utf-8");
 
+      // Escape quotes for metadata
+      const cleanTitle = (metadata.title || CONFIG.company.name).replace(/"/g, '&quot;');
+      const cleanDesc = (metadata.description || "").replace(/"/g, '&quot;');
+
       // Dynamic meta tags using OG and Twitter Card standards
       const metaTags = `
     <!-- Social Preview Tags (Dynamic) -->
-    <meta name="description" content="${metadata.description.replace(/"/g, '&quot;')}" />
-    <meta property="og:title" content="${metadata.title.replace(/"/g, '&quot;')}" />
-    <meta property="og:description" content="${metadata.description.replace(/"/g, '&quot;')}" />
+    <meta name="description" content="${cleanDesc}" />
+    <meta property="og:title" content="${cleanTitle}" />
+    <meta property="og:description" content="${cleanDesc}" />
     <meta property="og:image" content="${metadata.image}" />
+    <meta property="og:image:secure_url" content="${metadata.image}" />
     <meta property="og:url" content="${metadata.url}" />
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="GHT Wellness" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="${metadata.title.replace(/"/g, '&quot;')}" />
-    <meta name="twitter:description" content="${metadata.description.replace(/"/g, '&quot;')}" />
+    <meta name="twitter:title" content="${cleanTitle}" />
+    <meta name="twitter:description" content="${cleanDesc}" />
     <meta name="twitter:image" content="${metadata.image}" />
     <meta name="twitter:label1" content="CTA" />
     <meta name="twitter:data1" content="Order Now" />
+    <meta property="whatsapp:title" content="${cleanTitle}" />
+    <meta property="whatsapp:description" content="${cleanDesc}" />
       `;
 
       // Update Title tag
       if (html.includes("<title>")) {
-        html = html.replace(/<title>.*?<\/title>/, `<title>${metadata.title}</title>`);
+        html = html.replace(/<title>.*?<\/title>/, `<title>${cleanTitle}</title>`);
       } else {
-        html = html.replace("</head>", `<title>${metadata.title}</title></head>`);
+        html = html.replace("</head>", `<title>${cleanTitle}</title></head>`);
       }
       
       // Inject meta tags before closing head
       html = html.replace("</head>", `${metaTags}</head>`);
+      
+      console.log(`[Social Meta] Serving metadata for ${req.url} to ${userAgent.substring(0, 50)}...`);
 
-      // Important: Social media scrapers ignore JS, so we serve the static HTML with meta tags
-      const userAgent = req.headers['user-agent'] || '';
-      const isBot = /bot|googlebot|facebookexternalhit|twitterbot|slackbot|linkedinbot|whatsapp|telegram/i.test(userAgent);
-      
-      if (isBot || isProduction) {
-        res.set("Content-Type", "text/html");
-        return res.send(html);
-      }
-      
-      // Otherwise continue to static serving or Vite
-      next();
+      res.set("Content-Type", "text/html");
+      return res.send(html);
     } catch (e) {
       console.error("Social Meta Middleware Error:", e);
       next();
