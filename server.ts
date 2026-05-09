@@ -663,7 +663,7 @@ export async function createServer() {
           metadata.image = makeAbsolute(data.package_image_url);
         }
       } else if (blogIdOrSlug) {
-        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
         let query = supabase.from('blog_posts').select('title, meta_description, image_url');
         if (uuidRegex.test(blogIdOrSlug)) {
           query = query.eq('id', blogIdOrSlug);
@@ -1087,16 +1087,36 @@ export async function createServer() {
 
     try {
       const userAgent = req.headers['user-agent'] || '';
-      const isBot = /bot|googlebot|facebookexternalhit|twitterbot|slackbot|linkedinbot|whatsapp|telegram|pinterest|discord/i.test(userAgent);
+      const isBot = /bot|googlebot|facebookexternalhit|twitterbot|slackbot|linkedinbot|whatsapp|telegram|pinterest|discord|messenger/i.test(userAgent);
       const isProduction = process.env.NODE_ENV === "production" || !!process.env.VERCEL;
       
       // If NOT a bot and NOT production, continue to Vite in dev
       if (!isBot && !isProduction) return next();
 
       const metadata = await getMetadataForRequest(req);
-      const indexPath = path.resolve(process.cwd(), isProduction ? "dist/index.html" : "index.html");
       
-      if (!fs.existsSync(indexPath)) return next();
+      // Fallback paths for index.html depending on environment
+      const possibleIndexPaths = [
+        path.resolve(process.cwd(), "dist/index.html"),
+        path.resolve(process.cwd(), "index.html"),
+        // Vercel output structure fallback
+        path.join(__dirname, "../dist/index.html"),
+        path.join(__dirname, "dist/index.html"),
+        path.join(__dirname, "../index.html")
+      ];
+
+      let indexPath = possibleIndexPaths[0];
+      for (const p of possibleIndexPaths) {
+        if (fs.existsSync(p)) {
+          indexPath = p;
+          break;
+        }
+      }
+      
+      if (!fs.existsSync(indexPath)) {
+        console.warn(`[Social Meta] index.html not found after trying: ${possibleIndexPaths.join(', ')}`);
+        return next();
+      }
 
       let html = fs.readFileSync(indexPath, "utf-8");
 
