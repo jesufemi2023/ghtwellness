@@ -17,7 +17,8 @@ import {
   Check,
   Plus,
   Minus,
-  Upload
+  Upload,
+  Package
 } from 'lucide-react';
 import { PackageData, Product, PaymentMethod } from '../types';
 import { CONFIG } from '../config';
@@ -49,6 +50,7 @@ export const OrderDrawer: React.FC<OrderDrawerProps> = ({
   const [isSuccess, setIsSuccess] = useState(false);
   const [copied, setCopied] = useState(false);
   const [quantity, setQuantity] = useState(initialQuantity);
+  const [selectedOption, setSelectedOption] = useState<any>(null);
   const [settings, setSettings] = useState<any>({
     bank_name: CONFIG.company.bankDetails.bankName,
     account_number: CONFIG.company.bankDetails.accountNumber,
@@ -74,6 +76,13 @@ export const OrderDrawer: React.FC<OrderDrawerProps> = ({
   useEffect(() => {
     if (isOpen) {
       setQuantity(initialQuantity);
+      if (type === 'package' && (item as PackageData).options?.length) {
+        const options = (item as PackageData).options!;
+        const defaultOpt = options.find(o => o.bottles.toLowerCase().includes('3 bottle')) || options[0];
+        setSelectedOption(defaultOpt);
+      } else {
+        setSelectedOption(null);
+      }
       setStep(1);
       setIsSuccess(false);
       setLoading(false);
@@ -94,9 +103,11 @@ export const OrderDrawer: React.FC<OrderDrawerProps> = ({
     payment_receipt_url: ''
   });
 
-  const basePrice = type === 'package' 
-    ? (item as PackageData).price * (1 - (item as PackageData).discount / 100)
-    : (item as Product).price_naira * (1 - ((item as Product).discount_percent || 0) / 100);
+  const basePrice = selectedOption 
+    ? selectedOption.price 
+    : (type === 'package' 
+        ? (item as PackageData).price * (1 - (item as PackageData).discount / 100)
+        : (item as Product).price_naira * (1 - ((item as Product).discount_percent || 0) / 100));
 
   const totalPrice = basePrice * quantity;
 
@@ -158,6 +169,8 @@ export const OrderDrawer: React.FC<OrderDrawerProps> = ({
     }
   };
 
+  const hasOptions = type === 'package' && (item as PackageData).options && (item as PackageData).options!.length > 0;
+
   const handleSubmit = async () => {
     setLoading(true);
     console.log("Submitting order...", formData);
@@ -166,16 +179,30 @@ export const OrderDrawer: React.FC<OrderDrawerProps> = ({
       let orderItems: any[] = [];
       if (type === 'package') {
         const pkg = item as PackageData;
-        // If it's a package, we send all its products
-        orderItems = (pkg.products || []).map(p => ({
-          id: p.id,
-          name: p.name,
-          quantity: quantity,
-          price_at_time: p.price_naira * (1 - (p.discount_percent || 0) / 100),
-          is_package: true,
-          package_name: pkg.name,
-          package_price: basePrice
-        }));
+        // If an option is selected, use its details
+        if (selectedOption) {
+          orderItems = [{
+            id: pkg.id,
+            name: `${pkg.name} (${selectedOption.bottles})`,
+            quantity: quantity,
+            price_at_time: basePrice,
+            is_package: true,
+            package_name: pkg.name,
+            package_price: basePrice,
+            included_products: selectedOption.products
+          }];
+        } else {
+          // If it's a package, we send all its products
+          orderItems = (pkg.products || []).map(p => ({
+            id: p.id,
+            name: p.name,
+            quantity: quantity,
+            price_at_time: p.price_naira * (1 - (p.discount_percent || 0) / 100),
+            is_package: true,
+            package_name: pkg.name,
+            package_price: basePrice
+          }));
+        }
       } else {
         const prod = item as Product;
         orderItems = [{
@@ -319,8 +346,8 @@ Payment: ${formData.payment_method === 'pod' ? 'Pay on Delivery' : 'Bank Transfe
                         Step {step} of 3
                       </div>
                       <h2 className="text-3xl font-black text-slate-900">
-                        {step === 1 && "Who are you?"}
-                        {step === 2 && "Where & When?"}
+                        {step === 1 && (hasOptions ? "Customise Order" : "Who are you?")}
+                        {step === 2 && (hasOptions ? "Your Information" : "Where & When?")}
                         {step === 3 && "Payment Choice"}
                       </h2>
                     </div>
@@ -348,6 +375,10 @@ Payment: ${formData.payment_method === 'pod' ? 'Pay on Delivery' : 'Bank Transfe
                             <p className="text-lg font-black text-slate-900">{item.name}</p>
                           </div>
                           <div className="flex items-center gap-4 bg-white p-2 rounded-2xl border border-emerald-100">
+                            <div className="hidden md:flex flex-col items-end mr-2">
+                              <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Rate</span>
+                              <span className="text-[10px] font-black text-emerald-600">₦{basePrice.toLocaleString()} / pkg</span>
+                            </div>
                             <button 
                               onClick={() => setQuantity(Math.max(1, quantity - 1))}
                               className="w-10 h-10 bg-slate-50 text-slate-400 rounded-xl flex items-center justify-center hover:bg-slate-100 transition-colors"
@@ -363,38 +394,136 @@ Payment: ${formData.payment_method === 'pod' ? 'Pay on Delivery' : 'Bank Transfe
                             </button>
                           </div>
                         </div>
-                        <div className="space-y-4">
-                          <label className="block text-sm font-black text-slate-400 uppercase tracking-widest">Your Full Name</label>
-                          <div className="relative">
-                            <User className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300" size={24} />
-                            <input 
-                              type="text"
-                              placeholder="e.g. John Doe"
-                              className="w-full h-20 bg-slate-50 border-2 border-slate-100 rounded-3xl px-16 text-xl font-bold focus:border-emerald-500 focus:bg-white transition-all outline-none"
-                              value={formData.full_name}
-                              onChange={e => setFormData({ ...formData, full_name: e.target.value })}
-                            />
+
+                        {type === 'package' && (item as PackageData).options && (item as PackageData).options!.length > 0 && (
+                          <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                              <label className="text-sm font-black text-slate-400 uppercase tracking-widest">Select Package Size</label>
+                              <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">Most Popular</span>
+                            </div>
+                            <div className="grid grid-cols-1 gap-3">
+                              {(item as PackageData).options!.map((opt, i) => (
+                                <button
+                                  key={i}
+                                  onClick={() => setSelectedOption(opt)}
+                                  className={`group p-6 rounded-3xl border-2 text-left transition-all duration-300 relative overflow-hidden ${
+                                    selectedOption === opt 
+                                      ? 'bg-emerald-50 border-emerald-600 shadow-xl shadow-emerald-900/5' 
+                                      : 'bg-white border-slate-100 hover:border-slate-300 hover:bg-slate-50'
+                                  }`}
+                                >
+                                  {selectedOption === opt && (
+                                    <div className="absolute top-0 right-0 w-16 h-16 bg-emerald-600 translate-x-8 -translate-y-8 rotate-45 flex items-end justify-center pb-2">
+                                      <CheckCircle2 size={12} className="text-white -rotate-45" />
+                                    </div>
+                                  )}
+
+                                  <div className="flex justify-between items-center mb-3">
+                                    <div className="flex flex-col">
+                                      <span className={`text-lg font-black leading-none ${selectedOption === opt ? 'text-emerald-700' : 'text-slate-900'}`}>
+                                        {opt.bottles}
+                                      </span>
+                                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Full Treatment</span>
+                                    </div>
+                                    <div className="text-right">
+                                      <div className={`text-2xl font-black ${selectedOption === opt ? 'text-emerald-700' : 'text-slate-900'}`}>
+                                        ₦{opt.price.toLocaleString()}
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <div className="pt-4 border-t border-slate-100/50">
+                                    <div className="flex items-center gap-2 mb-2">
+                                      <Package size={12} className={selectedOption === opt ? 'text-emerald-600' : 'text-slate-400'} />
+                                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Package Includes:</span>
+                                    </div>
+                                    <div className="flex flex-wrap gap-1.5">
+                                      {opt.products.map((p, j) => (
+                                        <span 
+                                          key={j} 
+                                          className={`text-[10px] font-bold px-2 py-1 rounded-lg border transition-colors ${
+                                            selectedOption === opt 
+                                              ? 'bg-white border-emerald-200 text-emerald-700' 
+                                              : 'bg-slate-50 border-slate-100 text-slate-500'
+                                          }`}
+                                        >
+                                          {p}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  </div>
+                                </button>
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                        <div className="space-y-4">
-                          <label className="block text-sm font-black text-slate-400 uppercase tracking-widest">WhatsApp / Phone Number</label>
-                          <div className="relative">
-                            <Phone className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300" size={24} />
-                            <input 
-                              type="tel"
-                              placeholder="080 1234 5678"
-                              className="w-full h-20 bg-slate-50 border-2 border-slate-100 rounded-3xl px-16 text-xl font-bold focus:border-emerald-500 focus:bg-white transition-all outline-none"
-                              value={formData.phone_number}
-                              onChange={e => setFormData({ ...formData, phone_number: e.target.value })}
-                            />
-                          </div>
-                          <p className="text-slate-400 text-sm font-medium italic">We will call you to confirm your health progress.</p>
-                        </div>
+                        )}
+
+                        {!hasOptions && (
+                          <>
+                            <div className="space-y-4">
+                              <label className="block text-sm font-black text-slate-400 uppercase tracking-widest">Your Full Name</label>
+                              <div className="relative">
+                                <User className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300" size={24} />
+                                <input 
+                                  type="text"
+                                  placeholder="e.g. John Doe"
+                                  className="w-full h-20 bg-slate-50 border-2 border-slate-100 rounded-3xl px-16 text-xl font-bold focus:border-emerald-500 focus:bg-white transition-all outline-none"
+                                  value={formData.full_name}
+                                  onChange={e => setFormData({ ...formData, full_name: e.target.value })}
+                                />
+                              </div>
+                            </div>
+                            <div className="space-y-4">
+                              <label className="block text-sm font-black text-slate-400 uppercase tracking-widest">WhatsApp / Phone Number</label>
+                              <div className="relative">
+                                <Phone className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300" size={24} />
+                                <input 
+                                  type="tel"
+                                  placeholder="080 1234 5678"
+                                  className="w-full h-20 bg-slate-50 border-2 border-slate-100 rounded-3xl px-16 text-xl font-bold focus:border-emerald-500 focus:bg-white transition-all outline-none"
+                                  value={formData.phone_number}
+                                  onChange={e => setFormData({ ...formData, phone_number: e.target.value })}
+                                />
+                              </div>
+                              <p className="text-slate-400 text-sm font-medium italic">We will call you to confirm your health progress.</p>
+                            </div>
+                          </>
+                        )}
                       </motion.div>
                     )}
 
                     {step === 2 && (
                       <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-8">
+                        {hasOptions && (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-4">
+                              <label className="block text-sm font-black text-slate-400 uppercase tracking-widest">Full Name</label>
+                              <div className="relative">
+                                <User className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300" size={20} />
+                                <input 
+                                  type="text"
+                                  placeholder="John Doe"
+                                  className="w-full h-16 bg-slate-50 border-2 border-slate-100 rounded-2xl px-14 text-base font-bold focus:border-emerald-500 focus:bg-white transition-all outline-none"
+                                  value={formData.full_name}
+                                  onChange={e => setFormData({ ...formData, full_name: e.target.value })}
+                                />
+                              </div>
+                            </div>
+                            <div className="space-y-4">
+                              <label className="block text-sm font-black text-slate-400 uppercase tracking-widest">Phone Number</label>
+                              <div className="relative">
+                                <Phone className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300" size={20} />
+                                <input 
+                                  type="tel"
+                                  placeholder="080..."
+                                  className="w-full h-16 bg-slate-50 border-2 border-slate-100 rounded-2xl px-14 text-base font-bold focus:border-emerald-500 focus:bg-white transition-all outline-none"
+                                  value={formData.phone_number}
+                                  onChange={e => setFormData({ ...formData, phone_number: e.target.value })}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        )}
                         <div className="space-y-4">
                           <label className="block text-sm font-black text-slate-400 uppercase tracking-widest">Delivery Address</label>
                           <div className="relative">
@@ -609,7 +738,7 @@ Payment: ${formData.payment_method === 'pod' ? 'Pay on Delivery' : 'Bank Transfe
                     )}
                     <button 
                       onClick={step === 3 ? handleSubmit : nextStep}
-                      disabled={loading || isUploading || (step === 1 && (!formData.full_name || !formData.phone_number)) || (step === 2 && !formData.delivery_address)}
+                      disabled={loading || isUploading || (step === 1 && !hasOptions && (!formData.full_name || !formData.phone_number)) || (step === 2 && (!formData.delivery_address || (hasOptions && (!formData.full_name || !formData.phone_number))))}
                       className="flex-grow h-20 bg-slate-900 text-white rounded-3xl font-black text-xl uppercase tracking-[0.2em] flex items-center justify-center gap-4 hover:bg-emerald-600 transition-all shadow-xl active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {loading ? (

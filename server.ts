@@ -640,14 +640,17 @@ export async function createServer() {
   });
 
   app.get("/api/products", async (req, res) => {
-    if (!supabase) return res.json([]);
+    if (!supabase) return res.status(503).json({ error: "Database not initialized. Please ensure environment variables are set." });
     const { data, error } = await supabase.from('products').select('*');
-    if (error) return res.status(500).json({ error: error.message });
+    if (error) {
+      console.error("Products error:", error);
+      return res.status(500).json({ error: error.message, hint: "Ensure the 'products' table exists in Supabase by running the SQL migration." });
+    }
     res.json(data || []);
   });
 
   app.get("/api/recommended-packages", async (req, res) => {
-    if (!supabase) return res.json([]);
+    if (!supabase) return res.status(503).json({ error: "Database not initialized. Please ensure environment variables are set." });
     try {
       const { data, error } = await supabase
         .from('recommended_packages')
@@ -659,6 +662,7 @@ export async function createServer() {
         `);
       
       if (error) {
+        console.error("Packages error:", error);
         // If the error is specifically about is_combo missing, try fetching without it
         if (error.message?.includes("is_combo")) {
           console.warn("is_combo column missing in DB, falling back...");
@@ -670,7 +674,7 @@ export async function createServer() {
                 products (*)
               )
             `);
-          if (fallbackError) return res.status(500).json({ error: fallbackError.message });
+          if (fallbackError) return res.status(500).json({ error: fallbackError.message, hint: "Ensure the 'recommended_packages' and 'package_products' tables exist." });
           
           const formatted = fallbackData?.map((pkg: any) => ({
             ...pkg,
@@ -679,7 +683,7 @@ export async function createServer() {
           })) || [];
           return res.json(formatted);
         }
-        return res.status(500).json({ error: error.message });
+        return res.status(500).json({ error: error.message, hint: "Ensure the 'recommended_packages' and 'package_products' tables exist in Supabase by running the SQL migration." });
       }
       
       // Format the data to flatten the products array for easier frontend consumption

@@ -17,6 +17,12 @@ export interface Product {
   nafdac_no?: string;
 }
 
+export interface PackageOption {
+  bottles: string;
+  price: number;
+  products: string[];
+}
+
 export interface PackageData {
   id: string;
   name: string;
@@ -29,6 +35,7 @@ export interface PackageData {
   package_code?: string;
   is_combo?: boolean;
   products?: Product[];
+  options?: PackageOption[];
 }
 
 export type OrderStatus = 'pending' | 'paid' | 'shipped' | 'delivered' | 'cancelled';

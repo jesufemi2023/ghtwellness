@@ -244,6 +244,36 @@ export const PackageQuickView: React.FC<PackageQuickViewProps> = ({
                           </button>
                         </div>
                       </div>
+
+                      {data.options && data.options.length > 0 && (
+                        <div className="space-y-4">
+                          <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
+                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                            <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Package Configurations</h4>
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            {data.options.map((opt, i) => (
+                              <div key={i} className="p-5 bg-gradient-to-br from-slate-50 to-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+                                <div className="flex justify-between items-start mb-3">
+                                  <span className="text-[9px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100 uppercase">Size {i + 1}</span>
+                                  <div className="text-xs font-black text-slate-900">₦{opt.price.toLocaleString()}</div>
+                                </div>
+                                <div className="text-sm font-black text-slate-900 mb-2">{opt.bottles}</div>
+                                <div className="flex flex-wrap gap-1 mt-2">
+                                  {opt.products.map((prod, j) => (
+                                    <span key={j} className="text-[8px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">
+                                      {prod}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                          <p className="text-[10px] text-slate-400 italic flex items-center gap-2">
+                            <Info size={10} /> Select your configuration in the next step
+                          </p>
+                        </div>
+                      )}
                       
                       <div className="flex items-center gap-3">
                         <button 

@@ -164,6 +164,11 @@ export const PackageCard: React.FC<PackageCardProps> = ({ data, allPackages, onO
                   )}
                 </div>
                 <div className="flex flex-col items-end shrink-0">
+                  {data.options && data.options.length > 0 && (
+                    <div className="bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest mb-1 border border-indigo-100">
+                      {data.options.length} Sizes Available
+                    </div>
+                  )}
                   <div className="text-[8px] md:text-[9px] font-black text-red-600 uppercase tracking-tighter mb-0.5">
                     Only 5 Left!
                   </div>

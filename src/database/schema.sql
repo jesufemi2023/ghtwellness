@@ -158,7 +158,8 @@ FOR SELECT USING (
         SELECT 1 FROM orders 
         WHERE orders.id = order_items.order_id 
         AND orders.access_token = current_setting('app.current_access_token', true)::uuid
-    );
+    )
+);
 
 
 -- 7. RECOMMENDED PACKAGES
@@ -173,6 +174,7 @@ CREATE TABLE recommended_packages (
     symptoms TEXT[] DEFAULT '{}',
     package_code TEXT,
     is_combo BOOLEAN DEFAULT FALSE,
+    options JSONB DEFAULT '[]',
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -228,9 +230,6 @@ ALTER TABLE api_keys_status ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Anyone can view recommended packages" ON recommended_packages FOR SELECT USING (true);
 CREATE POLICY "Anyone can view package products" ON package_products FOR SELECT USING (true);
 CREATE POLICY "Admin can view api keys status" ON api_keys_status FOR ALL USING (true);
-
-
-);
 
 --  Create the storage bucket for receipts (if it doesn't exist)
 INSERT INTO storage.buckets (id, name, public) 

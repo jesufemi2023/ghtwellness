@@ -272,6 +272,7 @@ export default function AdminDashboard({ adminPassword, onLogout }: AdminDashboa
       defaults.package_code = "";
       defaults.product_ids = [];
       defaults.is_combo = false;
+      defaults.options = [];
     }
     setEditForm(defaults);
   };
@@ -458,6 +459,100 @@ export default function AdminDashboard({ adminPassword, onLogout }: AdminDashboa
             onChange={(e) => setEditForm({ ...editForm, [key]: e.target.checked })}
           />
           <label className="text-xs font-black text-slate-700 uppercase tracking-widest">Is Combo Pack?</label>
+        </div>
+      );
+    }
+
+    if (key === "options") {
+      const options = value || [];
+      return (
+        <div key={key} className="space-y-4 col-span-full bg-slate-50 p-6 rounded-2xl border border-slate-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Pricing Options / Variants</label>
+              <p className="text-[9px] text-slate-400 font-medium lowercase">Define different bottle quantities and prices for this package</p>
+            </div>
+            <button 
+              type="button"
+              onClick={() => {
+                const newOptions = [...options, { bottles: "", price: 0, products: [] }];
+                setEditForm({ ...editForm, options: newOptions });
+              }}
+              className="flex items-center gap-2 bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-sm"
+            >
+              <Plus size={14} /> Add Option
+            </button>
+          </div>
+          
+          {options.length > 0 ? (
+            <div className="grid grid-cols-1 gap-4">
+              {options.map((opt: any, index: number) => (
+                <div key={index} className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4 relative group">
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      const newOptions = options.filter((_: any, i: number) => i !== index);
+                      setEditForm({ ...editForm, options: newOptions });
+                    }}
+                    className="absolute top-4 right-4 text-slate-300 hover:text-red-500 transition-colors p-1"
+                    title="Remove Option"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="space-y-1">
+                      <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Option Label (e.g. 2 Bottles)</label>
+                      <input 
+                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold focus:ring-2 focus:ring-emerald-500 outline-none"
+                        value={opt.bottles}
+                        onChange={(e) => {
+                          const newOptions = [...options];
+                          newOptions[index].bottles = e.target.value;
+                          setEditForm({ ...editForm, options: newOptions });
+                        }}
+                        placeholder="e.g. 3 Bottles"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Price (₦)</label>
+                      <input 
+                        type="number"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold focus:ring-2 focus:ring-emerald-500 outline-none"
+                        value={opt.price}
+                        onChange={(e) => {
+                          const newOptions = [...options];
+                          newOptions[index].price = parseFloat(e.target.value) || 0;
+                          setEditForm({ ...editForm, options: newOptions });
+                        }}
+                      />
+                    </div>
+                    <div className="space-y-1 lg:col-span-1 md:col-span-2">
+                      <div className="flex justify-between items-center">
+                        <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Included Products</label>
+                        <span className="text-[8px] text-emerald-500 font-bold">Comma separated</span>
+                      </div>
+                      <input 
+                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold focus:ring-2 focus:ring-emerald-500 outline-none"
+                        value={opt.products?.join(", ") || ""}
+                        onChange={(e) => {
+                          const newOptions = [...options];
+                          newOptions[index].products = e.target.value.split(",").map(s => s.trim()).filter(s => s !== "");
+                          setEditForm({ ...editForm, options: newOptions });
+                        }}
+                        placeholder="Product1, Product2..."
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 border-2 border-dashed border-slate-200 rounded-xl bg-white">
+              <Package size={24} className="mx-auto text-slate-300 mb-2" />
+              <p className="text-xs font-bold text-slate-400 italic">No options defined. Click "Add Option" to create variations for this package.</p>
+            </div>
+          )}
         </div>
       );
     }

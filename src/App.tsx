@@ -210,13 +210,27 @@ export default function App() {
     try {
       const res = await fetch("/api/products");
       if (!res.ok) {
+        if (res.status === 404) {
+          throw new Error("API endpoint not found. Please ensure the server is configured correctly.");
+        }
         const text = await res.text();
         if (text.includes("Rate exceeded")) {
           console.warn("Rate limit exceeded for products, retrying in 2s...");
           setTimeout(fetchProducts, 2000);
           return;
         }
-        throw new Error(`HTTP error! status: ${res.status}`);
+        let errorMsg = `HTTP error! status: ${res.status}`;
+        try {
+          const errData = JSON.parse(text);
+          if (errData.error && errData.error.includes('relation "products" does not exist')) {
+            errorMsg = "Database table 'products' is missing. Please run the SQL migration in Supabase.";
+          } else if (errData.error) {
+            errorMsg = errData.error;
+          }
+        } catch (e) {
+          errorMsg = text || errorMsg;
+        }
+        throw new Error(errorMsg);
       }
       const data = await res.json();
       if (Array.isArray(data)) {
@@ -226,8 +240,12 @@ export default function App() {
         console.error("Products data is not an array:", data);
         setProducts([]);
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error("Failed to fetch products:", e);
+      if (e.message === "Failed to fetch") {
+        console.warn("Network error: Server might be starting or unreachable. Retrying in 3s...");
+        setTimeout(fetchProducts, 3000);
+      }
       setProducts([]);
     }
   };
@@ -236,13 +254,27 @@ export default function App() {
     try {
       const res = await fetch("/api/recommended-packages");
       if (!res.ok) {
+        if (res.status === 404) {
+          throw new Error("API endpoint not found. Please ensure the server is configured correctly.");
+        }
         const text = await res.text();
         if (text.includes("Rate exceeded")) {
           console.warn("Rate limit exceeded for packages, retrying in 2s...");
           setTimeout(fetchRecommendedPackages, 2000);
           return;
         }
-        throw new Error(`HTTP error! status: ${res.status}`);
+        let errorMsg = `HTTP error! status: ${res.status}`;
+        try {
+          const errData = JSON.parse(text);
+          if (errData.error && errData.error.includes('relation "recommended_packages" does not exist')) {
+            errorMsg = "Database table 'recommended_packages' is missing. Please run the SQL migration in Supabase.";
+          } else if (errData.error) {
+            errorMsg = errData.error;
+          }
+        } catch (e) {
+          errorMsg = text || errorMsg;
+        }
+        throw new Error(errorMsg);
       }
       const data: PackageData[] = await res.json();
       if (Array.isArray(data)) {
@@ -253,8 +285,12 @@ export default function App() {
         setRecommendedPackages([]);
         setComboPackages([]);
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error("Failed to fetch recommended packages:", e);
+      if (e.message === "Failed to fetch") {
+        console.warn("Network error: Server might be starting or unreachable. Retrying in 3s...");
+        setTimeout(fetchRecommendedPackages, 3000);
+      }
       setRecommendedPackages([]);
       setComboPackages([]);
     }
