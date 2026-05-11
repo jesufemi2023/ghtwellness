@@ -1051,11 +1051,16 @@ export default function App() {
                 {/* Right: Product Info */}
                 <div className="space-y-8">
                   <div>
-                    <div className="flex items-center gap-3 mb-4">
+                    <div className="flex flex-wrap items-center gap-3 mb-4">
                       <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest">
-                        {viewingProduct.product_code}
+                        CODE: {viewingProduct.product_code}
                       </span>
-                      <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest">
+                      {viewingProduct.nafdac_no && (
+                        <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest">
+                          NAFDAC: {viewingProduct.nafdac_no}
+                        </span>
+                      )}
+                      <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest">
                         In Stock
                       </span>
                     </div>
@@ -1198,6 +1203,12 @@ export default function App() {
                         <span className="text-slate-400 font-bold">Product Code</span>
                         <span className="font-black">{viewingProduct.product_code}</span>
                       </div>
+                      {viewingProduct.nafdac_no && (
+                        <div className="flex justify-between py-3 border-b border-slate-800">
+                          <span className="text-slate-400 font-bold">NAFDAC Reg No.</span>
+                          <span className="font-black">{viewingProduct.nafdac_no}</span>
+                        </div>
+                      )}
                       <div className="flex justify-between py-3 border-b border-slate-800">
                         <span className="text-slate-400 font-bold">Package</span>
                         <span className="font-black">{viewingProduct.package || "Standard"}</span>
@@ -1618,9 +1629,21 @@ export default function App() {
               <div className="w-full lg:w-1/2 p-6 lg:p-12 overflow-y-auto bg-white custom-scrollbar pb-12">
                 <div className="space-y-6 md:space-y-8">
                   <div>
-                    <div className="text-emerald-600 font-black text-[10px] md:text-xs uppercase tracking-widest mb-2 flex items-center gap-2">
-                      <Award size={14} />
-                      Premium Health Product
+                    <div className="text-emerald-600 font-black text-[10px] md:text-xs uppercase tracking-widest mb-2 flex flex-wrap items-center gap-x-4 gap-y-2">
+                      <div className="flex items-center gap-2">
+                        <Award size={14} />
+                        Premium Health Product
+                      </div>
+                      {selectedProduct.nafdac_no && (
+                        <div className="flex items-center gap-2 text-blue-600">
+                          <ShieldCheck size={14} />
+                          NAFDAC: {selectedProduct.nafdac_no}
+                        </div>
+                      )}
+                      <div className="flex items-center gap-2 text-slate-500">
+                        <Package size={14} />
+                        CODE: {selectedProduct.product_code}
+                      </div>
                     </div>
                     <h2 className="text-2xl md:text-4xl font-black text-slate-900 leading-tight">
                       {selectedProduct.name}
