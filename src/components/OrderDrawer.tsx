@@ -221,11 +221,32 @@ export const OrderDrawer: React.FC<OrderDrawerProps> = ({
         distributor_id: distributorId
       };
 
+      let activeToken = '';
+      try {
+        activeToken = localStorage.getItem('ght_access_token') || '';
+        if (!activeToken) {
+          activeToken = typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+            ? crypto.randomUUID()
+            : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+              });
+          localStorage.setItem('ght_access_token', activeToken);
+        }
+      } catch {
+        activeToken = typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+          ? crypto.randomUUID()
+          : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+              const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+              return v.toString(16);
+            });
+      }
+
       const res = await fetch('/api/orders', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          'x-access-token': localStorage.getItem('ght_access_token') || ''
+          'x-access-token': activeToken
         },
         body: JSON.stringify(orderData)
       });

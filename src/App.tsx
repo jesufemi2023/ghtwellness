@@ -167,11 +167,27 @@ export default function App() {
 
   // Robust Session Management (Anonymous RLS)
   const [accessToken] = useState(() => {
-    const existing = localStorage.getItem("ght_access_token");
-    if (existing) return existing;
-    const newToken = crypto.randomUUID();
-    localStorage.setItem("ght_access_token", newToken);
-    return newToken;
+    try {
+      const existing = localStorage.getItem("ght_access_token");
+      if (existing) return existing;
+      const newToken = typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+        ? crypto.randomUUID()
+        : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+          });
+      localStorage.setItem("ght_access_token", newToken);
+      return newToken;
+    } catch {
+      // Fallback for restricted/disabled environments like iOS Private Browsing
+      const newToken = typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+        ? crypto.randomUUID()
+        : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+          });
+      return newToken;
+    }
   });
 
   // Form State - No hardcoding
