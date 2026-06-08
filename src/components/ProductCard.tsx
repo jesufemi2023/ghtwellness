@@ -15,7 +15,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
 
   return (
     <div 
-      className="flex flex-col h-full bg-white border border-slate-200 rounded-2xl md:rounded-3xl overflow-hidden hover:shadow-2xl transition-all duration-500 group relative"
+      onClick={() => onQuickView(product)}
+      className="flex flex-col h-full bg-white border border-slate-200 rounded-2xl md:rounded-3xl overflow-hidden hover:shadow-2xl transition-all duration-500 group relative cursor-pointer"
     >
       {/* Urgency Badge - Top Center */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 z-30 bg-red-600 text-white px-4 py-1 rounded-b-xl text-[10px] font-black uppercase tracking-[0.2em] shadow-lg animate-bounce">
@@ -87,7 +88,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
         {/* Quick View Button Overlay - Responsive & Stable */}
         <div className="absolute inset-0 bg-slate-900/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-20">
           <button 
-            onClick={() => onQuickView(product)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onQuickView(product);
+            }}
             className="bg-white text-slate-900 px-8 py-3 rounded-full font-black text-sm shadow-2xl flex items-center gap-2 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 hover:bg-emerald-600 hover:text-white active:scale-95"
           >
             Quick View
@@ -107,7 +111,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
             onMouseLeave={() => setIsExpanded(false)}
             onFocus={() => setIsExpanded(true)}
             onBlur={() => setIsExpanded(false)}
-            onClick={() => setIsExpanded(!isExpanded)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsExpanded(!isExpanded);
+            }}
             className={`text-base text-slate-600 leading-relaxed font-medium cursor-pointer transition-all duration-300 ${isExpanded ? 'line-clamp-none' : 'line-clamp-2'}`}
           >
             {product.short_desc}
@@ -140,7 +147,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
           ))}
           {!isExpanded && product.health_benefits.length > 2 && (
             <button 
-              onClick={() => onQuickView(product)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onQuickView(product);
+              }}
               className="text-[9px] md:text-[10px] font-black text-emerald-600 uppercase tracking-widest mt-0.5 hover:text-emerald-800 transition-colors flex items-center gap-1 group/btn"
             >
               <span className="animate-pulse">+ {product.health_benefits.length - 2} Benefits</span>
@@ -179,7 +189,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
         <div className="pt-0.5 flex flex-col gap-2">
           <div className="flex items-center gap-2">
             <button 
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 const message = `Hello SD GHT Health Care, I am interested in ${product.name}. Could you please provide more information on how I can place an order?`;
                 window.open(`https://wa.me/${CONFIG.company.phone.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`, '_blank');
               }}
@@ -189,7 +200,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
               Chat with us
             </button>
             <button 
-              onClick={() => onOrder(product)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onOrder(product);
+              }}
               className="flex-[1.5] bg-emerald-600 text-white py-2 md:py-2.5 rounded-lg md:rounded-xl font-black text-sm md:text-base hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100 active:scale-[0.98] flex items-center justify-center gap-1 md:gap-2 group/order animate-shimmer"
             >
               Order Now
