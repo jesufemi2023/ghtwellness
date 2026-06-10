@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FileText, Loader2, Plus, Sparkles } from 'lucide-react';
 import { GoogleGenAI } from "@google/genai";
 
@@ -10,16 +10,32 @@ interface BlogAdminProps {
 export function BlogAdmin({ onBlogGenerated, adminPassword }: BlogAdminProps) {
   const [loading, setLoading] = useState(false);
   const [topic, setTopic] = useState('');
-  const [category, setCategory] = useState('Erectile Dysfunction');
+  const [packages, setPackages] = useState<any[]>([]);
+  const [selectedPackageId, setSelectedPackageId] = useState<string>('');
+  const [customCategory, setCustomCategory] = useState('');
+  const [loadingPackages, setLoadingPackages] = useState(true);
 
-  const categories = [
-    'Diabetes',
-    'Prostate Health',
-    'Erectile Dysfunction',
-    'Premature Ejaculation',
-    'Men\'s Health',
-    'Wellness'
-  ];
+  useEffect(() => {
+    const fetchPackages = async () => {
+      try {
+        const res = await fetch('/api/recommended-packages');
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data)) {
+            setPackages(data);
+            if (data.length > 0) {
+              setSelectedPackageId(data[0].id);
+            }
+          }
+        }
+      } catch (e) {
+        console.error("Failed to fetch packages in BlogAdmin:", e);
+      } finally {
+        setLoadingPackages(false);
+      }
+    };
+    fetchPackages();
+  }, []);
 
   const handleGenerate = async () => {
     if (!topic) {
@@ -48,46 +64,100 @@ export function BlogAdmin({ onBlogGenerated, adminPassword }: BlogAdminProps) {
       
       const ai = new GoogleGenAI(apiKey ? { apiKey } : {});
 
-      // 1. Define Category Rules for Packages
+      // Dynamic Category and Intelligent Rule Detection
       let packageSearchTerm = '';
       let packageProducts: string[] = [];
+      let packageBenefits: string[] = [];
+      let packageSymptoms: string[] = [];
+      let categoryName = 'Wellness';
+      let targetPackageId: string | null = null;
+
+      const selectedPkg = packages.find(p => p.id === selectedPackageId);
       
-      if (category === 'Erectile Dysfunction' || category === 'Premature Ejaculation' || category === 'Men\'s Health') {
-        packageSearchTerm = 'Weak Erection';
-        packageProducts = ['Zinc', 'Reodoe Capsules', 'Vigor Max Softgel'];
-      } else if (category === 'Prostate Health') {
-        packageSearchTerm = 'Prostate';
-        packageProducts = ['Vigor Max', 'B-Clear', 'Prostbeta'];
-      } else if (category === 'Diabetes') {
-        packageSearchTerm = 'Diabetes';
-        packageProducts = ['Constifree Tea', 'Longzit', 'Dialese', 'Myco-Balance'];
+      if (selectedPkg && selectedPackageId !== 'custom') {
+        targetPackageId = selectedPkg.id;
+        packageSearchTerm = selectedPkg.name;
+        categoryName = selectedPkg.name.replace(/Treatment|Package|Therapy|Solution|Kit|Combo|System|Set/gi, '').trim();
+        
+        // Extract product list for the package
+        packageProducts = selectedPkg.package_products?.map((pp: any) => {
+          if (pp.products && pp.products.name) return pp.products.name;
+          if (pp.name) return pp.name;
+          return null;
+        }).filter(Boolean) || [];
+        
+        packageBenefits = selectedPkg.health_benefits || [];
+        packageSymptoms = selectedPkg.symptoms || [];
       } else {
-        packageSearchTerm = 'Wellness';
+        categoryName = customCategory.trim() || 'Wellness';
+      }
+
+      let packageRecInstructions = '';
+      if (selectedPkg && selectedPackageId !== 'custom') {
+        packageRecInstructions = `
+          The article MUST recommend the specific supplement package: "${selectedPkg.name}".
+          This package contains the following specific products: ${packageProducts.length > 0 ? packageProducts.join(', ') : 'natural organic supplements'}.
+          ${packageSymptoms.length > 0 ? `It is specially formulated to relieve symptoms like: ${packageSymptoms.join(', ')}.` : ''}
+          ${packageBenefits.length > 0 ? `The key health benefits of this package include: ${packageBenefits.join(', ')}.` : ''}
+          
+          In the recommendation section of the article, you MUST recommend this package ("${selectedPkg.name}") explicitly as the ultimate therapeutic solution and explain how these components work synergistically to address the core medical conditions.
+        `;
+      } else {
+        packageRecInstructions = `
+          Recommend a general, natural organic supplement category or health solutions suited for the topic. Do not name specific proprietary brands.
+        `;
       }
 
       // 2. Generate Content with AI
       const prompt = `
-        Generate a comprehensive, SEO-optimized health blog article for the topic: "${topic}" in the category: "${category}".
-        
-        The article MUST include:
-        1. An SEO-optimized title.
-        2. A detailed introduction educating the visitor about the health issue.
-        3. Educational sections with clear headings and bullet points.
-        4. Health tips.
-        5. A "Real Customer Experience" section using a WhatsApp-style testimonial conversation between a customer and a consultant. Include chat bubbles, contact name, timestamp, and profile picture placeholders. Make it sound realistic and believable.
-        6. A recommendation section for a supplement package. If the category is ${category}, recommend a package containing: ${packageProducts.join(', ')}.
-        7. An FAQ section with at least 3 common questions.
-        8. A conclusion.
-        9. A list of 3 "Related Articles" titles.
+        You are a world-class health educator, elite direct-response health copywriter (like those at peak newsletter health publications), and cellular health researcher. Your copywriting has a 97% Conversion-Rate-Optimization (CRO) rating.
+        Your goal is to write a highly compelling, robust, deeply educational, and scientifically authoritative health blog article for the topic: "${topic}" in the category: "${categoryName}".
+        The reader must feel a profound sense of self-education, trust, and intense motivation to immediately take charge of their health by ordering the recommended wellness solution.
 
-        The tone must be educational and trustworthy, not like direct sales content.
+        Use the PAS (Problem-Agitation-Solution) direct copywriting framework:
+        1. **The Core Hook & Problem**: Start with a high-impact, peer-reviewed medical insight or a striking biological fact that captures focus immediately. Explain the underlooked cellular/organic ROOT causes of the condition (e.g., declining Nitric Oxide levels, microCapillary congestion, arterial stiffness, chronic tissue inflammation, cellular toxicity, insulin/metabolic decline) rather than standard surface-level symptoms. 
+        2. **Deep Agitation**: Paint an empathetic yet vivid, high-stakes picture of what happens when these biological bottlenecks are left unaddressed. Discuss the physical progression, decline in vitality, psychological toll, energy levels, marital harmony, and the burden of living with restricted health potential. 
+        3. **The Illusions of Quick Fixes**: Briefly expose why conventional chemical or quick-fix synthetic drugs only mask structural issues or place massive stress on the liver and kidneys, leading to dependency or unwanted side effects.
+        4. **The Science of Natural Synergy (The Solution)**: Reveal how an organic, scientifically targeted natural herbal protocol safely addresses the deep root cause at a cellular level, repairing tissues and restoring permanent organic balance.
+
+        The article MUST include these literal markdown sections:
+
+        ## 🔬 The Science Inside: Cellular Root Causes
+        Deep dive into the cellular mechanisms. Use simple analogies but professional terminology.
+
+        ## ⚠️ Why Waiting Compounds the Threat
+        Highlight the silent progression of the biological bottleneck.
+
+        ## 💬 A Private Consultation: Restoring Hope
+        Explain that many readers feel overwhelmed or skeptical, and then write a "Real Customer Experience" using a WhatsApp-style testimonial conversation between a customer and a health consultant. 
+        The dialogue must feel incredibly realistic, professional, deeply reassuring, and clear.
+        
+        CRITICAL FOR RENDERING - You MUST represent this conversation using exactly the blockquote syntax below, using the literal prefixes (**Customer:** and **Expert:**) on separate paragraph blocks:
+        > **Customer:** "Insert realistic patient concern here, mentioning their skepticism after wasting money on cheap drugs, their specific embarrassing symptoms, and how long they suffered."
+        > **Expert:** "Insert deeply empathetic and highly professional, informative expert response here, explaining how our synergistic wellness protocol addresses the root cause of their issue."
+        > **Customer:** "Insert emotional breakthrough response, detailing how using the formula for just a few weeks completely resolved their issue, restored their energy, and brought joy back to their marriage/lifestyle."
+        > **Expert:** "Insert follow-up encouragement here, thanking them and confirming that the organic ingredients are designed for long-term cell nourishment and zero side effects."
+
+        ## 🌿 The Premium Natural Protocol: ${categoryName}
+        ${packageRecInstructions}
+        Detail the specific components, active biological compounds (e.g., zinc, active saponins, alkaloids, organic teas), and explain how they work together synergistically (1 + 1 = 10) to flood the body with reparative nutrients, restore vigor, and cleanse arterial/cellular pathways.
+
+        ## ❓ Frequently Asked Questions
+        Address the top 4 objections/prejudices intellectually:
+        1. "Will this work for me if I've tried other natural therapies and failed?" (Address custom biological synergy and high concentration of our premium extracts)
+        2. "How long does it take to see positive results?" (Set realistic physiological timelines while highlighting early signs of recovery)
+        3. "Are there any side effects or interactions?" (Assure 100% organic, pure, additive-free safety certifications)
+        4. "How do I securely order and receive my package?" (Highlight fast, highly confidential, discreet shipping with pristine brown paper packaging to protect privacy)
+
+        ## 💡 Step-by-Step Vigor Action Plan
+        Provide 3 simple, immediate daily health changes the reader can combine with the protocol for maximum speed of healing.
 
         Format the entire response as a JSON object with the following structure:
         {
-          "title": "...",
-          "meta_description": "...",
-          "content": "Markdown formatted content. For the WhatsApp testimonial, use blockquotes or specific markdown to represent chat bubbles. For the package recommendation, create a visually appealing section in markdown.",
-          "tags": ["${category}", "health", "wellness", "tips"],
+          "title": "A highly compelling, curiosity-igniting, benefit-driven SEO title (not clickbafty, but irresistible to someone suffering from the issue)",
+          "meta_description": "A high-CTR, compelling meta description summarizing the breakthrough information inside the article.",
+          "content": "Entire Markdown formatted body using the sections above. Ensure headings use ##, subheadings use ###, bullet points are clear, and paragraphs are readable with beautiful typography spacing.",
+          "tags": ["${categoryName}", "health", "wellness", "natural recovery", "healing"],
           "image_prompt": "A professional, medical-grade, realistic photo or 3D illustration representing ${topic}. Not cartoonish."
         }
       `;
@@ -134,13 +204,13 @@ export function BlogAdmin({ onBlogGenerated, adminPassword }: BlogAdminProps) {
         }
       } catch (e: any) {
         console.error("Failed to generate image, using high-quality fallback:", e);
-        // Use a themed fallback based on category
+        // Use a themed fallback based on categoryName
         const seeds: Record<string, string> = {
           'Diabetes': '1584036561566-baf8f5f1b144',
           'Prostate Health': '1576091160550-2173dba999ef',
           'Wellness': '1544367567-0f2fcb009e0b'
         };
-        const photoId = seeds[category] || '1576091160550-2173dba999ef';
+        const photoId = seeds[categoryName] || '1576091160550-2173dba999ef';
         image_url = `https://images.unsplash.com/photo-${photoId}?q=80&w=800&auto=format&fit=crop`;
       }
 
@@ -151,7 +221,13 @@ export function BlogAdmin({ onBlogGenerated, adminPassword }: BlogAdminProps) {
           'Content-Type': 'application/json',
           'x-admin-password': adminPassword
         },
-        body: JSON.stringify({ category, blogData, image_url, packageSearchTerm })
+        body: JSON.stringify({ 
+          category: categoryName, 
+          blogData, 
+          image_url, 
+          packageSearchTerm,
+          recommendedPackageId: targetPackageId
+        })
       });
 
       if (!res.ok) {
@@ -160,6 +236,7 @@ export function BlogAdmin({ onBlogGenerated, adminPassword }: BlogAdminProps) {
       }
 
       setTopic('');
+      setCustomCategory('');
       onBlogGenerated();
       alert("Blog generated successfully!");
     } catch (e: any) {
@@ -189,17 +266,39 @@ export function BlogAdmin({ onBlogGenerated, adminPassword }: BlogAdminProps) {
 
       <div className="space-y-4">
         <div>
-          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Health Category</label>
-          <select 
-            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold focus:ring-2 focus:ring-emerald-500 outline-none"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-          >
-            {categories.map(c => (
-              <option key={c} value={c}>{c}</option>
-            ))}
-          </select>
+          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Health Package / Category</label>
+          {loadingPackages ? (
+            <div className="flex items-center gap-2 text-xs text-slate-500 font-bold bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
+              <Loader2 size={14} className="animate-spin" /> Loading categories...
+            </div>
+          ) : (
+            <select 
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold focus:ring-2 focus:ring-emerald-500 outline-none"
+              value={selectedPackageId}
+              onChange={(e) => setSelectedPackageId(e.target.value)}
+            >
+              {packages.map(p => (
+                <option key={p.id} value={p.id}>
+                  {p.name} {p.is_combo ? '(Combo Kit)' : '(Wellness Solution)'}
+                </option>
+              ))}
+              <option value="custom">✍️ Custom Category (Enter below)...</option>
+            </select>
+          )}
         </div>
+
+        {selectedPackageId === 'custom' && (
+          <div>
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Custom Category Name</label>
+            <input 
+              type="text"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold focus:ring-2 focus:ring-emerald-500 outline-none"
+              placeholder="e.g. Chronic Back Pain"
+              value={customCategory}
+              onChange={(e) => setCustomCategory(e.target.value)}
+            />
+          </div>
+        )}
 
         <div>
           <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Article Topic / Keyword</label>

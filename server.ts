@@ -417,14 +417,14 @@ export async function createServer() {
 
   // Specific route for AI Blog Generation (MUST be before generic /api/admin/:table)
   app.post("/api/admin/save-blog", adminAuth, async (req, res) => {
-    const { category, blogData, image_url, packageSearchTerm } = req.body;
+    const { category, blogData, image_url, packageSearchTerm, recommendedPackageId: reqPackageId } = req.body;
     if (!blogData || !category) return res.status(400).json({ error: "Blog data and Category are required" });
 
     try {
       // 1. Fetch the recommended package from the database
-      let recommendedPackageId = null;
+      let recommendedPackageId = reqPackageId || null;
       
-      if (supabase && packageSearchTerm) {
+      if (!recommendedPackageId && supabase && packageSearchTerm) {
         const { data: packages } = await supabase
           .from('recommended_packages')
           .select('id')
