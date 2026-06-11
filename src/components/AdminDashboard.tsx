@@ -1179,7 +1179,8 @@ const SettingsAdminView = ({ adminPassword }: { adminPassword: string }) => {
   const [settings, setSettings] = useState<any>({
     bank_name: "",
     account_number: "",
-    account_name: ""
+    account_name: "",
+    meta_pixel_id: ""
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -1273,6 +1274,23 @@ const SettingsAdminView = ({ adminPassword }: { adminPassword: string }) => {
               className="w-full h-14 bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 font-bold text-slate-900 focus:border-emerald-500 outline-none transition-all"
               placeholder="e.g. SD GHT HEALTH CARE LTD"
             />
+          </div>
+
+          <div className="border-t border-slate-100 pt-6 space-y-2">
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Meta (Facebook) Pixel ID</label>
+              <span className="text-[9px] bg-emerald-100 text-emerald-700 font-extrabold px-2 py-0.5 rounded-full uppercase tracking-widest">Active Tracker</span>
+            </div>
+            <input 
+              type="text"
+              value={settings.meta_pixel_id || ""}
+              onChange={e => setSettings({ ...settings, meta_pixel_id: e.target.value })}
+              className="w-full h-14 bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 font-bold text-slate-900 focus:border-emerald-500 outline-none transition-all font-mono"
+              placeholder="e.g. 4024543217840998"
+            />
+            <p className="text-[10px] text-slate-400 font-medium leading-relaxed pl-1">
+              Enter your Facebook custom Pixel ID above. Changes are applied instantly across all pages and events. Leaving this empty disables Facebook tracking or falls back to your VITE_META_PIXEL_ID env configuration.
+            </p>
           </div>
         </div>
 

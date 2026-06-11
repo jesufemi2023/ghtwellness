@@ -5,22 +5,38 @@ declare global {
   }
 }
 
-const PIXEL_ID = import.meta.env.VITE_META_PIXEL_ID;
-
 /**
- * Dynamically injects and initializes the Meta Pixel script
- * only if VITE_META_PIXEL_ID is configured in environment variables.
+ * Dynamically injects and initializes the Meta Pixel script.
+ * Looks for configured Pixel ID in:
+ * 1. Database app settings ('meta_pixel_id')
+ * 2. Environment variables ('VITE_META_PIXEL_ID')
+ * 3. Standard fallback ID ('4024543217840998')
  */
-export const initMetaPixel = () => {
+export const initMetaPixel = async () => {
   if (typeof window === "undefined") return;
 
-  if (!PIXEL_ID) {
-    console.warn("Meta Pixel ID (VITE_META_PIXEL_ID) not found. Facebook Pixel tracking is disabled.");
+  let activePixelId = import.meta.env.VITE_META_PIXEL_ID || '4024543217840998';
+
+  try {
+    const res = await fetch("/api/settings");
+    if (res.ok) {
+      const settings = await res.json();
+      if (settings && settings.meta_pixel_id) {
+        activePixelId = settings.meta_pixel_id.trim();
+        console.log("Using dynamically configured database Meta Pixel ID:", activePixelId);
+      }
+    }
+  } catch (err) {
+    console.warn("Could not retrieve dynamic database settings for Meta Pixel, falling back to static/default ID:", err);
+  }
+
+  if (!activePixelId) {
+    console.warn("Meta Pixel ID not found. Facebook Pixel tracking is disabled.");
     return;
   }
 
   if (window.fbq) {
-    console.log("Meta Pixel is already initialized.");
+    console.log("Meta Pixel was already initialized.");
     return;
   }
 
@@ -44,9 +60,9 @@ export const initMetaPixel = () => {
     })(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
     /* eslint-enable */
 
-    window.fbq('init', PIXEL_ID);
+    window.fbq('init', activePixelId);
     window.fbq('track', 'PageView');
-    console.log("Meta Pixel initialized successfully with ID:", PIXEL_ID);
+    console.log("Meta Pixel initialized successfully with ID:", activePixelId);
   } catch (error) {
     console.error("Error during Meta Pixel script injection:", error);
   }
