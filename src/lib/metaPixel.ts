@@ -7,38 +7,55 @@ declare global {
 
 /**
  * Dynamically injects and initializes the Meta Pixel script.
- * Looks for configured Pixel ID in:
- * 1. Database app settings ('meta_pixel_id')
- * 2. Environment variables ('VITE_META_PIXEL_ID')
- * 3. Standard fallback ID ('4024543217840998')
+ * Uses a non-blocking localStorage cache to eliminate any startup fetch latency.
+ * Falls back to environment variables or the default ID.
  */
-export const initMetaPixel = async () => {
+export const initMetaPixel = () => {
   if (typeof window === "undefined") return;
 
-  let activePixelId = import.meta.env.VITE_META_PIXEL_ID || '4024543217840998';
+  // 1. Get cached Pixel ID instantly from localStorage or fallback to Env/Hardcoded default
+  const cachedPixelId = localStorage.getItem("meta_pixel_id_cache");
+  const envPixelId = import.meta.env.VITE_META_PIXEL_ID;
+  const defaultFallbackId = '4024543217840998';
+  
+  const initialPixelId = cachedPixelId || envPixelId || defaultFallbackId;
 
-  try {
-    const res = await fetch("/api/settings");
-    if (res.ok) {
-      const settings = await res.json();
+  // 2. Initialize the Pixel immediately with the initial ID to prevent any blocking/delay
+  runPixelScriptInjection(initialPixelId);
+
+  // 3. Fire-and-forget background fetch to update the cache with any runtime DB changes
+  fetch("/api/settings")
+    .then((res) => {
+      if (res.ok) return res.json();
+      throw new Error("Failed to fetch settings from DB");
+    })
+    .then((settings) => {
       if (settings && settings.meta_pixel_id) {
-        activePixelId = settings.meta_pixel_id.trim();
-        console.log("Using dynamically configured database Meta Pixel ID:", activePixelId);
+        const freshPixelId = settings.meta_pixel_id.trim();
+        
+        // If the dynamic/admin ID changed, update the cache
+        if (freshPixelId !== cachedPixelId) {
+          localStorage.setItem("meta_pixel_id_cache", freshPixelId);
+          console.log(`[Meta Pixel Cache] Updated cached Pixel ID to: ${freshPixelId}. This will load instantly on the next page view.`);
+          
+          // If the page doesn't have fbq yet or was initialized with a different fallback, re-init
+          if (!window.fbq || window.fbq.instanceId !== freshPixelId) {
+            console.log(`[Meta Pixel] Re-initializing with updated ID: ${freshPixelId}`);
+            runPixelScriptInjection(freshPixelId);
+          }
+        }
       }
-    }
-  } catch (err) {
-    console.warn("Could not retrieve dynamic database settings for Meta Pixel, falling back to static/default ID:", err);
-  }
+    })
+    .catch((err) => {
+      console.warn("[Meta Pixel Cache] Could not fetch remote settings, using default/cached values:", err);
+    });
+};
 
-  if (!activePixelId) {
-    console.warn("Meta Pixel ID not found. Facebook Pixel tracking is disabled.");
-    return;
-  }
-
-  if (window.fbq) {
-    console.log("Meta Pixel was already initialized.");
-    return;
-  }
+/**
+ * Handles the actual injection/initialization logic for the Facebook Pixel script.
+ */
+function runPixelScriptInjection(pixelId: string) {
+  if (!pixelId) return;
 
   try {
     /* eslint-disable */
@@ -60,13 +77,18 @@ export const initMetaPixel = async () => {
     })(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
     /* eslint-enable */
 
-    window.fbq('init', activePixelId);
+    // Custom property to keep track of initialized ID
+    if (window.fbq) {
+      window.fbq.instanceId = pixelId;
+    }
+
+    window.fbq('init', pixelId);
     window.fbq('track', 'PageView');
-    console.log("Meta Pixel initialized successfully with ID:", activePixelId);
+    console.log("[Meta Pixel] Initialized/Synced tracking with Pixel ID:", pixelId);
   } catch (error) {
     console.error("Error during Meta Pixel script injection:", error);
   }
-};
+}
 
 /**
  * Tracks standard Page View event.
