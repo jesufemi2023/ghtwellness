@@ -477,7 +477,7 @@ export async function createServer() {
           const junctionData = product_ids.map(pid => ({ package_id: retryData.id, product_id: pid }));
           await supabase.from('package_products').insert(junctionData);
         }
-        await updateSyncTimestamp();
+        updateSyncTimestamp();
         return res.json(retryData);
       }
       return res.status(500).json({ error: error.message });
@@ -497,7 +497,7 @@ export async function createServer() {
       }
     }
 
-    await updateSyncTimestamp();
+    updateSyncTimestamp();
     res.json(data);
   });
 
@@ -536,7 +536,7 @@ export async function createServer() {
             await supabase.from('package_products').insert(junctionData);
           }
         }
-        await updateSyncTimestamp();
+        updateSyncTimestamp();
         return res.json(retryData);
       }
       return res.status(500).json({ error: error.message });
@@ -559,7 +559,7 @@ export async function createServer() {
       }
     }
 
-    await updateSyncTimestamp();
+    updateSyncTimestamp();
     res.json(data);
   });
 
@@ -569,7 +569,7 @@ export async function createServer() {
     const { table, id } = req.params;
     const { error } = await supabase.from(table).delete().eq('id', id);
     if (error) return res.status(500).json({ error: error.message });
-    await updateSyncTimestamp();
+    updateSyncTimestamp();
     res.json({ success: true });
   });
 

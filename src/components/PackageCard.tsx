@@ -64,7 +64,7 @@ export const PackageCard: React.FC<PackageCardProps> = ({ data, allPackages, onO
           {/* Floating Badges - Top Right */}
           <div className="absolute top-2 right-2 md:top-3 md:right-3 z-10 flex flex-col items-end gap-1 md:gap-1.5">
             <div className="bg-white/95 backdrop-blur-sm text-slate-900 px-1.5 py-0.5 md:px-2 md:py-1 rounded-md md:rounded-lg text-[8px] md:text-[9px] font-black uppercase tracking-wider border border-slate-200 shadow-md">
-              PACKAGE
+              {data.package_code || "PACKAGE"}
             </div>
             <div className="flex items-center gap-1 px-1.5 py-0.5 md:px-2 md:py-1 bg-emerald-600/95 backdrop-blur-sm text-white rounded-md md:rounded-lg text-[8px] md:text-[9px] font-black border border-emerald-500 shadow-md">
               <Globe size={10} className="md:size-3" />

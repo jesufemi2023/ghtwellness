@@ -154,6 +154,7 @@ export default function AdminDashboard({ adminPassword, onLogout }: AdminDashboa
         
         if (errorMessage.includes("Rate exceeded")) {
           console.warn("Rate limit exceeded for admin data, retrying in 2s...");
+          setLoading(false);
           setTimeout(fetchData, 2000);
           return;
         }

@@ -58,11 +58,16 @@ export const ComboCard: React.FC<ComboCardProps> = ({ data, onOrder, onProductCl
             />
             
             {/* Floating Badges */}
-            <div className="absolute top-6 left-6 flex flex-col gap-3 z-10">
+            <div className="absolute top-6 left-6 flex flex-col items-start gap-3 z-10">
               <div className="bg-emerald-600 text-white px-5 py-2.5 rounded-2xl shadow-2xl flex items-center gap-3 border-2 border-white/20 backdrop-blur-md">
                 <div className="w-3 h-3 bg-white rounded-full animate-pulse shadow-[0_0_12px_rgba(255,255,255,0.8)]" />
                 <span className="text-xs font-black uppercase tracking-widest">Master Kit</span>
               </div>
+              {data.package_code && (
+                <div className="bg-white/95 backdrop-blur-sm text-slate-900 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider border-2 border-slate-100 shadow-2xl">
+                  {data.package_code}
+                </div>
+              )}
             </div>
 
             {/* Quick View Button Overlay */}
