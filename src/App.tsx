@@ -49,6 +49,7 @@ import { AIChatBot } from "./components/chat/AIChatBot";
 import { SearchResults } from "./components/SearchResults";
 import AdminDashboard from "./components/AdminDashboard";
 import { TestimonialsPage } from "./components/TestimonialsPage";
+import { ThankYouPage } from "./components/ThankYouPage";
 import { Product, PackageData } from "./types";
 import { trackPageView, trackConsultation, trackWhatsAppClick, trackBlogView } from "./lib/analytics";
 
@@ -64,7 +65,17 @@ interface Consultation {
 }
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<"home" | "about" | "products" | "recommended" | "combo" | "consultation" | "history" | "product-detail" | "admin" | "blog" | "blog-post" | "search" | "testimonials">("home");
+  const [activeTab, setActiveTab] = useState<"home" | "about" | "products" | "recommended" | "combo" | "consultation" | "history" | "product-detail" | "admin" | "blog" | "blog-post" | "search" | "testimonials" | "thank-you">((() => {
+    const path = window.location.pathname;
+    if (path === "/thank-you" || path.startsWith("/thank-you")) {
+      return "thank-you";
+    }
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("page") === "thank-you" || params.get("page") === "thankyou" || params.has("thank-you")) {
+      return "thank-you";
+    }
+    return "home";
+  })());
   const [previousTab, setPreviousTab] = useState<typeof activeTab>("home");
 
   const navigateTo = (tab: typeof activeTab) => {
@@ -245,7 +256,8 @@ export default function App() {
       blog: "Health Blog",
       "blog-post": "Blog Article",
       search: `Search: ${searchQuery}`,
-      testimonials: "Success Stories"
+      testimonials: "Success Stories",
+      "thank-you": "Thank You"
     };
     trackPageView(activeTab, titles[activeTab]);
   }, [activeTab, viewingProduct, searchQuery]);
@@ -1480,6 +1492,17 @@ export default function App() {
             </motion.div>
           )}
 
+          {activeTab === "thank-you" && (
+            <motion.div
+              key="thank-you"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+            >
+              <ThankYouPage onNavigate={(tab) => navigateTo(tab)} />
+            </motion.div>
+          )}
+
           {activeTab === "admin" && (
             <motion.div
               key="admin"
@@ -1811,6 +1834,18 @@ export default function App() {
           type={orderItem.type}
           distributorId={distributorId}
           initialQuantity={orderItem.qty}
+          onOrderSuccess={(fullName, itemName, quantity, totalPrice, deliveryDate, paymentMethod) => {
+            const searchParams = new URLSearchParams();
+            searchParams.set("full_name", fullName);
+            searchParams.set("item_name", itemName);
+            searchParams.set("quantity", String(quantity));
+            searchParams.set("total_price", String(totalPrice));
+            searchParams.set("delivery_date", deliveryDate);
+            searchParams.set("payment_method", paymentMethod);
+            window.history.pushState(null, '', `/thank-you?${searchParams.toString()}`);
+            setActiveTab("thank-you");
+            setIsOrderDrawerOpen(false);
+          }}
         />
       )}
 

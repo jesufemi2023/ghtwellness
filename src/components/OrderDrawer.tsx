@@ -33,6 +33,7 @@ interface OrderDrawerProps {
   type: 'package' | 'product';
   distributorId?: string;
   initialQuantity?: number;
+  onOrderSuccess?: (fullname: string, itemName: string, quantity: number, totalPrice: number, deliveryDate: string, paymentMethod: string) => void;
 }
 
 export const OrderDrawer: React.FC<OrderDrawerProps> = ({ 
@@ -42,7 +43,8 @@ export const OrderDrawer: React.FC<OrderDrawerProps> = ({
   item, 
   type, 
   distributorId,
-  initialQuantity = 1
+  initialQuantity = 1,
+  onOrderSuccess
 }) => {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -255,6 +257,16 @@ export const OrderDrawer: React.FC<OrderDrawerProps> = ({
         console.log("Order submitted successfully");
         trackOrderComplete(item.name, totalPrice);
         setIsSuccess(true);
+        if (onOrderSuccess) {
+          onOrderSuccess(
+            formData.full_name,
+            item.name,
+            quantity,
+            totalPrice,
+            formData.delivery_date,
+            formData.payment_method
+          );
+        }
       } else {
         const errData = await res.json();
         console.error("Order submission failed:", errData);
