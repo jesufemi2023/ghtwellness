@@ -50,6 +50,7 @@ import { SearchResults } from "./components/SearchResults";
 import AdminDashboard from "./components/AdminDashboard";
 import { TestimonialsPage } from "./components/TestimonialsPage";
 import { ThankYouPage } from "./components/ThankYouPage";
+import { ReturnPolicy } from "./components/ReturnPolicy";
 import { Product, PackageData } from "./types";
 import { trackPageView, trackConsultation, trackWhatsAppClick, trackBlogView } from "./lib/analytics";
 
@@ -65,14 +66,20 @@ interface Consultation {
 }
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<"home" | "about" | "products" | "recommended" | "combo" | "consultation" | "history" | "product-detail" | "admin" | "blog" | "blog-post" | "search" | "testimonials" | "thank-you">((() => {
+  const [activeTab, setActiveTab] = useState<"home" | "about" | "products" | "recommended" | "combo" | "consultation" | "history" | "product-detail" | "admin" | "blog" | "blog-post" | "search" | "testimonials" | "thank-you" | "return-policy">((() => {
     const path = window.location.pathname;
     if (path === "/thank-you" || path.startsWith("/thank-you")) {
       return "thank-you";
     }
+    if (path === "/return-policy" || path.startsWith("/return-policy")) {
+      return "return-policy";
+    }
     const params = new URLSearchParams(window.location.search);
     if (params.get("page") === "thank-you" || params.get("page") === "thankyou" || params.has("thank-you")) {
       return "thank-you";
+    }
+    if (params.get("page") === "return-policy" || params.get("page") === "returnpolicy" || params.has("return-policy")) {
+      return "return-policy";
     }
     return "home";
   })());
@@ -81,6 +88,11 @@ export default function App() {
   const navigateTo = (tab: typeof activeTab) => {
     setPreviousTab(activeTab);
     setActiveTab(tab);
+    if (tab === "return-policy") {
+      window.history.pushState(null, '', '/return-policy');
+    } else if (tab === "home") {
+      window.history.pushState(null, '', '/');
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
   const [adminPassword, setAdminPassword] = useState("");
@@ -257,7 +269,8 @@ export default function App() {
       "blog-post": "Blog Article",
       search: `Search: ${searchQuery}`,
       testimonials: "Success Stories",
-      "thank-you": "Thank You"
+      "thank-you": "Thank You",
+      "return-policy": "Return & Exchange Policy"
     };
     trackPageView(activeTab, titles[activeTab]);
   }, [activeTab, viewingProduct, searchQuery]);
@@ -1503,6 +1516,17 @@ export default function App() {
             </motion.div>
           )}
 
+          {activeTab === "return-policy" && (
+            <motion.div
+              key="return-policy"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+            >
+              <ReturnPolicy onNavigate={(tab) => navigateTo(tab)} />
+            </motion.div>
+          )}
+
           {activeTab === "admin" && (
             <motion.div
               key="admin"
@@ -1582,11 +1606,16 @@ export default function App() {
             <ul className="space-y-3 md:space-y-4 text-slate-400 text-xs md:text-sm">
               {CONFIG.navigation.map(item => (
                 <li key={item.id}>
-                  <button onClick={() => navigateTo(item.id as any)} className="hover:text-emerald-400 transition-colors">
+                  <button onClick={() => navigateTo(item.id as any)} className="hover:text-emerald-400 transition-colors cursor-pointer">
                     {item.label}
                   </button>
                 </li>
               ))}
+              <li>
+                <button onClick={() => navigateTo("return-policy")} className="hover:text-emerald-400 transition-colors font-semibold text-emerald-500 cursor-pointer">
+                  Return Policy
+                </button>
+              </li>
             </ul>
           </div>
 
