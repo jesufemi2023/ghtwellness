@@ -6,12 +6,35 @@ declare global {
 }
 
 /**
+ * Helper to determine if Meta Pixel tracking should be enabled.
+ * Excludes localhost, 127.0.0.1, AI Studio preview environments (*.run.app), and cloud development containers.
+ * This guarantees Pixel events are ONLY sent from the deployed/live (Vercel) URL.
+ */
+export const isTrackingAllowed = (): boolean => {
+  if (typeof window === "undefined") return false;
+  const hostname = window.location.hostname;
+  return !(
+    hostname.includes("localhost") ||
+    hostname.includes("127.0.0.1") ||
+    hostname.includes("run.app") ||
+    hostname.includes("webcontainer") ||
+    hostname.includes("stackblitz")
+  );
+};
+
+/**
  * Dynamically injects and initializes the Meta Pixel script.
  * Uses a non-blocking localStorage cache to eliminate any startup fetch latency.
  * Falls back to environment variables or the default ID.
  */
 export const initMetaPixel = () => {
   if (typeof window === "undefined") return;
+
+  // Verify hostname to avoid polluting production pixel events during testing/development environment
+  if (!isTrackingAllowed()) {
+    console.log(`[Meta Pixel] Bypassing initialization on dev/preview domain: "${window.location.hostname}". Events will only fire on your deployed (Vercel) URL.`);
+    return;
+  }
 
   // 1. Get cached Pixel ID instantly from localStorage or fallback to Env/Hardcoded default
   const cachedPixelId = localStorage.getItem("meta_pixel_id_cache");
