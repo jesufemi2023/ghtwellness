@@ -163,7 +163,7 @@ export function BlogAdmin({ onBlogGenerated, adminPassword }: BlogAdminProps) {
       `;
 
       const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
+        model: "gemini-3.5-flash",
         contents: prompt,
         config: {
           responseMimeType: "application/json",
@@ -181,8 +181,8 @@ export function BlogAdmin({ onBlogGenerated, adminPassword }: BlogAdminProps) {
       // 3. Generate Image with AI
       let image_url = `https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=800&auto=format&fit=crop`; // High quality medical fallback
       try {
-        // Use gemini-3.1-flash-image-preview if user has selected a key, otherwise fallback to 2.5
-        const imageModel = hasUserKey ? "gemini-3.1-flash-image-preview" : "gemini-2.5-flash-image";
+        // Use gemini-3.1-flash-image if user has selected a key, otherwise fallback to 2.5
+        const imageModel = hasUserKey ? "gemini-3.1-flash-image" : "gemini-2.5-flash-image";
 
         const imageResponse = await ai.models.generateContent({
           model: imageModel,

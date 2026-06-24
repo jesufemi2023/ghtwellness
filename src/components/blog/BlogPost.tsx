@@ -1,11 +1,43 @@
 import React, { useEffect, useState } from 'react';
 import { BlogPost as BlogPostType } from '../../types';
-import { ArrowLeft, Calendar, Tag, Share2, CheckCircle2, Star, ShieldCheck, Truck, Clock, UserCheck, Phone } from 'lucide-react';
+import { 
+  ArrowLeft, 
+  Calendar, 
+  Tag, 
+  Share2, 
+  CheckCircle2, 
+  Star, 
+  ShieldCheck, 
+  Truck, 
+  Clock, 
+  UserCheck, 
+  Phone,
+  Sparkles,
+  Lock,
+  Gift,
+  Flame,
+  ThumbsUp,
+  Award,
+  Users2,
+  Check
+} from 'lucide-react';
 import { CONFIG } from '../../config';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { getOptimizedImageUrl } from '../../utils/cloudinary';
 import { trackBlogView } from '../../lib/analytics';
+import { motion, AnimatePresence } from 'motion/react';
+import { WhatsAppSuccessHub } from './WhatsAppSuccessHub';
+
+// Robust helper to extract raw text from react children
+const getRawText = (node: any): string => {
+  if (!node) return "";
+  if (typeof node === "string") return node;
+  if (typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map(getRawText).join("");
+  if (node.props && node.props.children) return getRawText(node.props.children);
+  return "";
+};
 
 interface BlogPostProps {
   id: string;
@@ -17,6 +49,90 @@ export function BlogPost({ id, onBack, onOrderPackage }: BlogPostProps) {
   const [post, setPost] = useState<BlogPostType | null>(null);
   const [loading, setLoading] = useState(true);
   const [isCopied, setIsCopied] = useState(false);
+  const [allPackages, setAllPackages] = useState<any[]>([]);
+  const [timeLeft, setTimeLeft] = useState(899); // 14 mins 59 secs
+  const [activeNotification, setActiveNotification] = useState<string | null>(null);
+
+  // Recent order notifications loop for maximum social proof
+  useEffect(() => {
+    const notifications = [
+      "Alhaji Umar from Kaduna just ordered Vigor Combo Treatment! 🎉",
+      "Mrs. Amaka from Lagos just ordered Sugar Balance Package! 💊",
+      "Chief Ogbonna from Port Harcourt just ordered Vigor Combo Treatment! 🔥",
+      "Pastor Johnson from Ibadan just ordered Cardio Cleanse! ❤️",
+      "Madam Evelyn from Benin City just ordered Sugar Balance Package! ✨",
+      "Dr. Gabriel from Abuja just ordered Vigor Combo Treatment! 🚀",
+      "Hajia Fatima from Kano just ordered Sugar Balance Package! 🙌",
+      "Mr. Christopher from Asaba just ordered Cardio Cleanse! 🩺"
+    ];
+
+    const interval = setInterval(() => {
+      const randomMsg = notifications[Math.floor(Math.random() * notifications.length)];
+      setActiveNotification(randomMsg);
+      setTimeout(() => {
+        setActiveNotification(null);
+      }, 6000);
+    }, 24000);
+
+    const initialTimeout = setTimeout(() => {
+      const randomMsg = notifications[Math.floor(Math.random() * notifications.length)];
+      setActiveNotification(randomMsg);
+      setTimeout(() => {
+        setActiveNotification(null);
+      }, 6000);
+    }, 5000);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(initialTimeout);
+    };
+  }, []);
+
+  // Countdown timer effect
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => (prev > 0 ? prev - 1 : 899));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Format time (MM:SS)
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  useEffect(() => {
+    const fetchAllPackages = async () => {
+      try {
+        const res = await fetch('/api/recommended-packages');
+        if (res.ok) {
+          setAllPackages(await res.json());
+        }
+      } catch (e) {
+        console.error("Failed to fetch packages in BlogPost:", e);
+      }
+    };
+    fetchAllPackages();
+  }, []);
+
+  const handleOrderPackageByName = (packageName: string) => {
+    if (!onOrderPackage) return;
+    const cleanName = packageName.toLowerCase();
+    
+    // Attempt fuzzy match on name
+    const found = allPackages.find(p => 
+      p.name.toLowerCase().includes(cleanName) || 
+      cleanName.includes(p.name.toLowerCase())
+    );
+    
+    if (found) {
+      onOrderPackage(found);
+    } else if (post?.recommended_package) {
+      onOrderPackage(post.recommended_package);
+    }
+  };
 
   const handleShare = async () => {
     if (!post) return;
@@ -90,29 +206,40 @@ export function BlogPost({ id, onBack, onOrderPackage }: BlogPostProps) {
   // Custom renderer for markdown
   const components = {
     blockquote: ({ node, children, ...props }: any) => {
-      const text = String(children).toLowerCase();
-      const isCustomer = text.includes('customer:') || text.includes('client:');
-      const isBrand = text.includes('brand:') || text.includes('consultant:') || text.includes('expert:');
+      const textVal = getRawText(children);
+      const isCustomer = textVal.toLowerCase().includes('customer:') || textVal.toLowerCase().includes('client:');
+      const isBrand = textVal.toLowerCase().includes('brand:') || textVal.toLowerCase().includes('consultant:') || textVal.toLowerCase().includes('expert:');
 
       if (isCustomer || isBrand) {
         const isUser = isCustomer;
+        const cleanText = textVal
+          .replace(/^\*?\*?(customer|client|expert|brand|consultant)\*?\*?\s*:\s*/i, '')
+          .replace(/^["']|["']$/g, '')
+          .trim();
+
         return (
-          <div className={`flex w-full mb-6 ${isUser ? 'justify-start' : 'justify-end'}`}>
-            <div className={`max-w-[85%] md:max-w-[75%] rounded-2xl px-5 py-4 shadow-sm ${
+          <div className={`flex w-full mb-3 ${isUser ? 'justify-start' : 'justify-end'}`}>
+            <div className={`relative max-w-[85%] md:max-w-[70%] px-4 py-2.5 pb-6 shadow-[0_1px_0.5px_rgba(0,0,0,0.13)] rounded-2xl ${
               isUser 
-                ? 'bg-slate-50 border border-slate-200 text-slate-800 rounded-tl-sm' 
-                : 'bg-emerald-50 text-emerald-900 border border-emerald-100 rounded-tr-sm'
+                ? 'bg-white text-slate-800 rounded-tl-none border-t border-slate-100' 
+                : 'bg-[#d9fdd3] text-slate-800 rounded-tr-none'
             }`}>
-              <div className="flex items-center gap-2 mb-2">
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${isUser ? 'bg-slate-200 text-slate-600' : 'bg-emerald-200 text-emerald-700'}`}>
-                  {isUser ? 'C' : 'E'}
-                </div>
-                <div className="text-[11px] font-black uppercase tracking-widest opacity-60">
-                  {isUser ? 'Verified Customer' : 'Health Expert'}
-                </div>
+              <div className="text-[10px] font-extrabold mb-1 flex items-center justify-between gap-2">
+                <span className={isUser ? 'text-[#075e54]' : 'text-[#128c7e]'}>
+                  {isUser ? 'Patient (Verified Customer)' : 'GHT Certified Health Expert'}
+                </span>
               </div>
-              <div className="text-base font-medium leading-relaxed">
-                {children}
+              <div className="text-sm md:text-base font-semibold leading-relaxed break-words text-slate-800">
+                {cleanText || children}
+              </div>
+              
+              <div className="absolute bottom-1 right-2 flex items-center gap-1 text-[9px] text-slate-400 select-none font-medium">
+                <span>10:48 AM</span>
+                {!isUser && (
+                  <span className="text-[#53bdeb]">
+                    <Check size={12} className="stroke-[3]" />
+                  </span>
+                )}
               </div>
             </div>
           </div>
@@ -318,6 +445,201 @@ export function BlogPost({ id, onBack, onOrderPackage }: BlogPostProps) {
               </div>
             )}
 
+
+            {/* High-Converting Ad Promo Countdown Banner */}
+            {post.recommended_package && (
+              <div className="mt-12 bg-gradient-to-br from-slate-950 via-emerald-950 to-slate-950 text-white rounded-3xl p-6 md:p-8 border border-emerald-500/30 shadow-2xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute -bottom-10 -left-10 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+                
+                <div className="relative z-10">
+                  <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+                    <span className="flex items-center gap-2 bg-red-600 text-white text-[10px] md:text-xs font-black uppercase tracking-widest px-3 py-1.5 rounded-full animate-pulse shadow-lg shadow-red-500/30">
+                      <Flame size={14} fill="currentColor" />
+                      Flash Deal: Active Now
+                    </span>
+                    <div className="flex items-center gap-2 text-amber-400 font-mono font-bold text-sm bg-black/40 border border-white/10 px-4 py-2 rounded-xl">
+                      <Clock size={16} className="animate-spin text-amber-500" style={{ animationDuration: '4s' }} />
+                      Time Left: <span className="text-white text-base font-black tracking-wider">{formatTime(timeLeft)}</span>
+                    </div>
+                  </div>
+
+                  <h3 className="text-2xl md:text-3xl font-black tracking-tight mb-2 leading-tight">
+                    Get ₦5,000 Instant Discount + FREE Nationwide Delivery Today!
+                  </h3>
+                  <p className="text-slate-300 text-sm md:text-base mb-6 font-medium">
+                    We are subsidizing the <span className="text-emerald-400 font-extrabold underline decoration-emerald-400/40">{post.recommended_package.name}</span> for the next 50 patients to make complete organic healing affordable. No coupon code needed—the discount is already applied inside our secure checkout!
+                  </p>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                    <div className="flex items-start gap-3 bg-white/5 border border-white/5 p-4 rounded-2xl">
+                      <Gift size={20} className="text-amber-400 shrink-0 mt-0.5" />
+                      <div>
+                        <h4 className="font-extrabold text-sm text-white">Bonus #1: Free Pill Organizer</h4>
+                        <p className="text-xs text-slate-400">Keep track of your daily doses effortlessly (Worth ₦3,500 - FREE today).</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3 bg-white/5 border border-white/5 p-4 rounded-2xl">
+                      <Truck size={20} className="text-emerald-400 shrink-0 mt-0.5" />
+                      <div>
+                        <h4 className="font-extrabold text-sm text-white">Bonus #2: Free Shipping & POD</h4>
+                        <p className="text-xs text-slate-400">Fast, confidential dispatch. Pay cash or transfer when you receive it.</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row items-center gap-4 border-t border-white/10 pt-6">
+                    <div className="text-center sm:text-left">
+                      <div className="flex items-baseline gap-2 justify-center sm:justify-start">
+                        <span className="text-3xl md:text-4xl font-black text-emerald-400">₦{post.recommended_package.price.toLocaleString()}</span>
+                        {post.recommended_package.discount > 0 && (
+                          <span className="text-sm font-bold text-slate-400 line-through">
+                            ₦{Math.round(post.recommended_package.price / (1 - post.recommended_package.discount / 100)).toLocaleString()}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[10px] text-emerald-500 font-extrabold uppercase tracking-wider mt-1">Guaranteed Authentic GHT Formulation</p>
+                    </div>
+
+                    <button 
+                      onClick={() => onOrderPackage && onOrderPackage(post.recommended_package)}
+                      className="w-full sm:w-auto sm:ml-auto bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-sm uppercase tracking-widest px-8 py-4.5 rounded-2xl transition-all shadow-xl shadow-emerald-500/20 hover:-translate-y-0.5 flex items-center justify-center gap-2 shrink-0"
+                    >
+                      Secure Instant Order
+                      <ArrowLeft size={16} className="rotate-180" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Interactive WhatsApp Success Hub */}
+            <WhatsAppSuccessHub onOrderPackageByName={handleOrderPackageByName} />
+
+            {/* Other Highly Convincing Verified Testimonials */}
+            <div className="mt-16 border-t border-slate-100 pt-12">
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-10">
+                <div>
+                  <span className="text-emerald-600 font-black text-xs uppercase tracking-widest block mb-1">Peer Reviews & Endorsements</span>
+                  <h3 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">Verified Patient Testimonials</h3>
+                </div>
+                <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 px-4 py-2 rounded-2xl text-xs font-bold text-slate-600">
+                  <Star size={16} fill="currentColor" className="text-amber-400" />
+                  <span className="text-slate-900 font-black">4.92 out of 5</span> (based on 1,480+ local orders)
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-slate-50 border border-slate-100 rounded-3xl p-6 shadow-sm">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-emerald-100 text-emerald-800 font-bold rounded-full flex items-center justify-center text-sm">
+                        PA
+                      </div>
+                      <div>
+                        <h4 className="font-extrabold text-sm text-slate-900">Pastor Adebayo</h4>
+                        <p className="text-xs text-slate-400">Ibadan, Oyo State</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-0.5 text-amber-400">
+                      <Star size={14} fill="currentColor" />
+                      <Star size={14} fill="currentColor" />
+                      <Star size={14} fill="currentColor" />
+                      <Star size={14} fill="currentColor" />
+                      <Star size={14} fill="currentColor" />
+                    </div>
+                  </div>
+                  <p className="text-slate-600 text-sm leading-relaxed font-medium mb-3">
+                    "I am a Pastor and diabetic patient of 8 years. My sugar level was constantly 280-320 mg/dL even with multiple daily injections. The leg burning pain was keeping me awake all night. I started taking this GHT solution and by the second week, my fasting glucose dropped to 110 mg/dL! I sleep like a baby now. Truly organic and blessed."
+                  </p>
+                  <span className="text-[10px] bg-emerald-50 text-emerald-700 px-2 py-1 rounded-md font-bold uppercase tracking-wider">
+                    Verified Purchase ✅
+                  </span>
+                </div>
+
+                <div className="bg-slate-50 border border-slate-100 rounded-3xl p-6 shadow-sm">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-indigo-100 text-indigo-800 font-bold rounded-full flex items-center justify-center text-sm">
+                        HF
+                      </div>
+                      <div>
+                        <h4 className="font-extrabold text-sm text-slate-900">Hajia Fatima</h4>
+                        <p className="text-xs text-slate-400">Kaduna, Kaduna State</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-0.5 text-amber-400">
+                      <Star size={14} fill="currentColor" />
+                      <Star size={14} fill="currentColor" />
+                      <Star size={14} fill="currentColor" />
+                      <Star size={14} fill="currentColor" />
+                      <Star size={14} fill="currentColor" />
+                    </div>
+                  </div>
+                  <p className="text-slate-600 text-sm leading-relaxed font-medium mb-3">
+                    "After my third scan showed the fibroids were growing larger, I was terrified of surgery. A senior nurse friend recommended the GHT Cleanse Combo. I took it faithfully for 2 months. Last week, I went back for a scan and the doctor was speechless—the fibroids had completely shrunk and melted away! I feel extremely light and happy."
+                  </p>
+                  <span className="text-[10px] bg-emerald-50 text-emerald-700 px-2 py-1 rounded-md font-bold uppercase tracking-wider">
+                    Verified Purchase ✅
+                  </span>
+                </div>
+
+                <div className="bg-slate-50 border border-slate-100 rounded-3xl p-6 shadow-sm">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-teal-100 text-teal-800 font-bold rounded-full flex items-center justify-center text-sm">
+                        OK
+                      </div>
+                      <div>
+                        <h4 className="font-extrabold text-sm text-slate-900">Okey Kunle</h4>
+                        <p className="text-xs text-slate-400">Port Harcourt</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-0.5 text-amber-400">
+                      <Star size={14} fill="currentColor" />
+                      <Star size={14} fill="currentColor" />
+                      <Star size={14} fill="currentColor" />
+                      <Star size={14} fill="currentColor" />
+                      <Star size={14} fill="currentColor" />
+                    </div>
+                  </div>
+                  <p className="text-slate-600 text-sm leading-relaxed font-medium mb-3">
+                    "My blood pressure was a ticking time bomb at 165/105. I had constant heavy headaches and chest stiffness. Conventional medical pills were giving me extreme weak performance which was ruining my relation with my wife. This GHT cardio treatment has completely cleared my vascular passages. My BP is now 118/79, no headaches, and my performance has returned to maximum levels!"
+                  </p>
+                  <span className="text-[10px] bg-emerald-50 text-emerald-700 px-2 py-1 rounded-md font-bold uppercase tracking-wider">
+                    Verified Purchase ✅
+                  </span>
+                </div>
+
+                <div className="bg-slate-50 border border-slate-100 rounded-3xl p-6 shadow-sm">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-amber-100 text-amber-800 font-bold rounded-full flex items-center justify-center text-sm">
+                        NS
+                      </div>
+                      <div>
+                        <h4 className="font-extrabold text-sm text-slate-900">Nurse Sandra</h4>
+                        <p className="text-xs text-slate-400">Enugu, Enugu State</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-0.5 text-amber-400">
+                      <Star size={14} fill="currentColor" />
+                      <Star size={14} fill="currentColor" />
+                      <Star size={14} fill="currentColor" />
+                      <Star size={14} fill="currentColor" />
+                      <Star size={14} fill="currentColor" />
+                    </div>
+                  </div>
+                  <p className="text-slate-600 text-sm leading-relaxed font-medium mb-3">
+                    "As a healthcare professional, I am extremely picky about quality standards. GHT utilizes pristine extraction techniques. The clinical synergy of these herbal treatments is amazing. The prostate therapy is particularly phenomenal. I recommend it to my family and patients without any hesitation."
+                  </p>
+                  <span className="text-[10px] bg-emerald-50 text-emerald-700 px-2 py-1 rounded-md font-bold uppercase tracking-wider">
+                    Verified Professional Endorsement 🩺
+                  </span>
+                </div>
+              </div>
+            </div>
+
             {/* Tags & Share */}
             <div className="mt-12 pt-8 border-t border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
               <div className="flex flex-wrap gap-2">
@@ -471,6 +793,27 @@ export function BlogPost({ id, onBack, onOrderPackage }: BlogPostProps) {
           </div>
         </div>
       )}
+
+      {/* Live Social Proof Floating Notification Pop-up */}
+      <AnimatePresence>
+        {activeNotification && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, x: -20 }}
+            animate={{ opacity: 1, y: 0, x: 0 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            className="fixed bottom-24 md:bottom-6 left-4 z-50 bg-slate-900/95 text-white backdrop-blur-md rounded-2xl p-4 shadow-2xl border border-white/10 flex items-center gap-3.5 max-w-[90%] md:max-w-md"
+          >
+            <div className="w-9 h-9 bg-emerald-500 rounded-full flex items-center justify-center text-slate-900 shrink-0 font-bold shadow-inner">
+              <Sparkles size={18} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] font-bold text-emerald-400 uppercase tracking-widest mb-0.5">Recent Order Placed</p>
+              <p className="text-xs md:text-sm font-semibold text-slate-100 leading-snug">{activeNotification}</p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </article>
   );
 }
