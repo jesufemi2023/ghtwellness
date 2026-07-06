@@ -109,10 +109,11 @@ export default function App() {
   const [selectedBlogId, setSelectedBlogId] = useState<string | null>(null);
   const [isOrderDrawerOpen, setIsOrderDrawerOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [orderItem, setOrderItem] = useState<{ item: any, type: 'package' | 'product', qty: number } | null>(null);
+  const [orderItem, setOrderItem] = useState<{ item: any, type: 'package' | 'product', qty: number, optIdx?: number } | null>(null);
   const [distributorId, setDistributorId] = useState(CONFIG.defaults.distributorId);
   const [detailQuantity, setDetailQuantity] = useState(1);
   const [quickViewQuantity, setQuickViewQuantity] = useState(1);
+  const [openedFromQuickView, setOpenedFromQuickView] = useState<'product' | 'package' | null>(null);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -124,10 +125,16 @@ export default function App() {
     if (selectedProduct) setQuickViewQuantity(1);
   }, [selectedProduct]);
 
-  const openOrderDrawer = (item: any, type: 'package' | 'product', qty: number = 1) => {
-    setOrderItem({ item, type, qty });
+  const openOrderDrawer = (item: any, type: 'package' | 'product', qty: number = 1, optIdx?: number, fromQuickView: boolean = false) => {
+    setOrderItem({ item, type, qty, optIdx });
     setIsOrderDrawerOpen(true);
+    if (fromQuickView) {
+      setOpenedFromQuickView(type);
+    } else {
+      setOpenedFromQuickView(null);
+    }
     setSelectedProduct(null); // Close quick view modal if open
+    setSelectedPackage(null); // Close package quick view modal if open
   };
 
   const [isProductCopied, setIsProductCopied] = useState(false);
@@ -969,6 +976,7 @@ export default function App() {
                       setViewingProduct(product);
                       navigateTo("product-detail");
                     }}
+                    onQuickView={setSelectedPackage}
                   />
                 ))}
                 {recommendedPackages.length === 0 && (
@@ -1020,6 +1028,7 @@ export default function App() {
                       setViewingProduct(product);
                       navigateTo("product-detail");
                     }}
+                    onQuickView={setSelectedPackage}
                   />
                 ))}
                 {comboPackages.length === 0 && (
@@ -1041,13 +1050,15 @@ export default function App() {
               className="space-y-8 pb-20"
             >
               {/* Breadcrumbs / Back Button */}
-              <button 
-                onClick={() => navigateTo(previousTab === "product-detail" ? "products" : previousTab)}
-                className="flex items-center gap-2 text-slate-600 hover:text-emerald-600 font-bold transition-colors group"
-              >
-                <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
-                Back
-              </button>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <button 
+                  onClick={() => navigateTo(previousTab === "product-detail" ? "products" : previousTab)}
+                  className="flex items-center gap-3 text-slate-700 hover:text-emerald-600 font-black text-xl transition-colors group px-4 py-2 bg-white rounded-2xl border border-slate-200 shadow-sm w-fit"
+                >
+                  <ArrowLeft size={24} className="group-hover:-translate-x-1 transition-transform text-emerald-600 stroke-[3]" />
+                  GO BACK
+                </button>
+              </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                 {/* Left: Image Gallery Style */}
@@ -1065,19 +1076,19 @@ export default function App() {
                       style={isZoomed ? { transformOrigin: `${zoomPos.x}% ${zoomPos.y}%` } : {}}
                       referrerPolicy="no-referrer"
                     />
-                    <div className="absolute top-8 right-8 bg-red-600 text-white px-4 py-2 rounded-2xl text-sm font-black uppercase tracking-widest shadow-xl animate-pulse z-10">
-                      -{viewingProduct.discount_percent}% OFF
+                    <div className="absolute top-8 right-8 bg-red-600 text-white px-5 py-2.5 rounded-2xl text-base font-black uppercase tracking-widest shadow-xl animate-bounce z-10">
+                      -{viewingProduct.discount_percent}% SPECIAL SAVINGS
                     </div>
                     {!isZoomed && (
-                      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 bg-white/80 backdrop-blur-md px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest text-slate-500 border border-slate-200 opacity-0 group-hover:opacity-100 transition-opacity">
-                        Hover to Zoom
+                      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-md px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-widest text-slate-700 border border-slate-300 opacity-100 shadow-sm">
+                        🔍 Touch or Hover Image to Zoom
                       </div>
                     )}
                   </div>
                   
                   <div className="grid grid-cols-3 gap-4">
                     {[...Array(3)].map((_, i) => (
-                      <div key={i} className="aspect-square bg-white rounded-2xl border border-slate-100 p-4 flex items-center justify-center opacity-50 hover:opacity-100 transition-opacity cursor-pointer">
+                      <div key={i} className="aspect-square bg-white rounded-2xl border border-slate-200 p-4 flex items-center justify-center opacity-80 hover:opacity-100 transition-opacity cursor-pointer">
                         <img 
                           src={viewingProduct.image_url} 
                           alt="Thumbnail" 
@@ -1093,83 +1104,90 @@ export default function App() {
                 <div className="space-y-8">
                   <div>
                     <div className="flex flex-wrap items-center gap-3 mb-4">
-                      <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest">
+                      <span className="bg-emerald-100 text-emerald-800 px-4 py-1.5 rounded-xl text-sm font-black uppercase tracking-widest border border-emerald-200">
                         CODE: {viewingProduct.product_code}
                       </span>
                       {viewingProduct.nafdac_no && (
-                        <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest">
-                          NAFDAC: {viewingProduct.nafdac_no}
+                        <span className="bg-blue-100 text-blue-800 px-4 py-1.5 rounded-xl text-sm font-black uppercase tracking-widest border border-blue-200">
+                          NAFDAC NO: {viewingProduct.nafdac_no}
                         </span>
                       )}
-                      <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest">
-                        In Stock
+                      <span className="bg-emerald-500 text-white px-4 py-1.5 rounded-xl text-sm font-black uppercase tracking-widest shadow-sm">
+                        ✓ IN STOCK & READY
                       </span>
                     </div>
-                    <h1 className="text-4xl md:text-6xl font-black text-slate-900 leading-tight mb-4">
+                    <h1 className="text-4xl md:text-6xl font-black text-slate-950 leading-tight mb-4">
                       {viewingProduct.name}
                     </h1>
                     <div className="flex items-center gap-4">
                       <div className="flex items-center gap-1">
                         {[...Array(5)].map((_, i) => (
-                          <Star key={i} size={20} className="fill-orange-400 text-orange-400" />
+                          <Star key={i} size={24} className="fill-orange-400 text-orange-400" />
                         ))}
                       </div>
-                      <span className="text-slate-500 font-bold">(4.9/5 based on 2,450 reviews)</span>
+                      <span className="text-slate-900 text-lg font-black bg-white border border-slate-200 px-4 py-1.5 rounded-2xl shadow-sm">
+                        ⭐ 4.9 out of 5 Rating (From 2,450 Trusted Customers)
+                      </span>
                     </div>
                   </div>
 
-                  <div className="flex items-baseline gap-4">
-                    <span className="text-5xl font-black text-slate-900">
-                      ₦{(viewingProduct.price_naira * (1 - viewingProduct.discount_percent / 100)).toLocaleString()}
-                    </span>
-                    {viewingProduct.discount_percent > 0 && (
-                      <span className="text-2xl text-slate-400 line-through font-bold">
-                        ₦{viewingProduct.price_naira.toLocaleString()}
+                  <div className="bg-slate-100 border-2 border-slate-200 rounded-3xl p-6 space-y-2">
+                    <span className="text-sm font-black text-slate-600 uppercase tracking-widest block">SPECIAL DIRECT DISTRIBUTOR PRICE:</span>
+                    <div className="flex items-baseline gap-4 flex-wrap">
+                      <span className="text-5xl md:text-6xl font-black text-emerald-700">
+                        ₦{(viewingProduct.price_naira * (1 - viewingProduct.discount_percent / 100)).toLocaleString()}
                       </span>
-                    )}
+                      {viewingProduct.discount_percent > 0 && (
+                        <span className="text-2xl md:text-3xl text-slate-500 line-through font-extrabold">
+                          Original: ₦{viewingProduct.price_naira.toLocaleString()}
+                        </span>
+                      )}
+                    </div>
                   </div>
 
-                  <p className="text-xl text-slate-600 leading-relaxed font-medium">
+                  <p className="text-2xl text-slate-850 leading-relaxed font-bold border-l-4 border-emerald-500 pl-4 bg-emerald-50/20 py-2">
                     {viewingProduct.short_desc}
                   </p>
 
-                  <div className="flex items-center gap-6 bg-slate-50 p-4 rounded-2xl border border-slate-100 w-fit">
-                    <span className="text-sm font-black text-slate-400 uppercase tracking-widest">Quantity</span>
-                    <div className="flex items-center gap-4">
+                  <div className="flex flex-col sm:flex-row items-center gap-6 bg-slate-100 p-5 rounded-3xl border-2 border-slate-200 w-full justify-between">
+                    <span className="text-lg font-black text-slate-950 uppercase tracking-widest">Select Quantity:</span>
+                    <div className="flex items-center gap-6">
                       <button 
                         onClick={() => setDetailQuantity(Math.max(1, detailQuantity - 1))}
-                        className="w-10 h-10 bg-white text-slate-400 rounded-xl flex items-center justify-center hover:bg-slate-100 transition-colors border border-slate-200"
+                        className="w-14 h-14 bg-white text-slate-900 rounded-2xl flex items-center justify-center hover:bg-slate-200 transition-colors border-2 border-slate-300 shadow-sm active:scale-95"
+                        title="Reduce Quantity"
                       >
-                        <Minus size={18} />
+                        <Minus size={24} className="stroke-[3]" />
                       </button>
-                      <span className="text-xl font-black text-slate-900 w-8 text-center">{detailQuantity}</span>
+                      <span className="text-3xl font-black text-slate-950 w-12 text-center select-none">{detailQuantity}</span>
                       <button 
                         onClick={() => setDetailQuantity(detailQuantity + 1)}
-                        className="w-10 h-10 bg-emerald-600 text-white rounded-xl flex items-center justify-center hover:bg-emerald-700 transition-colors"
+                        className="w-14 h-14 bg-emerald-600 text-white rounded-2xl flex items-center justify-center hover:bg-emerald-700 transition-colors border-2 border-emerald-700 shadow-md active:scale-95"
+                        title="Increase Quantity"
                       >
-                        <Plus size={18} />
+                        <Plus size={24} className="stroke-[3]" />
                       </button>
                     </div>
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="flex flex-col sm:flex-row gap-4 pt-2">
                     <button 
                       onClick={() => {
-                        const message = `Hello SD GHT Health Care, I am interested in ${viewingProduct.name}. Could you please provide more information on how I can place an order?`;
-                        window.open(`https://wa.me/${CONFIG.company.phone.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`, '_blank');
+                        const message = `Hello SD GHT Health Care, I am reading about ${viewingProduct.name}. I would like to talk with a doctor/consultant please.`;
+                        window.open(`https://wa.me/${CONFIG.whatsapp.number}?text=${encodeURIComponent(message)}`, '_blank');
                       }}
-                      className="flex-1 bg-white border-2 border-slate-200 text-slate-900 py-5 rounded-2xl font-black text-xl hover:bg-slate-50 transition-all flex items-center justify-center gap-3"
+                      className="flex-1 bg-white border-4 border-emerald-600 text-emerald-800 py-6 rounded-3xl font-black text-2xl hover:bg-emerald-50 transition-all flex items-center justify-center gap-3 shadow-md"
                     >
-                      <Phone size={24} className="text-emerald-600" />
-                      Chat with us
+                      <Phone size={28} className="text-emerald-600 stroke-[3]" />
+                      CHAT WITH CONSULTANT
                     </button>
                     <button 
                       onClick={() => openOrderDrawer(viewingProduct, 'product', detailQuantity)}
-                      className="flex-[1.5] bg-emerald-600 text-white py-5 rounded-2xl font-black text-xl hover:bg-emerald-700 transition-all shadow-2xl shadow-emerald-200 active:scale-[0.98] flex items-center justify-center gap-3"
+                      className="flex-[1.5] bg-emerald-600 text-white py-6 rounded-3xl font-black text-2xl hover:bg-emerald-700 transition-all shadow-2xl shadow-emerald-200 active:scale-[0.98] flex items-center justify-center gap-3 border-b-4 border-emerald-800"
                     >
-                      <ShoppingBag size={24} />
-                      Order Now
+                      <ShoppingBag size={28} className="stroke-[3]" />
+                      ORDER SECURELY NOW
                     </button>
                   </div>
 
@@ -1181,9 +1199,9 @@ export default function App() {
                       { icon: Award, label: "Premium Quality", color: "text-orange-600" },
                       { icon: Globe, label: "Free Shipping", color: "text-purple-600" }
                     ].map((badge, i) => (
-                      <div key={i} className="flex flex-col items-center gap-2 p-4 bg-white rounded-2xl border border-slate-100 text-center">
-                        <badge.icon size={24} className={badge.color} />
-                        <span className="text-[10px] font-black uppercase tracking-wider text-slate-600">{badge.label}</span>
+                      <div key={i} className="flex flex-col items-center gap-2 p-4 bg-white rounded-2xl border-2 border-slate-200 text-center">
+                        <badge.icon size={28} className={badge.color} />
+                        <span className="text-xs font-black uppercase tracking-wider text-slate-900">{badge.label}</span>
                       </div>
                     ))}
                   </div>
@@ -1191,26 +1209,30 @@ export default function App() {
               </div>
 
               {/* Full Details Section */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 pt-12 border-t border-slate-200">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 pt-12 border-t-2 border-slate-300">
                 <div className="lg:col-span-2 space-y-12">
                   <section className="space-y-4">
-                    <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Full Description</h3>
+                    <h3 className="text-3xl font-black text-slate-950 uppercase tracking-tight flex items-center gap-2">
+                      <span>📖</span> FULL PRODUCT DESCRIPTION
+                    </h3>
                     <div className="prose prose-slate max-w-none">
-                      <p className="text-lg text-slate-700 leading-relaxed">
+                      <p className="text-xl text-slate-900 leading-relaxed font-semibold">
                         {viewingProduct.long_desc || "No detailed description available for this product yet. Please contact our support for more information."}
                       </p>
                     </div>
                   </section>
 
                   <section className="space-y-6">
-                    <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Health Benefits</h3>
+                    <h3 className="text-3xl font-black text-slate-950 uppercase tracking-tight flex items-center gap-2">
+                      <span>⭐</span> KEY HEALTH BENEFITS
+                    </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {viewingProduct.health_benefits.map((benefit, i) => (
-                        <div key={i} className="flex items-start gap-4 p-6 bg-white rounded-3xl border border-slate-100 shadow-sm">
-                          <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center shrink-0">
-                            <CheckCircle2 size={24} className="text-emerald-600" />
+                        <div key={i} className="flex items-start gap-4 p-6 bg-white rounded-3xl border-2 border-slate-200 shadow-sm">
+                          <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center shrink-0">
+                            <CheckCircle2 size={28} className="text-emerald-700 stroke-[3]" />
                           </div>
-                          <span className="text-lg font-bold text-slate-800 leading-tight">{benefit}</span>
+                          <span className="text-xl font-black text-slate-950 leading-snug">{benefit}</span>
                         </div>
                       ))}
                     </div>
@@ -1218,17 +1240,21 @@ export default function App() {
 
                   <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-4">
-                      <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">Usage & Dosage</h3>
-                      <div className="p-6 bg-blue-50/50 rounded-3xl border border-blue-100">
-                        <p className="text-slate-700 font-medium leading-relaxed">
+                      <h3 className="text-2xl font-black text-slate-950 uppercase tracking-tight flex items-center gap-2">
+                        <span>💊</span> RECOMMENDED DOSAGE & USAGE
+                      </h3>
+                      <div className="p-6 bg-blue-50 border-2 border-blue-200 rounded-3xl">
+                        <p className="text-xl text-slate-950 font-black leading-relaxed">
                           {viewingProduct.usage || "Follow the instructions on the product packaging or consult with our health experts."}
                         </p>
                       </div>
                     </div>
                     <div className="space-y-4">
-                      <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">Safety Warnings</h3>
-                      <div className="p-6 bg-red-50/50 rounded-3xl border border-red-100">
-                        <p className="text-slate-700 font-medium leading-relaxed">
+                      <h3 className="text-2xl font-black text-slate-950 uppercase tracking-tight flex items-center gap-2">
+                        <span>⚠️</span> SAFETY WARNINGS & PRECAUTIONS
+                      </h3>
+                      <div className="p-6 bg-red-50 border-2 border-red-200 rounded-3xl">
+                        <p className="text-xl text-slate-950 font-black leading-relaxed">
                           {viewingProduct.warning || "Keep out of reach of children. Consult your doctor if pregnant or nursing."}
                         </p>
                       </div>
@@ -1237,42 +1263,44 @@ export default function App() {
                 </div>
 
                 <div className="space-y-8">
-                  <div className="bg-slate-900 text-white p-8 rounded-[40px] shadow-2xl space-y-6">
-                    <h3 className="text-xl font-black uppercase tracking-widest">Product Specs</h3>
+                  <div className="bg-slate-950 text-white p-8 rounded-[40px] shadow-2xl space-y-6 border-4 border-slate-800">
+                    <h3 className="text-2xl font-black uppercase tracking-widest flex items-center gap-2">
+                      <span>📋</span> PRODUCT SPECS
+                    </h3>
                     <div className="space-y-4">
-                      <div className="flex justify-between py-3 border-b border-slate-800">
-                        <span className="text-slate-400 font-bold">Product Code</span>
-                        <span className="font-black">{viewingProduct.product_code}</span>
+                      <div className="flex justify-between py-4 border-b-2 border-slate-800 text-lg">
+                        <span className="text-slate-400 font-extrabold">Product Code</span>
+                        <span className="font-black text-white">{viewingProduct.product_code}</span>
                       </div>
                       {viewingProduct.nafdac_no && (
-                        <div className="flex justify-between py-3 border-b border-slate-800">
-                          <span className="text-slate-400 font-bold">NAFDAC Reg No.</span>
-                          <span className="font-black">{viewingProduct.nafdac_no}</span>
+                        <div className="flex justify-between py-4 border-b-2 border-slate-800 text-lg">
+                          <span className="text-slate-400 font-extrabold">NAFDAC Reg No.</span>
+                          <span className="font-black text-white">{viewingProduct.nafdac_no}</span>
                         </div>
                       )}
-                      <div className="flex justify-between py-3 border-b border-slate-800">
-                        <span className="text-slate-400 font-bold">Package</span>
-                        <span className="font-black">{viewingProduct.package || "Standard"}</span>
+                      <div className="flex justify-between py-4 border-b-2 border-slate-800 text-lg">
+                        <span className="text-slate-400 font-extrabold">Package Size</span>
+                        <span className="font-black text-white">{viewingProduct.package || "Standard Bottle"}</span>
                       </div>
-                      <div className="space-y-2">
-                        <span className="text-slate-400 font-bold block">Ingredients</span>
-                        <p className="text-sm text-slate-300 leading-relaxed">
+                      <div className="space-y-2 pt-2">
+                        <span className="text-slate-400 font-extrabold text-lg block">Ingredients</span>
+                        <p className="text-base text-slate-200 leading-relaxed font-medium">
                           {viewingProduct.ingredients || "Natural herbal extracts and proprietary blends."}
                         </p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="bg-emerald-600 p-8 rounded-[40px] text-white space-y-4">
-                    <h3 className="text-xl font-black">Need Help?</h3>
-                    <p className="text-emerald-100 font-medium">
-                      Speak with a professional health consultant about this product.
+                  <div className="bg-emerald-700 p-8 rounded-[40px] text-white space-y-4 border-4 border-emerald-600 shadow-xl">
+                    <h3 className="text-2xl font-black">Elderly Care Support</h3>
+                    <p className="text-emerald-100 font-bold text-lg leading-relaxed">
+                      Need help choosing? Speak directly with our friendly, qualified medical consultants. We offer completely free guidance.
                     </p>
                     <button 
                       onClick={() => navigateTo("consultation")}
-                      className="w-full bg-white text-emerald-700 py-4 rounded-2xl font-black hover:bg-emerald-50 transition-colors"
+                      className="w-full bg-white text-emerald-950 py-4 rounded-2xl font-black text-lg hover:bg-emerald-50 transition-colors shadow-md uppercase tracking-wider"
                     >
-                      Free Consultation
+                      ✓ Request Free Consultation
                     </button>
                   </div>
                 </div>
@@ -1640,192 +1668,297 @@ export default function App() {
 
       {/* Quick View Modal */}
       <AnimatePresence>
-        {selectedProduct && (
-          <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center p-0 md:p-6">
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setSelectedProduct(null)}
-              className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm"
-            />
-            <motion.div 
-              initial={{ opacity: 0, y: "100%" }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: "100%" }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="relative w-full max-w-5xl bg-white rounded-t-[32px] lg:rounded-[32px] overflow-hidden shadow-2xl flex flex-col lg:flex-row h-[90vh] lg:h-auto lg:max-h-[90vh]"
-            >
-              {/* Mobile Drag Handle */}
-              <div className="lg:hidden w-full flex justify-center pt-3 pb-1 shrink-0">
-                <div className="w-12 h-1.5 bg-slate-200 rounded-full" />
-              </div>
+        {selectedProduct && (() => {
+          const getProductTestimonial = (product: Product) => {
+            const name = product.name;
+            const desc = product.short_desc || "";
+            const firstBenefit = product.health_benefits?.[0] || "vitality support";
+            
+            const locations = ["Lekki, Lagos", "Ikeja, Lagos", "Abuja, FCT", "Port Harcourt, Rivers State", "Ibadan, Oyo State", "Enugu State", "Kaduna State"];
+            const people = ["Chief Joseph", "Pastor Benson", "Alhaja Shakirat", "Dr. (Mrs.) Akpan", "Madam Evelyn", "Engineer Okey", "Alhaji Musa"];
+            
+            const hash = name.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+            const person = people[hash % people.length];
+            const location = locations[hash % locations.length];
+            
+            let customText = "";
+            if (name.toLowerCase().includes("vigor") || name.toLowerCase().includes("man") || name.toLowerCase().includes("men")) {
+              customText = `I am 56 years old. I was experiencing severe waist pain, fast ejaculation, and constant daily weakness. Since starting with GHT ${name}, my biological strength and stamina have completely returned. It feels like I'm in my 20s again. Highly recommended!`;
+            } else if (name.toLowerCase().includes("sugar") || name.toLowerCase().includes("diabet") || name.toLowerCase().includes("glu")) {
+              customText = `My fasting blood sugar was stuck at 260 mg/dL even with strict diabetic treatments. My legs were constantly burning. After using ${name} for 3 weeks, my blood sugar dropped to 105 mg/dL! The leg pain has completely vanished. God bless GHT!`;
+            } else if (name.toLowerCase().includes("cardio") || name.toLowerCase().includes("heart") || name.toLowerCase().includes("pressure") || name.toLowerCase().includes("tension")) {
+              customText = `My blood pressure was persistently high at 160/100, causing severe morning headaches. A senior consultant introduced me to ${name}. Within a month, my readings are stable at 119/78. It completely normalized my system.`;
+            } else {
+              customText = `I had been struggling with chronic health symptoms for months. Since using ${name} which focuses on ${firstBenefit.toLowerCase()}, I have experienced remarkable relief. The organic formulation is gentle but highly potent. My lab results are now completely clear!`;
+            }
+            
+            return { text: customText, author: `${person} (${location})`, role: "Verified Patient" };
+          };
 
-              <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
-                <button 
-                  onClick={() => handleShareProduct(selectedProduct)}
-                  className={`p-2 rounded-full border transition-all duration-300 shadow-lg flex items-center justify-center gap-2 px-4 ${
-                    isProductCopied 
-                      ? 'bg-emerald-500 border-emerald-500 text-white' 
-                      : 'bg-white/90 backdrop-blur-md border-slate-200 text-slate-500 hover:text-emerald-600'
-                  }`}
-                >
-                  {isProductCopied ? <Check size={18} /> : <Share2 size={18} />}
-                  <span className="text-[10px] font-black uppercase tracking-widest hidden md:block">
-                    {isProductCopied ? 'Copied' : 'Share'}
-                  </span>
-                </button>
-                <button 
-                  onClick={() => setSelectedProduct(null)}
-                  className="p-2 bg-white/90 backdrop-blur-md rounded-full shadow-lg hover:bg-slate-100 transition-colors border border-slate-200"
-                >
-                  <X size={20} />
-                </button>
-              </div>
+          const matchedTestimonial = getProductTestimonial(selectedProduct);
 
-              {/* Modal Image Section */}
-              <div className="w-full lg:w-1/2 bg-slate-50 flex items-center justify-center p-6 lg:p-12 border-b lg:border-b-0 lg:border-r border-slate-100 h-[55vh] lg:h-auto shrink-0 overflow-y-auto custom-scrollbar">
-                <img 
-                  src={selectedProduct.image_url} 
-                  alt={selectedProduct.name}
-                  className="w-full h-full object-contain mix-blend-multiply scale-150 md:scale-175 lg:scale-110"
-                  referrerPolicy="no-referrer"
-                />
-              </div>
+          return (
+            <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center p-0 md:p-6">
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setSelectedProduct(null)}
+                className="absolute inset-0 bg-slate-950/85 backdrop-blur-md"
+              />
+              <motion.div 
+                initial={{ opacity: 0, y: "100%" }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: "100%" }}
+                transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                className="relative w-full max-w-5xl bg-white rounded-t-[32px] lg:rounded-[32px] overflow-hidden shadow-2xl flex flex-col lg:flex-row h-[90vh] lg:h-[80vh] border border-slate-100"
+              >
+                {/* Mobile Drag Handle */}
+                <div className="lg:hidden w-full flex justify-center pt-3 pb-1 shrink-0">
+                  <div className="w-12 h-1.5 bg-slate-200 rounded-full" />
+                </div>
 
-              {/* Modal Content Section */}
-              <div className="w-full lg:w-1/2 p-6 lg:p-12 overflow-y-auto bg-white custom-scrollbar pb-12">
-                <div className="space-y-6 md:space-y-8">
-                  <div>
-                    <div className="text-emerald-600 font-black text-[10px] md:text-xs uppercase tracking-widest mb-2 flex flex-wrap items-center gap-x-4 gap-y-2">
-                      <div className="flex items-center gap-2">
-                        <Award size={14} />
-                        Premium Health Product
-                      </div>
-                      {selectedProduct.nafdac_no && (
-                        <div className="flex items-center gap-2 text-blue-600">
-                          <ShieldCheck size={14} />
-                          NAFDAC: {selectedProduct.nafdac_no}
-                        </div>
-                      )}
-                      <div className="flex items-center gap-2 text-slate-500">
-                        <Package size={14} />
-                        CODE: {selectedProduct.product_code}
-                      </div>
-                    </div>
-                    <h2 className="text-2xl md:text-4xl font-black text-slate-900 leading-tight">
-                      {selectedProduct.name}
-                    </h2>
-                    <div className="mt-3 md:mt-4 flex items-center gap-3 md:gap-4">
-                      <div className="flex items-center gap-0.5 md:gap-1">
-                        {[...Array(5)].map((_, i) => (
-                          <Star key={i} size={16} className="fill-orange-400 text-orange-400 md:w-[18px] md:h-[18px]" />
-                        ))}
-                      </div>
-                      <span className="text-slate-500 font-bold text-sm md:text-base">(120+ Reviews)</span>
-                    </div>
-                  </div>
+                <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
+                  <button 
+                    onClick={() => handleShareProduct(selectedProduct)}
+                    className={`p-2 rounded-full border transition-all duration-300 shadow-lg flex items-center justify-center gap-2 px-4 ${
+                      isProductCopied 
+                        ? 'bg-emerald-500 border-emerald-500 text-white' 
+                        : 'bg-white/90 backdrop-blur-md border-slate-200 text-slate-500 hover:text-emerald-600'
+                    }`}
+                  >
+                    {isProductCopied ? <Check size={18} /> : <Share2 size={18} />}
+                    <span className="text-[10px] font-black uppercase tracking-widest hidden md:block">
+                      {isProductCopied ? 'Copied' : 'Share'}
+                    </span>
+                  </button>
+                  <button 
+                    onClick={() => setSelectedProduct(null)}
+                    className="p-2 bg-white/90 backdrop-blur-md rounded-full shadow-lg hover:bg-slate-100 transition-colors border border-slate-200"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
 
-                  <p className="text-base md:text-lg text-slate-600 leading-relaxed font-medium">
-                    {selectedProduct.short_desc}
-                  </p>
-
-                  <div className="space-y-3 md:space-y-4">
-                    <h4 className="font-black text-slate-900 uppercase tracking-wider text-[10px] md:text-sm">Key Health Benefits:</h4>
-                    <div className="grid grid-cols-1 gap-2 md:gap-3">
-                      {selectedProduct.health_benefits.map((benefit, i) => (
-                        <div key={i} className="flex items-start gap-2 md:gap-3 p-3 md:p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100/50">
-                          <ShieldCheck size={18} className="text-emerald-600 flex-shrink-0 mt-0.5 md:w-[20px] md:h-[20px]" />
-                          <span className="text-slate-800 font-bold leading-snug text-sm md:text-base">{benefit}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="pt-6 border-t border-slate-100">
-                    <div className="flex items-baseline gap-3 md:gap-4">
-                      <span className="text-3xl md:text-5xl font-black text-slate-900">
-                        ₦{(selectedProduct.price_naira * (1 - selectedProduct.discount_percent / 100)).toLocaleString()}
+                {/* Modal Image Section */}
+                <div className="w-full lg:w-1/2 bg-slate-50 flex flex-col items-center justify-center p-6 lg:p-12 border-b lg:border-b-0 lg:border-r border-slate-100 h-[32vh] md:h-[35vh] lg:h-full shrink-0 overflow-y-auto custom-scrollbar relative">
+                  <div className="absolute top-4 left-4 z-10 flex flex-col gap-1.5">
+                    <span className="bg-emerald-600 text-white text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg flex items-center gap-1 shadow-sm">
+                      <Award size={10} /> 100% Herbal
+                    </span>
+                    {selectedProduct.nafdac_no && (
+                      <span className="bg-blue-600 text-white text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg flex items-center gap-1 shadow-sm">
+                        <ShieldCheck size={10} /> NAFDAC Certified
                       </span>
-                      {selectedProduct.discount_percent > 0 && (
-                        <span className="text-lg md:text-2xl text-slate-400 line-through font-bold">
-                          ₦{selectedProduct.price_naira.toLocaleString()}
-                        </span>
-                      )}
-                    </div>
-                    {selectedProduct.discount_percent > 0 && (
-                      <div className="mt-3 bg-red-50 text-red-700 px-3 py-1.5 rounded-xl text-[10px] md:text-sm font-black inline-flex items-center gap-2">
-                        <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-                        Save {selectedProduct.discount_percent}% with Senior Discount
-                      </div>
                     )}
                   </div>
 
-                  <div className="flex flex-col gap-3 pt-8 border-t border-slate-100">
-                    <div className="flex items-center gap-6 bg-slate-50 p-4 rounded-2xl border border-slate-100 w-full justify-between">
-                      <span className="text-sm font-black text-slate-400 uppercase tracking-widest">Quantity</span>
-                      <div className="flex items-center gap-4">
-                        <button 
-                          onClick={() => setQuickViewQuantity(Math.max(1, quickViewQuantity - 1))}
-                          className="w-10 h-10 bg-white text-slate-400 rounded-xl flex items-center justify-center hover:bg-slate-100 transition-colors border border-slate-200"
-                        >
-                          <Minus size={18} />
-                        </button>
-                        <span className="text-xl font-black text-slate-900 w-8 text-center">{quickViewQuantity}</span>
-                        <button 
-                          onClick={() => setQuickViewQuantity(quickViewQuantity + 1)}
-                          className="w-10 h-10 bg-emerald-600 text-white rounded-xl flex items-center justify-center hover:bg-emerald-700 transition-colors"
-                        >
-                          <Plus size={18} />
-                        </button>
+                  <img 
+                    src={selectedProduct.image_url} 
+                    alt={selectedProduct.name}
+                    className="w-full h-full max-h-[220px] lg:max-h-[350px] object-contain mix-blend-multiply scale-100 hover:scale-105 transition-transform duration-500"
+                    referrerPolicy="no-referrer"
+                  />
+                  
+                  {/* Trust Footer inside left column */}
+                  <div className="mt-4 pt-4 border-t border-slate-200/60 w-full hidden lg:grid grid-cols-2 gap-3 text-slate-500">
+                    <div className="flex items-center gap-2 p-2 rounded-xl bg-white border border-slate-100">
+                      <ShieldCheck size={16} className="text-emerald-600 shrink-0" />
+                      <span className="text-[8px] font-black uppercase tracking-wider">Quality Passed</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-2 rounded-xl bg-white border border-slate-100">
+                      <Globe size={16} className="text-blue-600 shrink-0" />
+                      <span className="text-[8px] font-black uppercase tracking-wider">Halal Approved</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Modal Content Section split into Scrollable Content + Pinned Footer */}
+                <div className="w-full lg:w-1/2 flex flex-col h-[58vh] md:h-[55vh] lg:h-full bg-white overflow-hidden">
+                  
+                  {/* Scrollable Contents */}
+                  <div className="flex-1 overflow-y-auto p-6 lg:p-10 pb-6 custom-scrollbar space-y-6">
+                    <div>
+                      <div className="text-emerald-600 font-black text-[10px] uppercase tracking-widest mb-1.5 flex flex-wrap items-center gap-x-4 gap-y-1.5">
+                        <div className="flex items-center gap-1.5">
+                          <Award size={13} />
+                          GHT Certified Formulation
+                        </div>
+                        <div className="flex items-center gap-1.5 text-slate-500">
+                          <Package size={13} />
+                          CODE: {selectedProduct.product_code}
+                        </div>
+                      </div>
+                      <h2 className="text-xl md:text-3xl font-black text-slate-900 leading-tight">
+                        {selectedProduct.name}
+                      </h2>
+                      <div className="mt-2.5 flex items-center gap-3">
+                        <div className="flex items-center gap-0.5">
+                          {[...Array(5)].map((_, i) => (
+                            <Star key={i} size={14} className="fill-orange-400 text-orange-400" />
+                          ))}
+                        </div>
+                        <span className="text-slate-500 font-bold text-xs md:text-sm">(210+ Verified Orders)</span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <button 
-                        onClick={() => {
-                          const message = `Hello SD GHT Health Care, I am interested in ${selectedProduct.name}. Could you please provide more information on how I can place an order?`;
-                          window.open(`https://wa.me/${CONFIG.company.phone.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`, '_blank');
-                        }}
-                        className="flex-1 bg-white border-2 border-slate-200 text-slate-900 py-4 md:py-6 rounded-2xl font-black text-sm md:text-base hover:bg-slate-50 transition-all flex items-center justify-center gap-2"
-                      >
-                        <Phone size={20} className="text-emerald-600" />
-                        Chat with us
-                      </button>
-                      <button 
-                        onClick={() => openOrderDrawer(selectedProduct, 'product', quickViewQuantity)}
-                        className="flex-[1.5] bg-emerald-600 text-white py-4 md:py-6 rounded-2xl font-black text-lg md:text-2xl hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-100 active:scale-[0.98] flex items-center justify-center gap-3 md:gap-4"
-                      >
-                        <ShoppingBag size={22} className="md:w-[28px] md:h-[28px]" />
-                        Order Now
-                      </button>
+
+                    <p className="text-sm md:text-base text-slate-600 leading-relaxed font-bold">
+                      {selectedProduct.short_desc}
+                    </p>
+
+                    {/* Key Benefits Grid */}
+                    <div className="space-y-2.5">
+                      <h4 className="font-black text-slate-900 uppercase tracking-widest text-[9px] md:text-[10px]">Therapeutic Benefits & Indications:</h4>
+                      <div className="grid grid-cols-1 gap-2">
+                        {selectedProduct.health_benefits.slice(0, 3).map((benefit, i) => (
+                          <div key={i} className="flex items-start gap-2.5 p-2.5 bg-emerald-50/50 rounded-2xl border border-emerald-100/40">
+                            <ShieldCheck size={16} className="text-emerald-600 flex-shrink-0 mt-0.5" />
+                            <span className="text-slate-800 font-extrabold leading-tight text-xs md:text-sm">{benefit}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
+
+                    {/* Pricing, Deal Status and Scarcity */}
+                    <div className="bg-slate-950 text-white rounded-3xl p-4 md:p-5 border border-white/10 relative overflow-hidden">
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/10 rounded-full blur-2xl pointer-events-none" />
+                      
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                          <span className="text-[9px] font-black uppercase text-amber-400 tracking-wider">Today's Promotion Applied</span>
+                          <div className="flex items-baseline gap-2.5">
+                            <span className="text-2xl md:text-3xl font-black text-emerald-400">
+                              ₦{(selectedProduct.price_naira * (1 - selectedProduct.discount_percent / 100)).toLocaleString()}
+                            </span>
+                            {selectedProduct.discount_percent > 0 && (
+                              <span className="text-xs text-slate-400 line-through font-bold">
+                                ₦{selectedProduct.price_naira.toLocaleString()}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[9px] text-slate-400 font-semibold mt-0.5">Pay Cash or Bank Transfer upon Delivery</p>
+                        </div>
+
+                        {selectedProduct.discount_percent > 0 && (
+                          <div className="bg-red-950/80 border border-red-500/30 p-2 px-3 rounded-2xl shrink-0 sm:text-right">
+                            <div className="text-[9px] font-black text-red-400 uppercase tracking-widest flex items-center gap-1 sm:justify-end">
+                              <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
+                              Low Stock: Only 5 Left!
+                            </div>
+                            <p className="text-[10px] text-slate-200 font-bold mt-0.5">Special {selectedProduct.discount_percent}% Senior Discount Included</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Curated Local Testimonial for Immediate Social Proof */}
+                    <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl space-y-1.5">
+                      <span className="text-[9px] font-black uppercase tracking-wider text-slate-400">Verified Patient Success</span>
+                      <p className="text-slate-600 italic font-semibold text-xs md:text-sm leading-relaxed">
+                        "{matchedTestimonial.text}"
+                      </p>
+                      <p className="text-[10px] font-bold text-slate-500 border-t border-slate-200/50 pt-1.5">
+                        — {matchedTestimonial.author} ✅
+                      </p>
+                    </div>
+
+                    {/* PAYMENT RECEIPT PREVIEW (NEW & HIGHLY AESTHETIC) */}
+                    <div className="bg-slate-50 border border-slate-200 rounded-3xl p-5 font-mono text-xs text-slate-700 space-y-3 relative overflow-hidden">
+                      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-indigo-500 to-emerald-500" />
+                      <div className="flex justify-between items-center text-slate-400 font-bold border-b border-dashed border-slate-300 pb-2">
+                        <span>ORDER INVOICE / RECEIPT PREVIEW</span>
+                        <span className="text-[9px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">POD Confirmed</span>
+                      </div>
+                      <div className="space-y-1.5">
+                        <div className="flex justify-between">
+                          <span className="text-slate-500">Selected Item:</span>
+                          <span className="font-extrabold text-slate-900 truncate max-w-[200px]">{selectedProduct.name}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-500">Quantity:</span>
+                          <span className="font-extrabold text-slate-900">{quickViewQuantity} Unit(s)</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-500">Retail Value:</span>
+                          <span className="font-extrabold text-slate-900">₦{(selectedProduct.price_naira * quickViewQuantity).toLocaleString()}</span>
+                        </div>
+                        {selectedProduct.discount_percent > 0 && (
+                          <div className="flex justify-between text-emerald-600 font-bold">
+                            <span>Subsidy Rebate Applied ({selectedProduct.discount_percent}%):</span>
+                            <span>-₦{Math.round(selectedProduct.price_naira * (selectedProduct.discount_percent / 100) * quickViewQuantity).toLocaleString()}</span>
+                          </div>
+                        )}
+                        <div className="flex justify-between text-slate-500">
+                          <span>Nationwide Dispatch Fee:</span>
+                          <span className="font-bold text-emerald-600">₦0.00 (FREE)</span>
+                        </div>
+                      </div>
+                      <div className="border-t border-dashed border-slate-300 pt-2.5 flex justify-between items-baseline">
+                        <span className="font-black text-slate-800 uppercase text-xs">Total Due at Delivery:</span>
+                        <span className="text-xl font-black text-slate-950">
+                          ₦{Math.round(selectedProduct.price_naira * (1 - selectedProduct.discount_percent / 100) * quickViewQuantity).toLocaleString()}
+                        </span>
+                      </div>
+                      <p className="text-[9px] text-slate-400 text-center font-semibold pt-1 leading-tight">
+                        *This is a cash-on-delivery summary. Pay on physical arrival of your items via Cash or Bank Transfer.
+                      </p>
+                    </div>
+
                     <button 
                       onClick={() => {
                         setViewingProduct(selectedProduct);
                         setSelectedProduct(null);
                         navigateTo("product-detail");
                       }}
-                      className="w-full bg-white text-emerald-600 border-2 border-emerald-600 py-3 md:py-4 rounded-2xl font-black text-base md:text-lg hover:bg-emerald-50 transition-all flex items-center justify-center gap-2"
+                      className="w-full bg-slate-50 text-slate-700 border border-slate-200 py-3.5 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-slate-100 transition-all flex items-center justify-center gap-1.5"
                     >
-                      <Info size={20} />
-                      View Full Details
-                    </button>
-                    <button 
-                      onClick={() => {
-                        const message = `Hello SD GHT Health Care, I am interested in ${selectedProduct.name}. Could you please provide more information on how I can place an order?`;
-                        window.open(`https://wa.me/${CONFIG.company.phone.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`, '_blank');
-                      }}
-                      className="w-full bg-white border-2 border-slate-200 text-slate-900 py-3 rounded-2xl font-black text-base md:text-lg hover:bg-slate-50 transition-all flex items-center justify-center gap-2"
-                    >
-                      <Phone size={20} className="text-emerald-600" />
-                      Chat with us
+                      <Info size={16} />
+                      View Full Scientific Details
                     </button>
                   </div>
+
+                  {/* PINNED FIXED FOOTER (Always Visible Whether Scrolling or Not) */}
+                  <div className="shrink-0 p-3 sm:p-4 lg:p-6 bg-slate-50 border-t border-slate-200/80 shadow-[0_-8px_30px_rgba(0,0,0,0.04)] space-y-2 sm:space-y-3">
+                    
+                    {/* Encrypted info display directly inside footer */}
+                    <div className="hidden sm:flex text-[10px] text-slate-400 font-bold items-center gap-2 justify-center leading-tight">
+                      <ShieldCheck size={12} className="text-emerald-500 shrink-0" />
+                      <span>All patient info is encrypted. Pay cash/bank transfer upon delivery.</span>
+                    </div>
+
+                    {/* Actions Row */}
+                    <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                      <button 
+                        onClick={() => {
+                          const message = `Hello SD GHT Health Care, I am interested in ${selectedProduct.name}. I would like to chat with a health consultant first.`;
+                          window.open(`https://wa.me/${CONFIG.whatsapp.number}?text=${encodeURIComponent(message)}`, '_blank');
+                        }}
+                        className="h-11 sm:h-14 bg-white border border-slate-200 text-slate-800 rounded-xl sm:rounded-2xl font-black text-[10px] sm:text-xs uppercase tracking-wider sm:tracking-widest hover:bg-slate-50 transition-all flex items-center justify-center gap-1.5 sm:gap-2 shadow-sm"
+                      >
+                        <Phone size={14} className="text-emerald-600 shrink-0" />
+                        CHAT WITH US
+                      </button>
+                      <button 
+                        onClick={() => {
+                          openOrderDrawer(selectedProduct, 'product', quickViewQuantity, undefined, true);
+                        }}
+                        className="h-11 sm:h-14 bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-700 hover:to-teal-600 text-white rounded-xl sm:rounded-2xl font-black text-[10px] sm:text-xs uppercase tracking-wider sm:tracking-widest transition-all shadow-xl active:scale-[0.98] flex items-center justify-center gap-1.5 sm:gap-2 border-b-[3px] sm:border-b-4 border-emerald-800 ring-2 ring-emerald-500/15"
+                      >
+                        <ShoppingBag size={14} className="shrink-0 animate-bounce" />
+                        <span className="font-black text-[10px] sm:text-xs text-white">ORDER NOW</span>
+                      </button>
+                    </div>
+
+                    <p className="hidden sm:block text-center text-[9px] text-slate-400 font-extrabold uppercase tracking-widest">
+                      📦 Nationwide Delivery Within 24-48 Hours | Pay Only When You Receive It
+                    </p>
+                  </div>
+
                 </div>
-              </div>
-            </motion.div>
-          </div>
-        )}
+              </motion.div>
+            </div>
+          );
+        })()}
       </AnimatePresence>
 
       {/* Package Quick View Modal */}
@@ -1835,9 +1968,8 @@ export default function App() {
           onClose={() => setSelectedPackage(null)}
           data={selectedPackage}
           allPackages={recommendedPackages}
-          onOrder={(qty) => {
-            openOrderDrawer(selectedPackage, 'package', qty);
-            setSelectedPackage(null);
+          onOrder={(qty, optIdx) => {
+            openOrderDrawer(selectedPackage, 'package', qty, optIdx, true);
           }}
           onViewProduct={(product) => {
             setViewingProduct(product);
@@ -1853,6 +1985,18 @@ export default function App() {
           isOpen={isOrderDrawerOpen}
           onClose={() => {
             setIsOrderDrawerOpen(false);
+            if (openedFromQuickView === 'product' && orderItem) {
+              setSelectedProduct(orderItem.item);
+              setQuickViewQuantity(orderItem.qty || 1);
+            } else if (openedFromQuickView === 'package' && orderItem) {
+              setSelectedPackage(orderItem.item);
+            } else {
+              if (activeTab === "product-detail" && orderItem && orderItem.type === 'product') {
+                setViewingProduct(orderItem.item);
+                navigateTo("product-detail");
+              }
+            }
+            setOpenedFromQuickView(null);
             setTimeout(() => setOrderItem(null), 500); // Wait for slide-out animation
           }}
           onShopMore={() => {
@@ -1863,6 +2007,7 @@ export default function App() {
           type={orderItem.type}
           distributorId={distributorId}
           initialQuantity={orderItem.qty}
+          initialOptionIndex={orderItem.optIdx}
           onOrderSuccess={(fullName, itemName, quantity, totalPrice, deliveryDate, paymentMethod) => {
             const searchParams = new URLSearchParams();
             searchParams.set("full_name", fullName);
@@ -1882,6 +2027,7 @@ export default function App() {
       <AIChatBot 
         isOpen={isChatOpen}
         setIsOpen={setIsChatOpen}
+        forceHide={!!selectedProduct || !!selectedPackage || isOrderDrawerOpen}
         onProductClick={(itemId, label, type) => {
           // Clean up the ID in case the AI added quotes or prefixes
           let cleanId = itemId.replace(/['"]/g, '').trim();

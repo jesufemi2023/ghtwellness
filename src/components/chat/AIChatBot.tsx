@@ -12,9 +12,10 @@ interface AIChatBotProps {
   onProductClick?: (itemId: string, label: string, type: 'product' | 'package' | 'id') => void;
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
+  forceHide?: boolean;
 }
 
-export const AIChatBot: React.FC<AIChatBotProps> = ({ onProductClick, isOpen, setIsOpen }) => {
+export const AIChatBot: React.FC<AIChatBotProps> = ({ onProductClick, isOpen, setIsOpen, forceHide }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 'welcome',
@@ -144,24 +145,24 @@ export const AIChatBot: React.FC<AIChatBotProps> = ({ onProductClick, isOpen, se
     <>
       {/* Floating Action Button */}
       <AnimatePresence>
-        {!isOpen && (
+        {!isOpen && !forceHide && (
           <motion.button
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
             onClick={() => setIsOpen(true)}
-            className="!fixed bottom-6 right-6 md:bottom-10 md:right-10 p-4 md:p-5 bg-emerald-600 text-white rounded-full shadow-2xl hover:bg-emerald-700 transition-all z-[9999] flex items-center justify-center group"
+            className="!fixed bottom-4 right-4 md:bottom-10 md:right-10 p-3 md:p-5 bg-emerald-600 text-white rounded-full shadow-2xl hover:bg-emerald-700 transition-all z-[9999] flex items-center justify-center group"
           >
             {/* Pulsing ring effect */}
             <span className="absolute inset-0 rounded-full bg-emerald-600 animate-ping opacity-75"></span>
             
-            {/* Tooltip to draw attention */}
-            <span className="absolute -top-14 right-0 bg-white text-emerald-700 px-5 py-3 rounded-2xl text-sm md:text-base font-black shadow-2xl whitespace-nowrap border-2 border-emerald-100 animate-bounce">
+            {/* Tooltip to draw attention - Hidden on mobile screen */}
+            <span className="hidden sm:inline-flex absolute -top-14 right-0 bg-white text-emerald-700 px-5 py-3 rounded-2xl text-sm md:text-base font-black shadow-2xl whitespace-nowrap border-2 border-emerald-100 animate-bounce">
               Ask Dr. GHT ✨
               <div className="absolute -bottom-2 right-8 w-4 h-4 bg-white border-b-2 border-r-2 border-emerald-100 transform rotate-45"></div>
             </span>
             
-            <Bot size={32} className="relative z-10" />
+            <Bot className="w-6 h-6 md:w-8 md:h-8 relative z-10" />
           </motion.button>
         )}
       </AnimatePresence>

@@ -33,6 +33,7 @@ interface OrderDrawerProps {
   type: 'package' | 'product';
   distributorId?: string;
   initialQuantity?: number;
+  initialOptionIndex?: number;
   onOrderSuccess?: (fullname: string, itemName: string, quantity: number, totalPrice: number, deliveryDate: string, paymentMethod: string) => void;
 }
 
@@ -44,6 +45,7 @@ export const OrderDrawer: React.FC<OrderDrawerProps> = ({
   type, 
   distributorId,
   initialQuantity = 1,
+  initialOptionIndex,
   onOrderSuccess
 }) => {
   const [step, setStep] = useState(1);
@@ -80,8 +82,10 @@ export const OrderDrawer: React.FC<OrderDrawerProps> = ({
       setQuantity(initialQuantity);
       if (type === 'package' && (item as PackageData).options?.length) {
         const options = (item as PackageData).options!;
-        const defaultOpt = options.find(o => o.bottles.toLowerCase().includes('3 bottle')) || options[0];
-        setSelectedOption(defaultOpt);
+        const selectedOpt = (initialOptionIndex !== undefined && options[initialOptionIndex])
+          ? options[initialOptionIndex]
+          : (options.find(o => o.bottles.toLowerCase().includes('3 bottle')) || options[0]);
+        setSelectedOption(selectedOpt);
       } else {
         setSelectedOption(null);
       }
@@ -91,7 +95,7 @@ export const OrderDrawer: React.FC<OrderDrawerProps> = ({
       setIsUploading(false);
       trackOrderStart(item.name, type);
     }
-  }, [isOpen, initialQuantity, item.name, type]);
+  }, [isOpen, initialQuantity, item.name, type, initialOptionIndex]);
 
   const [formData, setFormData] = useState({
     full_name: '',

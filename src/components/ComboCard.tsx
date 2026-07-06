@@ -10,12 +10,21 @@ interface ComboCardProps {
   data: PackageData;
   onOrder: (item: any, type: 'package', qty: number) => void;
   onProductClick: (product: Product) => void;
+  onQuickView?: (pkg: PackageData) => void;
 }
 
-export const ComboCard: React.FC<ComboCardProps> = ({ data, onOrder, onProductClick }) => {
+export const ComboCard: React.FC<ComboCardProps> = ({ data, onOrder, onProductClick, onQuickView }) => {
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
   const [showFullBenefits, setShowFullBenefits] = useState(false);
   const [carouselIndex, setCarouselIndex] = useState(0);
+
+  const handleQuickView = () => {
+    if (onQuickView) {
+      onQuickView(data);
+    } else {
+      setIsQuickViewOpen(true);
+    }
+  };
 
   const discountPrice = data.price * (1 - data.discount / 100);
 
@@ -37,7 +46,7 @@ export const ComboCard: React.FC<ComboCardProps> = ({ data, onOrder, onProductCl
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        onClick={() => setIsQuickViewOpen(true)}
+        onClick={handleQuickView}
         className="bg-white rounded-[3rem] border-4 border-slate-100 shadow-xl hover:shadow-3xl transition-all duration-700 overflow-hidden flex flex-col group relative cursor-pointer"
       >
         {/* IMAGE SECTION */}
@@ -74,7 +83,7 @@ export const ComboCard: React.FC<ComboCardProps> = ({ data, onOrder, onProductCl
             <button 
               onClick={(e) => {
                 e.stopPropagation();
-                setIsQuickViewOpen(true);
+                handleQuickView();
               }}
               className="absolute top-6 right-6 bg-white/95 backdrop-blur-sm p-4 rounded-3xl shadow-2xl text-slate-500 hover:text-emerald-600 hover:scale-110 transition-all z-20 border-2 border-slate-100 group/qv"
               title="Quick View"
@@ -105,7 +114,7 @@ export const ComboCard: React.FC<ComboCardProps> = ({ data, onOrder, onProductCl
             <button 
               onClick={(e) => {
                 e.stopPropagation();
-                setIsQuickViewOpen(true);
+                handleQuickView();
               }}
               className="w-full flex items-center justify-between p-4 bg-slate-50 rounded-2xl border-2 border-slate-100 hover:border-emerald-400 hover:bg-white transition-all group/includes"
             >

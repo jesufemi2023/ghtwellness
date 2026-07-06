@@ -10,18 +10,27 @@ interface PackageCardProps {
   allPackages?: PackageData[];
   onOrder?: (quantity: number) => void;
   onViewProduct?: (product: Product) => void;
+  onQuickView?: (pkg: PackageData) => void;
 }
 
-export const PackageCard: React.FC<PackageCardProps> = ({ data, allPackages, onOrder, onViewProduct }) => {
+export const PackageCard: React.FC<PackageCardProps> = ({ data, allPackages, onOrder, onViewProduct, onQuickView }) => {
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [isExpanded, setIsExpanded] = useState(false);
   const discountedPrice = data.price * (1 - (data.discount / 100));
 
+  const handleQuickView = () => {
+    if (onQuickView) {
+      onQuickView(data);
+    } else {
+      setIsQuickViewOpen(true);
+    }
+  };
+
   return (
     <>
       <div 
-        onClick={() => setIsQuickViewOpen(true)}
+        onClick={handleQuickView}
         className="flex flex-col h-full bg-white border border-slate-200 rounded-2xl md:rounded-3xl overflow-hidden hover:shadow-2xl transition-all duration-500 group relative cursor-pointer"
       >
         {/* Urgency Badge - Top Center */}
@@ -90,7 +99,7 @@ export const PackageCard: React.FC<PackageCardProps> = ({ data, allPackages, onO
             <button 
               onClick={(e) => {
                 e.stopPropagation();
-                setIsQuickViewOpen(true);
+                handleQuickView();
               }}
               className="bg-white text-slate-900 px-8 py-3 rounded-full font-black text-sm shadow-2xl flex items-center gap-2 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 hover:bg-emerald-600 hover:text-white active:scale-95"
             >
@@ -151,7 +160,7 @@ export const PackageCard: React.FC<PackageCardProps> = ({ data, allPackages, onO
               <button 
                 onClick={(e) => {
                   e.stopPropagation();
-                  setIsQuickViewOpen(true);
+                  handleQuickView();
                 }}
                 className="text-[9px] md:text-[10px] font-black text-emerald-600 uppercase tracking-widest mt-0.5 hover:text-emerald-800 transition-colors flex items-center gap-1 group/btn"
               >
