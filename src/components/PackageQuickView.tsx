@@ -142,7 +142,7 @@ export const PackageQuickView: React.FC<PackageQuickViewProps> = ({
 
   const selectedOption = data.options && data.options[selectedOptionIdx] ? data.options[selectedOptionIdx] : null;
   const basePrice = selectedOption ? selectedOption.price : data.price;
-  const discountedPrice = basePrice * (1 - (data.discount / 100));
+  const discountedPrice = selectedOption ? selectedOption.price : (data.price * (1 - (data.discount / 100)));
 
   // Countdown timer & dynamic stock simulation
   useEffect(() => {
@@ -364,13 +364,13 @@ export const PackageQuickView: React.FC<PackageQuickViewProps> = ({
               <div className="lg:w-[55%] flex-1 flex flex-col lg:h-full bg-white overflow-hidden">
                 
                 {/* Active Deal Banner */}
-                <div className="bg-gradient-to-r from-red-600 via-orange-500 to-red-600 text-white px-6 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs font-black uppercase tracking-wider shrink-0 shadow-inner">
+                <div className="bg-gradient-to-r from-red-600 via-orange-500 to-red-600 text-white px-6 py-3 pr-32 sm:pr-40 lg:pr-48 flex flex-wrap items-center justify-between gap-2 text-xs font-black uppercase tracking-wider shrink-0 shadow-inner">
                   <div className="flex items-center gap-1.5 animate-pulse">
-                    <Flame size={14} fill="currentColor" />
-                    <span>Special Subsidized Deal: Active Now</span>
+                    <Flame size={16} fill="currentColor" />
+                    <span>🔥 LIMITED TIME DIRECT PROMOTION — 100% CLINICALLY PROVEN & AUTHENTIC</span>
                   </div>
-                  <div className="flex items-center gap-2 text-[10px] sm:text-xs">
-                    <span>✓ MANUFACTURER DIRECT PRICE GUARANTEED TODAY</span>
+                  <div className="flex items-center gap-2 text-[10px] sm:text-xs bg-black/20 px-3 py-1 rounded-full font-black">
+                    <span>⚡ OVER 1000 PATIENTS HEALED THIS MONTH — ORDER NOW FOR PRIORITY DISPATCH</span>
                   </div>
                 </div>
 
@@ -488,9 +488,9 @@ export const PackageQuickView: React.FC<PackageQuickViewProps> = ({
                         <span className="text-[10px] font-black uppercase text-emerald-400 tracking-wider">Exclusive Subsidy Pricing</span>
                         <div className="flex items-baseline gap-2.5">
                           <span className="text-3xl md:text-4xl font-black text-emerald-400">₦{discountedPrice.toLocaleString()}</span>
-                          {!selectedOption && data.discount > 0 && (
+                          {(selectedOption || data.discount > 0) && (
                             <span className="text-xs text-slate-400 line-through font-bold">
-                              ₦{data.price.toLocaleString()}
+                              ₦{(selectedOption ? selectedOption.price * 1.2 : data.price).toLocaleString()}
                             </span>
                           )}
                         </div>

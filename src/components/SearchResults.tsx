@@ -14,6 +14,7 @@ interface SearchResultsProps {
   onViewProduct: (product: Product) => void;
   onOrderProduct: (product: Product) => void;
   onOrderPackage: (pkg: PackageData) => void;
+  onQuickView?: (pkg: PackageData) => void;
 }
 
 export const SearchResults: React.FC<SearchResultsProps> = ({
@@ -24,7 +25,8 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
   onClose,
   onViewProduct,
   onOrderProduct,
-  onOrderPackage
+  onOrderPackage,
+  onQuickView
 }) => {
   const lowerQuery = query.toLowerCase();
 

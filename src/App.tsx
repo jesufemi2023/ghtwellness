@@ -571,25 +571,29 @@ export default function App() {
         {/* Header */}
         <header className="bg-white border-b border-slate-200">
           <div className="max-w-7xl mx-auto px-4 h-16 md:h-20 flex items-center justify-between gap-4">
-            <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
+            <button 
+              onClick={() => navigateTo("home")}
+              className="flex items-center gap-2 md:gap-3 flex-shrink-0 cursor-pointer text-left hover:opacity-95 transition-all group"
+              title="Go to Homepage"
+            >
               {CONFIG.company.logoUrl ? (
                 <img 
                   src={CONFIG.company.logoUrl} 
                   alt={CONFIG.company.name} 
-                  className="h-8 md:h-12 w-auto object-contain"
+                  className="h-8 md:h-12 w-auto object-contain group-hover:scale-105 transition-transform"
                   referrerPolicy="no-referrer"
                 />
               ) : (
-                <div className="w-8 h-8 md:w-10 md:h-10 bg-emerald-600 rounded-lg md:rounded-xl flex items-center justify-center text-white shadow-lg">
+                <div className="w-8 h-8 md:w-10 md:h-10 bg-emerald-600 rounded-lg md:rounded-xl flex items-center justify-center text-white shadow-lg group-hover:scale-105 transition-transform">
                   <Activity size={18} className="md:hidden" />
                   <Activity size={24} className="hidden md:block" />
                 </div>
               )}
               <div className="flex flex-col">
-                <h1 className="font-bold text-sm md:text-xl tracking-tight text-slate-800 leading-none">{CONFIG.company.name}</h1>
+                <h1 className="font-bold text-sm md:text-xl tracking-tight text-slate-800 leading-none group-hover:text-emerald-600 transition-colors">{CONFIG.company.name}</h1>
                 <p className="text-[8px] md:text-[10px] uppercase tracking-[0.1em] md:tracking-[0.2em] font-semibold text-emerald-600 mt-0.5">{CONFIG.company.subtitle}</p>
               </div>
-            </div>
+            </button>
 
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center justify-center gap-4 xl:gap-6 flex-1 px-4">
@@ -791,8 +795,8 @@ export default function App() {
       </div>
 
       <main className={`mx-auto transition-all duration-500 ${
-        activeTab === "home" || activeTab === "about" || activeTab === "search" || activeTab === "testimonials"
-          ? "max-w-none px-0 py-0" 
+        activeTab === "home" || activeTab === "about" || activeTab === "search" || activeTab === "testimonials" || activeTab === "product-detail"
+          ? "max-w-none px-0 py-0 bg-slate-50 min-h-screen" 
           : activeTab === "combo" 
             ? "max-w-[1440px] px-4 py-8 md:py-12" 
             : "max-w-7xl px-4 py-8 md:py-12"
@@ -818,6 +822,7 @@ export default function App() {
                 }}
                 onOrderProduct={(p) => openOrderDrawer(p, "product")}
                 onOrderPackage={(pkg) => openOrderDrawer(pkg, "package")}
+                onQuickView={setSelectedPackage}
               />
             </motion.div>
           )}
@@ -855,6 +860,7 @@ export default function App() {
                   navigateTo("blog-post");
                 }}
                 onOpenChat={() => setIsChatOpen(true)}
+                onQuickView={setSelectedPackage}
               />
             </motion.div>
           )}
@@ -1047,7 +1053,7 @@ export default function App() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="space-y-8 pb-20"
+              className="max-w-[1600px] mx-auto px-4 md:px-8 lg:px-12 py-8 md:py-12 space-y-12 pb-32"
             >
               {/* Breadcrumbs / Back Button */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -1187,7 +1193,7 @@ export default function App() {
                       className="flex-[1.5] bg-emerald-600 text-white py-6 rounded-3xl font-black text-2xl hover:bg-emerald-700 transition-all shadow-2xl shadow-emerald-200 active:scale-[0.98] flex items-center justify-center gap-3 border-b-4 border-emerald-800"
                     >
                       <ShoppingBag size={28} className="stroke-[3]" />
-                      ORDER SECURELY NOW
+                      ORDER NOW
                     </button>
                   </div>
 

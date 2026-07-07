@@ -39,6 +39,7 @@ interface HomeProps {
   onViewProduct: (product: Product) => void;
   onSelectBlog: (id: string) => void;
   onOpenChat: () => void;
+  onQuickView?: (pkg: PackageData) => void;
 }
 
 export function Home({ 
@@ -51,7 +52,8 @@ export function Home({
   onOrderComboItem,
   onViewProduct,
   onSelectBlog,
-  onOpenChat
+  onOpenChat,
+  onQuickView
 }: HomeProps) {
   const [recentBlogs, setRecentBlogs] = useState<BlogPost[]>([]);
   const trendingScrollRef = useRef<HTMLDivElement>(null);
@@ -413,6 +415,7 @@ export function Home({
                     allPackages={recommendedPackages} 
                     onOrder={() => onOrderPackage(pkg)} 
                     onViewProduct={onViewProduct} 
+                    onQuickView={onQuickView}
                   />
                 </div>
               ))}
@@ -451,6 +454,7 @@ export function Home({
                     data={pkg} 
                     onOrder={onOrderComboItem || ((item) => onOrderPackage(item))} 
                     onProductClick={onViewProduct} 
+                    onQuickView={onQuickView}
                   />
                 </div>
               ))}
