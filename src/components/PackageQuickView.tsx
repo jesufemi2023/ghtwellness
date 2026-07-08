@@ -363,16 +363,7 @@ export const PackageQuickView: React.FC<PackageQuickViewProps> = ({
               {/* RIGHT COLUMN: Highly Persuasive Contents, Offers, Testimonials */}
               <div className="lg:w-[55%] flex-1 flex flex-col lg:h-full bg-white overflow-hidden">
                 
-                {/* Active Deal Banner */}
-                <div className="bg-gradient-to-r from-red-600 via-orange-500 to-red-600 text-white px-6 py-3 pr-32 sm:pr-40 lg:pr-48 flex flex-wrap items-center justify-between gap-2 text-xs font-black uppercase tracking-wider shrink-0 shadow-inner">
-                  <div className="flex items-center gap-1.5 animate-pulse">
-                    <Flame size={16} fill="currentColor" />
-                    <span>🔥 LIMITED TIME DIRECT PROMOTION — 100% CLINICALLY PROVEN & AUTHENTIC</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-[10px] sm:text-xs bg-black/20 px-3 py-1 rounded-full font-black">
-                    <span>⚡ OVER 1000 PATIENTS HEALED THIS MONTH — ORDER NOW FOR PRIORITY DISPATCH</span>
-                  </div>
-                </div>
+
 
                 {/* Scrollable Contents */}
                 <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 custom-scrollbar pb-6">
