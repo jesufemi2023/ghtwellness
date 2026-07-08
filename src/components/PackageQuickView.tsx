@@ -351,65 +351,79 @@ export const PackageQuickView: React.FC<PackageQuickViewProps> = ({
 
 
                 {/* Scrollable Contents */}
-                <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 custom-scrollbar pb-6">
+                <div className="flex-1 overflow-y-auto p-6 md:p-10 space-y-8 custom-scrollbar pb-8">
                   {/* Title & Reviews */}
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="bg-red-50 text-red-600 px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-widest border border-red-100">
-                        Today: Direct Promo Discount Applied
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <span className="bg-red-100 text-red-700 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-widest border border-red-200">
+                        ⭐ Special Subsidy Promo Active
                       </span>
-                      <div className="flex items-center gap-0.5 bg-amber-50 border border-amber-100 text-amber-700 px-2.5 py-0.5 rounded-md text-xs font-bold">
-                        <Star size={12} fill="currentColor" className="text-amber-500" />
-                        <span>4.9 (1.4K+ Orders)</span>
+                      <div className="flex items-center gap-1.5 bg-amber-50 border border-amber-200 text-amber-800 px-3.5 py-1.5 rounded-xl text-xs font-black">
+                        <Star size={16} fill="currentColor" className="text-amber-500" />
+                        <span>4.9 / 5.0 Rating (1,450+ Verified Patient Orders)</span>
                       </div>
                     </div>
-                    <h2 className="text-2xl md:text-3xl font-black text-slate-900 leading-tight">
+                    <h2 className="text-3xl md:text-5xl font-black text-slate-950 leading-tight">
                       {data.name}
                     </h2>
-                    <p className="text-slate-600 text-sm md:text-base font-bold leading-relaxed">
+                    <p className="text-slate-800 text-lg md:text-xl font-bold leading-relaxed bg-slate-50 p-5 rounded-3xl border border-slate-200">
                       {data.description}
                     </p>
                   </div>
 
-                  {/* Senior & Family Care Guidance Banner */}
-                  <div className="bg-gradient-to-r from-emerald-900 to-teal-900 text-white rounded-3xl p-5 border border-emerald-800 shadow-lg space-y-2">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xl">👵👴</span>
-                      <h4 className="text-xs font-black uppercase tracking-wider text-emerald-300">Senior Care & Family Friendly</h4>
+                  {/* Step-by-Step Clinical Healing Process (Optimized for Adults & Seniors) */}
+                  <div className="bg-emerald-50/70 border-2 border-emerald-200 rounded-3xl p-6 space-y-4">
+                    <div className="flex items-center gap-2 border-b border-emerald-200 pb-3 text-emerald-900">
+                      <Sparkles size={20} className="text-emerald-700 shrink-0" />
+                      <h3 className="text-base md:text-lg font-black uppercase tracking-wide">How This Treatment Works (3-Step Healing Process)</h3>
                     </div>
-                    <p className="text-xs text-slate-100 font-medium leading-relaxed">
-                      Specially formulated with 100% natural organic extracts safe for seniors. Free phone consultation and home delivery with Pay-on-Delivery available for elderly patients.
-                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="bg-white p-4 rounded-2xl border border-emerald-100 shadow-sm space-y-1.5">
+                        <span className="text-xs bg-emerald-600 text-white px-2 py-0.5 rounded font-black uppercase">Step 1</span>
+                        <h4 className="text-base font-black text-slate-900">Deep Cleansing</h4>
+                        <p className="text-xs text-slate-600 font-semibold leading-relaxed">Flushes out harmful toxins, metabolic waste, and accumulated impurities from your system.</p>
+                      </div>
+                      <div className="bg-white p-4 rounded-2xl border border-emerald-100 shadow-sm space-y-1.5">
+                        <span className="text-xs bg-emerald-600 text-white px-2 py-0.5 rounded font-black uppercase">Step 2</span>
+                        <h4 className="text-base font-black text-slate-900">Cellular Repair</h4>
+                        <p className="text-xs text-slate-600 font-semibold leading-relaxed">Nourishes damaged cells with pure organic herbal extracts to restore normal organ function.</p>
+                      </div>
+                      <div className="bg-white p-4 rounded-2xl border border-emerald-100 shadow-sm space-y-1.5">
+                        <span className="text-xs bg-emerald-600 text-white px-2 py-0.5 rounded font-black uppercase">Step 3</span>
+                        <h4 className="text-base font-black text-slate-900">Total Immunity</h4>
+                        <p className="text-xs text-slate-600 font-semibold leading-relaxed">Strengthens your natural defenses to prevent relapse and maintain lifelong vitality.</p>
+                      </div>
+                    </div>
                   </div>
 
                   {/* Target Symptoms & Healing Benefits - Visual Contrast */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Symptoms Addressed */}
-                    <div className="p-4 bg-slate-50 rounded-3xl border border-slate-100 space-y-3">
-                      <div className="flex items-center gap-1.5 border-b border-slate-200/60 pb-1.5 text-slate-500">
-                        <AlertCircle size={14} className="text-red-500 shrink-0" />
-                        <h4 className="text-[10px] font-black uppercase tracking-wider">Symptoms Targeted</h4>
+                    <div className="p-6 bg-slate-50 rounded-3xl border-2 border-slate-200 space-y-4">
+                      <div className="flex items-center gap-2 border-b border-slate-200 pb-2.5 text-slate-700">
+                        <AlertCircle size={20} className="text-red-600 shrink-0" />
+                        <h4 className="text-sm md:text-base font-black uppercase tracking-wider">Symptoms Addressed</h4>
                       </div>
-                      <div className="flex flex-wrap gap-1.5">
+                      <div className="flex flex-wrap gap-2">
                         {data.symptoms.map((symptom, i) => (
-                          <span key={i} className="bg-white text-slate-700 px-2.5 py-1 rounded-xl text-[10px] font-bold border border-slate-200/50 shadow-sm">
-                            {symptom}
+                          <span key={i} className="bg-white text-slate-800 px-3.5 py-1.5 rounded-xl text-xs md:text-sm font-extrabold border border-slate-200 shadow-sm">
+                            ✓ {symptom}
                           </span>
                         ))}
                       </div>
                     </div>
 
                     {/* Medical Health Benefits */}
-                    <div className="p-4 bg-emerald-50/50 rounded-3xl border border-emerald-100/50 space-y-3">
-                      <div className="flex items-center gap-1.5 border-b border-emerald-100 pb-1.5 text-emerald-800">
-                        <CheckCircle2 size={14} className="text-emerald-600 shrink-0" />
-                        <h4 className="text-[10px] font-black uppercase tracking-wider">Therapeutic Benefits</h4>
+                    <div className="p-6 bg-emerald-50/60 rounded-3xl border-2 border-emerald-200 space-y-4">
+                      <div className="flex items-center gap-2 border-b border-emerald-200 pb-2.5 text-emerald-900">
+                        <CheckCircle2 size={20} className="text-emerald-700 shrink-0" />
+                        <h4 className="text-sm md:text-base font-black uppercase tracking-wider">Key Health Benefits</h4>
                       </div>
-                      <div className="space-y-2">
+                      <div className="space-y-3">
                         {data.health_benefits.slice(0, 4).map((benefit, i) => (
-                          <div key={i} className="flex items-start gap-2">
-                            <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full mt-1.5 shrink-0" />
-                            <span className="text-[11px] text-slate-800 font-extrabold leading-snug">{benefit}</span>
+                          <div key={i} className="flex items-start gap-3">
+                            <span className="w-2.5 h-2.5 bg-emerald-600 rounded-full mt-1.5 shrink-0" />
+                            <span className="text-sm md:text-base text-slate-900 font-extrabold leading-snug">{benefit}</span>
                           </div>
                         ))}
                       </div>
@@ -418,44 +432,44 @@ export const PackageQuickView: React.FC<PackageQuickViewProps> = ({
 
                   {/* Package Option Selector (NEW & RESTORED) */}
                   {data.options && data.options.length > 0 && (
-                    <div className="space-y-3 p-4 bg-slate-50 border border-slate-200/60 rounded-3xl">
+                    <div className="space-y-4 p-6 bg-slate-50 border-2 border-slate-300 rounded-3xl">
                       <div className="flex items-center justify-between">
-                        <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
-                          <Award size={13} className="text-emerald-600" />
-                          Select Treatment Plan Option:
+                        <h4 className="text-sm md:text-base font-black text-slate-900 uppercase tracking-widest flex items-center gap-2">
+                          <Award size={20} className="text-emerald-700" />
+                          Select Your Treatment Plan Option:
                         </h4>
-                        <span className="text-[8px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-black uppercase tracking-wider animate-pulse">Subsidized Pricing</span>
+                        <span className="text-xs bg-emerald-200 text-emerald-900 px-3 py-1 rounded-lg font-black uppercase tracking-wider animate-pulse">Recommended Course</span>
                       </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         {data.options.map((opt, idx) => {
                           const isSelected = selectedOptionIdx === idx;
                           return (
                             <button
                               key={idx}
                               onClick={() => setSelectedOptionIdx(idx)}
-                              className={`p-3 rounded-2xl border text-left transition-all duration-300 relative overflow-hidden flex flex-col justify-between group/opt cursor-pointer min-h-[95px] ${
+                              className={`p-4 rounded-2xl border-2 text-left transition-all duration-300 relative overflow-hidden flex flex-col justify-between group/opt cursor-pointer min-h-[110px] ${
                                 isSelected
-                                  ? 'border-emerald-600 bg-white ring-2 ring-emerald-500/15 shadow-md'
-                                  : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
+                                  ? 'border-emerald-600 bg-white ring-4 ring-emerald-500/20 shadow-lg'
+                                  : 'border-slate-300 bg-white hover:border-slate-400 hover:bg-slate-50'
                               }`}
                             >
                               {isSelected && (
-                                <div className="absolute top-2 right-2 text-emerald-600">
-                                  <div className="w-3.5 h-3.5 bg-emerald-600 rounded-full flex items-center justify-center text-white">
-                                    <Check size={9} strokeWidth={4} />
+                                <div className="absolute top-3 right-3 text-emerald-600">
+                                  <div className="w-6 h-6 bg-emerald-600 rounded-full flex items-center justify-center text-white">
+                                    <Check size={14} strokeWidth={4} />
                                   </div>
                                 </div>
                               )}
                               <div>
-                                <span className={`text-[10px] font-black uppercase tracking-wider block pr-4 ${isSelected ? 'text-emerald-700' : 'text-slate-700'}`}>
+                                <span className={`text-sm md:text-base font-black uppercase tracking-wider block pr-6 ${isSelected ? 'text-emerald-800' : 'text-slate-900'}`}>
                                   {opt.bottles}
                                 </span>
                               </div>
-                              <div className="mt-2.5">
-                                <span className="text-[10px] text-slate-400 block font-bold line-through">
+                              <div className="mt-3">
+                                <span className="text-xs text-slate-500 block font-bold line-through">
                                   ₦{(opt.price * 1.2).toLocaleString()}
                                 </span>
-                                <span className="text-xs font-black text-slate-900 block mt-0.5">
+                                <span className="text-lg md:text-xl font-black text-slate-950 block mt-0.5">
                                   ₦{opt.price.toLocaleString()}
                                 </span>
                               </div>
@@ -467,30 +481,30 @@ export const PackageQuickView: React.FC<PackageQuickViewProps> = ({
                   )}
 
                   {/* Pricing and Scarcity Box */}
-                  <div className="bg-slate-900 text-white rounded-3xl p-5 border border-white/10 relative overflow-hidden shadow-xl">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
+                  <div className="bg-slate-950 text-white rounded-3xl p-6 md:p-8 border-2 border-slate-800 relative overflow-hidden shadow-2xl">
+                    <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
                     
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      <div className="space-y-1">
-                        <span className="text-[10px] font-black uppercase text-emerald-400 tracking-wider">Exclusive Subsidy Pricing</span>
-                        <div className="flex items-baseline gap-2.5">
-                          <span className="text-3xl md:text-4xl font-black text-emerald-400">₦{discountedPrice.toLocaleString()}</span>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                      <div className="space-y-2">
+                        <span className="text-xs font-black uppercase text-emerald-400 tracking-wider">Subsidized Direct Clinical Price</span>
+                        <div className="flex items-baseline gap-3">
+                          <span className="text-4xl md:text-5xl font-black text-emerald-400">₦{discountedPrice.toLocaleString()}</span>
                           {(selectedOption || data.discount > 0) && (
-                            <span className="text-xs text-slate-400 line-through font-bold">
+                            <span className="text-sm md:text-base text-slate-400 line-through font-extrabold">
                               ₦{(selectedOption ? selectedOption.price * 1.2 : data.price).toLocaleString()}
                             </span>
                           )}
                         </div>
-                        <p className="text-[10px] text-slate-400 font-semibold">Includes Free Shipping & Confidential POD (Pay on Delivery)</p>
+                        <p className="text-xs md:text-sm text-slate-300 font-bold">Includes FREE Nationwide Delivery & Cash / Transfer on Delivery (POD)</p>
                       </div>
 
-                      <div className="bg-black/30 border border-white/5 p-3 rounded-2xl sm:text-right shrink-0">
-                        <div className="flex items-center gap-1.5 text-red-500 font-black text-[10px] uppercase tracking-wider justify-start sm:justify-end">
-                          <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                          <span>Strictly Limited Stock</span>
+                      <div className="bg-black/50 border border-white/10 p-4 rounded-2xl sm:text-right shrink-0">
+                        <div className="flex items-center gap-2 text-red-400 font-black text-xs uppercase tracking-wider justify-start sm:justify-end">
+                          <div className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse" />
+                          <span>High Demand Alert</span>
                         </div>
-                        <p className="text-xs text-slate-300 font-extrabold mt-1">Only <span className="text-white text-sm font-black">{stockLeft} packages</span> left for Abuja & Lagos region</p>
-                        <div className="w-full sm:w-32 h-1.5 bg-slate-800 rounded-full overflow-hidden mt-1.5 ml-auto">
+                        <p className="text-sm text-slate-200 font-extrabold mt-1">Only <span className="text-white text-base font-black">{stockLeft} packages</span> left in regional stock</p>
+                        <div className="w-full sm:w-36 h-2 bg-slate-800 rounded-full overflow-hidden mt-2 ml-auto">
                           <div className="h-full bg-red-500 rounded-full transition-all duration-1000" style={{ width: `${(stockLeft / 10) * 100}%` }} />
                         </div>
                       </div>
@@ -498,131 +512,152 @@ export const PackageQuickView: React.FC<PackageQuickViewProps> = ({
                   </div>
 
                   {/* Free Premium Gift Bonuses Included */}
-                  <div className="border border-amber-200/60 bg-amber-50/20 p-5 rounded-3xl space-y-4">
-                    <div className="flex items-center gap-2 border-b border-amber-200/40 pb-2 text-amber-800">
-                      <Gift size={16} className="text-amber-500 shrink-0" />
-                      <h4 className="text-[10px] font-black uppercase tracking-widest">Added Ordering Incentives (100% Free Today)</h4>
+                  <div className="border-2 border-amber-300 bg-amber-50/40 p-6 rounded-3xl space-y-4">
+                    <div className="flex items-center gap-2 border-b border-amber-200 pb-3 text-amber-900">
+                      <Gift size={20} className="text-amber-600 shrink-0" />
+                      <h4 className="text-sm md:text-base font-black uppercase tracking-widest">Free Ordering Bonuses Included Today</h4>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div className="flex items-start gap-2.5">
-                        <Check size={14} className="text-emerald-600 bg-emerald-100 rounded-full p-0.5 mt-0.5 shrink-0" />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="flex items-start gap-3 bg-white p-4 rounded-2xl border border-amber-200 shadow-sm">
+                        <Check size={18} className="text-emerald-700 bg-emerald-100 rounded-full p-1 mt-0.5 shrink-0" />
                         <div>
-                          <h5 className="text-xs font-black text-slate-900">Bonus #1: Premium Pill Organizer</h5>
-                          <p className="text-[10px] text-slate-500 leading-snug">Ensures safe, consistent daily dosage and scheduling (Worth ₦3,500 - Free today).</p>
+                          <h5 className="text-sm font-black text-slate-900">Bonus #1: Premium Pill Organizer</h5>
+                          <p className="text-xs text-slate-600 font-medium leading-relaxed mt-0.5">Ensures safe, consistent daily dosage and scheduling (Worth ₦3,500 - 100% Free).</p>
                         </div>
                       </div>
-                      <div className="flex items-start gap-2.5">
-                        <Check size={14} className="text-emerald-600 bg-emerald-100 rounded-full p-0.5 mt-0.5 shrink-0" />
+                      <div className="flex items-start gap-3 bg-white p-4 rounded-2xl border border-amber-200 shadow-sm">
+                        <Check size={18} className="text-emerald-700 bg-emerald-100 rounded-full p-1 mt-0.5 shrink-0" />
                         <div>
-                          <h5 className="text-xs font-black text-slate-900">Bonus #2: Free Shipping & POD</h5>
-                          <p className="text-[10px] text-slate-500 leading-snug">Dispatched securely. Pay comfortably in cash or transfer upon physical delivery.</p>
+                          <h5 className="text-sm font-black text-slate-900">Bonus #2: Free Nationwide Delivery</h5>
+                          <p className="text-xs text-slate-600 font-medium leading-relaxed mt-0.5">Dispatched securely to your doorstep. Pay only upon inspection and receipt.</p>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Curated Patient Testimonial For Social Proof (Reflects Description perfectly!) */}
-                  <div className="p-5 bg-slate-50 border border-slate-100 rounded-3xl space-y-3">
-                    <div className="flex items-center gap-1.5 text-slate-400">
-                      <CheckCircle2 size={12} className="text-emerald-500" />
-                      <span className="text-[9px] font-black uppercase tracking-wider">Patient Success Story</span>
+                  {/* Curated Patient Testimonial For Social Proof */}
+                  <div className="p-6 bg-slate-50 border-2 border-slate-200 rounded-3xl space-y-4">
+                    <div className="flex items-center gap-2 text-slate-700">
+                      <CheckCircle2 size={18} className="text-emerald-600" />
+                      <span className="text-xs md:text-sm font-black uppercase tracking-wider">Verified Patient Success Story</span>
                     </div>
                     <div className="relative">
-                      <p className="text-slate-600 italic font-semibold text-xs md:text-sm leading-relaxed">
+                      <p className="text-slate-900 italic font-bold text-base md:text-lg leading-relaxed">
                         "{activeTestimonial.text}"
                       </p>
-                      <div className="mt-2 flex items-center justify-between text-[10px] font-bold text-slate-500 border-t border-slate-200/50 pt-2">
-                        <span>— {activeTestimonial.author}</span>
-                        <span className="text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded font-extrabold uppercase text-[8px] tracking-wider">
+                      <div className="mt-4 flex items-center justify-between text-xs font-bold text-slate-700 border-t border-slate-200 pt-3">
+                        <span className="font-black text-slate-900 text-sm">— {activeTestimonial.author}</span>
+                        <span className="text-emerald-800 bg-emerald-100 px-2.5 py-1 rounded-lg font-black uppercase text-xs tracking-wider">
                           {activeTestimonial.role} ✅
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  {/* PAYMENT RECEIPT PREVIEW (NEW & HIGHLY AESTHETIC) */}
-                  <div className="bg-slate-50 border border-slate-200 rounded-3xl p-5 font-mono text-xs text-slate-700 space-y-3 relative overflow-hidden">
-                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-indigo-500 to-emerald-500" />
-                    <div className="flex justify-between items-center text-slate-400 font-bold border-b border-dashed border-slate-300 pb-2">
-                      <span>ORDER INVOICE / RECEIPT PREVIEW</span>
-                      <span className="text-[9px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">POD Confirmed</span>
+                  {/* FAQ Section for Adults & Seniors */}
+                  <div className="space-y-4 p-6 bg-slate-50 border-2 border-slate-200 rounded-3xl">
+                    <h4 className="text-base font-black text-slate-950 uppercase tracking-tight flex items-center gap-2">
+                      <span>❓</span> Frequently Asked Questions (FAQ)
+                    </h4>
+                    <div className="space-y-3">
+                      <div className="bg-white p-4 rounded-2xl border border-slate-200">
+                        <h5 className="text-sm font-black text-slate-950">Q: How do I take this treatment?</h5>
+                        <p className="text-xs text-slate-700 font-semibold mt-1 leading-relaxed">Detailed dosage instructions with morning/evening schedules are printed clearly on every bottle and inside your package.</p>
+                      </div>
+                      <div className="bg-white p-4 rounded-2xl border border-slate-200">
+                        <h5 className="text-sm font-black text-slate-950">Q: Do I pay online before delivery?</h5>
+                        <p className="text-xs text-slate-700 font-semibold mt-1 leading-relaxed">No! We operate strict Pay on Delivery (POD). You only inspect your package and pay cash or transfer when our dispatch agent delivers it to you.</p>
+                      </div>
+                      <div className="bg-white p-4 rounded-2xl border border-slate-200">
+                        <h5 className="text-sm font-black text-slate-950">Q: Are there any side effects?</h5>
+                        <p className="text-xs text-slate-700 font-semibold mt-1 leading-relaxed">All GHT formulas are 100% natural, herbal, and NAFDAC registered with zero chemical additives or side effects.</p>
+                      </div>
                     </div>
-                    <div className="space-y-1.5">
+                  </div>
+
+                  {/* PAYMENT RECEIPT PREVIEW */}
+                  <div className="bg-slate-50 border-2 border-slate-300 rounded-3xl p-6 font-mono text-sm text-slate-800 space-y-4 relative overflow-hidden shadow-sm">
+                    <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-600 via-indigo-600 to-emerald-600" />
+                    <div className="flex justify-between items-center text-slate-500 font-bold border-b border-dashed border-slate-300 pb-3">
+                      <span className="font-black text-slate-900">OFFICIAL ORDER INVOICE SUMMARY</span>
+                      <span className="text-xs bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded font-black uppercase tracking-wider">Pay on Delivery</span>
+                    </div>
+                    <div className="space-y-2">
                       <div className="flex justify-between">
-                        <span className="text-slate-500">Selected Treatment:</span>
-                        <span className="font-extrabold text-slate-900 truncate max-w-[200px]">{data.name}</span>
+                        <span className="text-slate-600 font-bold">Selected Treatment:</span>
+                        <span className="font-black text-slate-950 truncate max-w-[220px]">{data.name}</span>
                       </div>
                       {selectedOption && (
                         <div className="flex justify-between">
-                          <span className="text-slate-500">Option Plan:</span>
-                          <span className="font-extrabold text-slate-900 uppercase tracking-wider">{selectedOption.bottles}</span>
+                          <span className="text-slate-600 font-bold">Option Plan:</span>
+                          <span className="font-black text-slate-950 uppercase tracking-wider">{selectedOption.bottles}</span>
                         </div>
                       )}
                       <div className="flex justify-between">
-                        <span className="text-slate-500">Quantity:</span>
-                        <span className="font-extrabold text-slate-900">{quantity} Unit(s)</span>
+                        <span className="text-slate-600 font-bold">Quantity:</span>
+                        <span className="font-black text-slate-950">{quantity} Unit(s)</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-slate-500">Retail Value:</span>
-                        <span className="font-extrabold text-slate-900">₦{((selectedOption ? selectedOption.price : data.price) * quantity).toLocaleString()}</span>
+                        <span className="text-slate-600 font-bold">Retail Value:</span>
+                        <span className="font-black text-slate-950">₦{((selectedOption ? selectedOption.price : data.price) * quantity).toLocaleString()}</span>
                       </div>
                       {data.discount > 0 && (
-                        <div className="flex justify-between text-emerald-600 font-bold">
+                        <div className="flex justify-between text-emerald-700 font-black">
                           <span>Subsidy Rebate Applied:</span>
                           <span>-₦{Math.round((selectedOption ? selectedOption.price : data.price) * (data.discount / 100) * quantity).toLocaleString()}</span>
                         </div>
                       )}
-                      <div className="flex justify-between text-slate-500">
-                        <span>Nationwide Dispatch Fee:</span>
-                        <span className="font-bold text-emerald-600">₦0.00 (FREE)</span>
+                      <div className="flex justify-between text-slate-600">
+                        <span className="font-bold">Nationwide Dispatch Fee:</span>
+                        <span className="font-black text-emerald-700">₦0.00 (FREE)</span>
                       </div>
                     </div>
-                    <div className="border-t border-dashed border-slate-300 pt-2.5 flex justify-between items-baseline">
-                      <span className="font-black text-slate-800 uppercase text-xs">Total Due at Delivery:</span>
-                      <span className="text-xl font-black text-slate-950">
+                    <div className="border-t-2 border-dashed border-slate-300 pt-3 flex justify-between items-baseline">
+                      <span className="font-black text-slate-900 uppercase text-sm">Total Due upon Delivery:</span>
+                      <span className="text-2xl font-black text-slate-950">
                         ₦{(discountedPrice * quantity).toLocaleString()}
                       </span>
                     </div>
-                    <p className="text-[9px] text-slate-400 text-center font-semibold pt-1 leading-tight">
-                      *This is a cash-on-delivery summary. Pay on physical arrival of your items via Cash or Bank Transfer.
+                    <p className="text-xs text-slate-500 text-center font-bold pt-1 leading-relaxed">
+                      *No prepayment required. Pay cash or bank transfer only when our dispatch rider arrives at your address.
                     </p>
                   </div>
                 </div>
 
-                 {/* PINNED FIXED FOOTER (Always Visible Whether Scrolling or Not) */}
-                 <div className="shrink-0 p-3 sm:p-4 lg:p-6 bg-slate-50 border-t border-slate-200/80 shadow-[0_-8px_30px_rgba(0,0,0,0.04)] space-y-2 sm:space-y-3">
-                   {/* Immediate Refund & Guarantee Note */}
-                   <div className="hidden sm:flex text-[10px] text-slate-400 font-bold items-center gap-2 justify-center leading-tight">
-                     <ShieldCheck size={12} className="text-emerald-500 shrink-0" />
-                     <span>All patient information is secured and protected with medical privacy protocols.</span>
-                   </div>
+                {/* PINNED FIXED FOOTER (Always Visible Whether Scrolling or Not) */}
+                <div className="shrink-0 p-4 sm:p-6 bg-slate-100 border-t-2 border-slate-300 shadow-2xl space-y-3">
+                  {/* Immediate Refund & Guarantee Note */}
+                  <div className="hidden sm:flex text-xs text-slate-700 font-black items-center gap-2 justify-center leading-tight">
+                    <ShieldCheck size={16} className="text-emerald-700 shrink-0" />
+                    <span>🔒 Secure Medical Privacy Protocol | 100% Satisfaction Guaranteed</span>
+                  </div>
 
-                   {/* Actions Row */}
-                   <div className="grid grid-cols-2 gap-2 sm:gap-3">
-                     <button 
-                       onClick={() => {
-                         const message = `Hello SD GHT Health Care, I am interested in the ${data.name} package ${selectedOption ? `(${selectedOption.bottles})` : ""}. I would like to chat with a health consultant first.`;
-                         window.open(`https://wa.me/${CONFIG.whatsapp.number}?text=${encodeURIComponent(message)}`, '_blank');
-                       }}
-                       className="h-11 sm:h-14 bg-white border border-slate-200 text-slate-850 rounded-xl sm:rounded-2xl font-black text-[10px] sm:text-xs uppercase tracking-wider sm:tracking-widest hover:bg-slate-50 transition-all flex items-center justify-center gap-1.5 sm:gap-2 shadow-sm"
-                     >
-                       <Phone size={14} className="text-emerald-600 shrink-0" />
-                       CHAT WITH US
-                     </button>
-                     <button 
-                       onClick={() => onOrder?.(quantity, selectedOptionIdx)}
-                       className="h-11 sm:h-14 bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-700 hover:to-teal-600 text-white rounded-xl sm:rounded-2xl font-black text-[10px] sm:text-xs uppercase tracking-wider sm:tracking-widest transition-all shadow-xl active:scale-[0.98] flex items-center justify-center gap-1.5 sm:gap-2 border-b-[3px] sm:border-b-4 border-emerald-800 ring-2 ring-emerald-500/15"
-                     >
-                       <ShoppingBag size={14} className="shrink-0 animate-bounce" />
-                       <span className="font-black text-[10px] sm:text-xs text-white">ORDER NOW</span>
-                     </button>
-                   </div>
+                  {/* Actions Row */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <button 
+                      onClick={() => {
+                        const message = `Hello SD GHT Health Care, I am interested in the ${data.name} package ${selectedOption ? `(${selectedOption.bottles})` : ""}. I would like to chat with a health consultant first.`;
+                        window.open(`https://wa.me/${CONFIG.whatsapp.number}?text=${encodeURIComponent(message)}`, '_blank');
+                      }}
+                      className="h-14 sm:h-16 bg-white border-2 border-slate-300 text-slate-950 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider hover:bg-slate-50 transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer active:scale-95"
+                    >
+                      <Phone size={18} className="text-emerald-700 shrink-0 stroke-[3]" />
+                      CHAT WITH DOCTOR
+                    </button>
+                    <button 
+                      onClick={() => onOrder?.(quantity, selectedOptionIdx)}
+                      className="h-14 sm:h-16 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all shadow-xl active:scale-[0.98] flex items-center justify-center gap-2 border-b-4 border-emerald-900 ring-2 ring-emerald-500/25 cursor-pointer"
+                    >
+                      <ShoppingBag size={18} className="shrink-0 animate-bounce stroke-[3]" />
+                      <span className="font-black text-xs sm:text-sm text-white">ORDER NOW (POD)</span>
+                    </button>
+                  </div>
 
-                   <p className="hidden sm:block text-center text-[9px] text-slate-400 font-extrabold uppercase tracking-widest">
-                     📦 Nationwide Delivery Within 24-48 Hours | Pay Only When You Receive It
-                   </p>
-                 </div>
+                  <p className="hidden sm:block text-center text-xs text-slate-600 font-black uppercase tracking-widest">
+                    📦 Nationwide Express Delivery Within 24-48 Hours | Pay Only Upon Delivery
+                  </p>
+                </div>
 
               </div>
 

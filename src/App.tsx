@@ -1360,6 +1360,27 @@ export default function App() {
                       </div>
                     </div>
                   </section>
+
+                  {/* Frequently Asked Questions (FAQ) for Adults & Seniors */}
+                  <section className="space-y-6 pt-6 border-t-2 border-slate-200">
+                    <h3 className="text-3xl font-black text-slate-950 uppercase tracking-tight flex items-center gap-2">
+                      <span>❓</span> FREQUENTLY ASKED QUESTIONS
+                    </h3>
+                    <div className="space-y-4">
+                      <div className="p-6 bg-white rounded-3xl border-2 border-slate-200 shadow-sm space-y-2">
+                        <h4 className="text-xl font-black text-slate-950">Q: How soon will I start seeing results?</h4>
+                        <p className="text-lg text-slate-700 font-semibold leading-relaxed">Most patients report noticeable improvement and relief within 7 to 14 days of consistent usage as directed.</p>
+                      </div>
+                      <div className="p-6 bg-white rounded-3xl border-2 border-slate-200 shadow-sm space-y-2">
+                        <h4 className="text-xl font-black text-slate-950">Q: Can I take this alongside my prescribed medications?</h4>
+                        <p className="text-lg text-slate-700 font-semibold leading-relaxed">Our formulas are 100% natural, but we always recommend consulting with our free medical advisors or your personal physician.</p>
+                      </div>
+                      <div className="p-6 bg-white rounded-3xl border-2 border-slate-200 shadow-sm space-y-2">
+                        <h4 className="text-xl font-black text-slate-950">Q: How does Pay on Delivery (POD) work?</h4>
+                        <p className="text-lg text-slate-700 font-semibold leading-relaxed">You place your order online, our dispatch agent delivers it to your doorstep anywhere in Nigeria, and you inspect your items before paying cash or transfer.</p>
+                      </div>
+                    </div>
+                  </section>
                 </div>
 
                 <div className="space-y-8">
