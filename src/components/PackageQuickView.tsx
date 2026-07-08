@@ -626,35 +626,35 @@ export const PackageQuickView: React.FC<PackageQuickViewProps> = ({
                 </div>
 
                 {/* PINNED FIXED FOOTER (Always Visible Whether Scrolling or Not) */}
-                <div className="shrink-0 p-4 sm:p-6 bg-slate-100 border-t-2 border-slate-300 shadow-2xl space-y-3">
+                <div className={`${isPage ? 'fixed bottom-0 left-0 right-0 z-50 max-w-7xl mx-auto px-6 sm:px-8' : 'sticky bottom-0 z-50'} p-4 sm:p-6 bg-slate-950/95 backdrop-blur-md text-white border-t-4 border-emerald-500 shadow-[0_-15px_40px_rgba(0,0,0,0.3)] space-y-3`}>
                   {/* Immediate Refund & Guarantee Note */}
-                  <div className="hidden sm:flex text-xs text-slate-700 font-black items-center gap-2 justify-center leading-tight">
-                    <ShieldCheck size={16} className="text-emerald-700 shrink-0" />
-                    <span>🔒 Secure Medical Privacy Protocol | 100% Satisfaction Guaranteed</span>
+                  <div className="hidden sm:flex text-xs text-emerald-400 font-black items-center gap-2 justify-center leading-tight">
+                    <ShieldCheck size={16} className="text-emerald-400 shrink-0" />
+                    <span>🔒 Secure Medical Privacy Protocol | Pay on Delivery (POD) Guaranteed</span>
                   </div>
 
                   {/* Actions Row */}
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-3 max-w-4xl mx-auto">
                     <button 
                       onClick={() => {
                         const message = `Hello SD GHT Health Care, I am interested in the ${data.name} package ${selectedOption ? `(${selectedOption.bottles})` : ""}. I would like to chat with a health consultant first.`;
                         window.open(`https://wa.me/${CONFIG.whatsapp.number}?text=${encodeURIComponent(message)}`, '_blank');
                       }}
-                      className="h-14 sm:h-16 bg-white border-2 border-slate-300 text-slate-950 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider hover:bg-slate-50 transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer active:scale-95"
+                      className="h-14 sm:h-16 bg-white border-2 border-slate-300 text-slate-950 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider hover:bg-slate-100 transition-all flex items-center justify-center gap-2 shadow-xl cursor-pointer active:scale-95"
                     >
                       <Phone size={18} className="text-emerald-700 shrink-0 stroke-[3]" />
-                      CHAT WITH DOCTOR
+                      CHAT WITH US
                     </button>
                     <button 
                       onClick={() => onOrder?.(quantity, selectedOptionIdx)}
-                      className="h-14 sm:h-16 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all shadow-xl active:scale-[0.98] flex items-center justify-center gap-2 border-b-4 border-emerald-900 ring-2 ring-emerald-500/25 cursor-pointer"
+                      className="h-14 sm:h-16 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all shadow-2xl active:scale-[0.98] flex items-center justify-center gap-2 border-b-4 border-emerald-900 ring-4 ring-emerald-500/30 cursor-pointer animate-pulse"
                     >
-                      <ShoppingBag size={18} className="shrink-0 animate-bounce stroke-[3]" />
+                      <ShoppingBag size={18} className="shrink-0 stroke-[3]" />
                       <span className="font-black text-xs sm:text-sm text-white">ORDER NOW (POD)</span>
                     </button>
                   </div>
 
-                  <p className="hidden sm:block text-center text-xs text-slate-600 font-black uppercase tracking-widest">
+                  <p className="block text-center text-xs text-slate-300 font-black uppercase tracking-widest">
                     📦 Nationwide Express Delivery Within 24-48 Hours | Pay Only Upon Delivery
                   </p>
                 </div>
@@ -666,7 +666,7 @@ export const PackageQuickView: React.FC<PackageQuickViewProps> = ({
 
   if (isPage) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-4 pt-0">
         {onBack && (
           <button 
             onClick={onBack}

@@ -1123,7 +1123,7 @@ export default function App() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="max-w-[1600px] mx-auto px-4 md:px-8 lg:px-12 py-8 md:py-12 space-y-12 pb-32"
+              className="max-w-[1600px] mx-auto px-4 md:px-8 lg:px-12 pt-2 pb-32 space-y-6"
             >
               <PackageQuickView
                 isOpen={true}
@@ -1147,7 +1147,7 @@ export default function App() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="max-w-[1600px] mx-auto px-4 md:px-8 lg:px-12 py-8 md:py-12 space-y-12 pb-32"
+              className="max-w-[1600px] mx-auto px-4 md:px-8 lg:px-12 pt-2 pb-32 space-y-6"
             >
               {/* Breadcrumbs / Back Button */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -1274,21 +1274,53 @@ export default function App() {
                   <div className="flex flex-col sm:flex-row gap-4 pt-2">
                     <button 
                       onClick={() => {
-                        const message = `Hello SD GHT Health Care, I am reading about ${viewingProduct.name}. I would like to talk with a doctor/consultant please.`;
+                        const message = `Hello SD GHT Health Care, I am reading about ${viewingProduct.name}. I would like to chat with a health consultant first.`;
                         window.open(`https://wa.me/${CONFIG.whatsapp.number}?text=${encodeURIComponent(message)}`, '_blank');
                       }}
-                      className="flex-1 bg-white border-4 border-emerald-600 text-emerald-800 py-6 rounded-3xl font-black text-2xl hover:bg-emerald-50 transition-all flex items-center justify-center gap-3 shadow-md"
+                      className="flex-1 bg-white border-4 border-emerald-600 text-emerald-800 py-6 rounded-3xl font-black text-2xl hover:bg-emerald-50 transition-all flex items-center justify-center gap-3 shadow-md cursor-pointer"
                     >
                       <Phone size={28} className="text-emerald-600 stroke-[3]" />
-                      CHAT WITH CONSULTANT
+                      CHAT WITH US
                     </button>
                     <button 
                       onClick={() => openOrderDrawer(viewingProduct, 'product', detailQuantity)}
-                      className="flex-[1.5] bg-emerald-600 text-white py-6 rounded-3xl font-black text-2xl hover:bg-emerald-700 transition-all shadow-2xl shadow-emerald-200 active:scale-[0.98] flex items-center justify-center gap-3 border-b-4 border-emerald-800"
+                      className="flex-[1.5] bg-emerald-600 text-white py-6 rounded-3xl font-black text-2xl hover:bg-emerald-700 transition-all shadow-2xl shadow-emerald-200 active:scale-[0.98] flex items-center justify-center gap-3 border-b-4 border-emerald-800 cursor-pointer"
                     >
                       <ShoppingBag size={28} className="stroke-[3]" />
                       ORDER NOW
                     </button>
+                  </div>
+
+                  {/* STICKY BOTTOM FIXED ACTION BAR FOR PRODUCT DETAIL PAGE */}
+                  <div className="fixed bottom-0 left-0 right-0 z-50 bg-slate-950/95 backdrop-blur-md text-white p-4 sm:p-6 border-t-4 border-emerald-500 shadow-[0_-15px_40px_rgba(0,0,0,0.3)]">
+                    <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+                      <div className="hidden md:flex items-center gap-3">
+                        <img src={viewingProduct.image_url} alt="" className="w-12 h-12 object-contain bg-white rounded-xl p-1" />
+                        <div>
+                          <h4 className="font-black text-white text-base truncate max-w-xs">{viewingProduct.name}</h4>
+                          <p className="text-xs text-emerald-400 font-extrabold">₦{(viewingProduct.price_naira * (1 - viewingProduct.discount_percent / 100) * detailQuantity).toLocaleString()} (Qty: {detailQuantity})</p>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3 w-full sm:w-auto">
+                        <button 
+                          onClick={() => {
+                            const message = `Hello SD GHT Health Care, I am reading about ${viewingProduct.name}. I would like to chat with a health consultant first.`;
+                            window.open(`https://wa.me/${CONFIG.whatsapp.number}?text=${encodeURIComponent(message)}`, '_blank');
+                          }}
+                          className="h-14 sm:h-16 px-6 bg-white border-2 border-slate-300 text-slate-950 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider hover:bg-slate-100 transition-all flex items-center justify-center gap-2 shadow-xl cursor-pointer active:scale-95"
+                        >
+                          <Phone size={18} className="text-emerald-700 shrink-0 stroke-[3]" />
+                          CHAT WITH US
+                        </button>
+                        <button 
+                          onClick={() => openOrderDrawer(viewingProduct, 'product', detailQuantity)}
+                          className="h-14 sm:h-16 px-6 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all shadow-2xl active:scale-[0.98] flex items-center justify-center gap-2 border-b-4 border-emerald-900 ring-4 ring-emerald-500/30 cursor-pointer animate-pulse"
+                        >
+                          <ShoppingBag size={18} className="shrink-0 stroke-[3]" />
+                          <span className="font-black text-xs sm:text-sm text-white">ORDER NOW (POD)</span>
+                        </button>
+                      </div>
+                    </div>
                   </div>
 
                   {/* Trust Badges */}
@@ -1725,7 +1757,8 @@ export default function App() {
         </AnimatePresence>
       </main>
 
-      <footer className="bg-slate-900 text-white py-12 md:py-20 mt-12 md:mt-20">
+      {activeTab !== "product-detail" && activeTab !== "package-detail" && (
+        <footer className="bg-slate-900 text-white py-12 md:py-20 mt-12 md:mt-20">
         <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
           <div className="col-span-1 sm:col-span-2">
             <div className="flex items-center gap-3 mb-6">
@@ -1786,6 +1819,7 @@ export default function App() {
           © {new Date().getFullYear()} {CONFIG.company.name} {CONFIG.company.subtitle}. All Rights Reserved.
         </div>
       </footer>
+      )}
 
       {/* Quick View Modal */}
       <AnimatePresence>
@@ -2039,39 +2073,39 @@ export default function App() {
                   </div>
 
                   {/* PINNED FIXED FOOTER (Always Visible Whether Scrolling or Not) */}
-                  <div className="shrink-0 p-3 sm:p-4 lg:p-6 bg-slate-50 border-t border-slate-200/80 shadow-[0_-8px_30px_rgba(0,0,0,0.04)] space-y-2 sm:space-y-3">
+                  <div className="sticky bottom-0 z-50 p-4 sm:p-6 bg-slate-950/95 backdrop-blur-md text-white border-t-4 border-emerald-500 shadow-2xl space-y-3">
                     
                     {/* Encrypted info display directly inside footer */}
-                    <div className="hidden sm:flex text-[10px] text-slate-400 font-bold items-center gap-2 justify-center leading-tight">
-                      <ShieldCheck size={12} className="text-emerald-500 shrink-0" />
-                      <span>All patient info is encrypted. Pay cash/bank transfer upon delivery.</span>
+                    <div className="hidden sm:flex text-xs text-emerald-400 font-black items-center gap-2 justify-center leading-tight">
+                      <ShieldCheck size={16} className="text-emerald-400 shrink-0" />
+                      <span>🔒 Secure Medical Privacy Protocol | Pay on Delivery (POD) Guaranteed</span>
                     </div>
 
                     {/* Actions Row */}
-                    <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                    <div className="grid grid-cols-2 gap-3 max-w-4xl mx-auto">
                       <button 
                         onClick={() => {
                           const message = `Hello SD GHT Health Care, I am interested in ${selectedProduct.name}. I would like to chat with a health consultant first.`;
                           window.open(`https://wa.me/${CONFIG.whatsapp.number}?text=${encodeURIComponent(message)}`, '_blank');
                         }}
-                        className="h-11 sm:h-14 bg-white border border-slate-200 text-slate-800 rounded-xl sm:rounded-2xl font-black text-[10px] sm:text-xs uppercase tracking-wider sm:tracking-widest hover:bg-slate-50 transition-all flex items-center justify-center gap-1.5 sm:gap-2 shadow-sm"
+                        className="h-14 sm:h-16 bg-white border-2 border-slate-300 text-slate-950 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider hover:bg-slate-100 transition-all flex items-center justify-center gap-2 shadow-xl cursor-pointer active:scale-95"
                       >
-                        <Phone size={14} className="text-emerald-600 shrink-0" />
+                        <Phone size={18} className="text-emerald-700 shrink-0 stroke-[3]" />
                         CHAT WITH US
                       </button>
                       <button 
                         onClick={() => {
                           openOrderDrawer(selectedProduct, 'product', quickViewQuantity, undefined, true);
                         }}
-                        className="h-11 sm:h-14 bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-700 hover:to-teal-600 text-white rounded-xl sm:rounded-2xl font-black text-[10px] sm:text-xs uppercase tracking-wider sm:tracking-widest transition-all shadow-xl active:scale-[0.98] flex items-center justify-center gap-1.5 sm:gap-2 border-b-[3px] sm:border-b-4 border-emerald-800 ring-2 ring-emerald-500/15"
+                        className="h-14 sm:h-16 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all shadow-2xl active:scale-[0.98] flex items-center justify-center gap-2 border-b-4 border-emerald-900 ring-4 ring-emerald-500/30 cursor-pointer animate-pulse"
                       >
-                        <ShoppingBag size={14} className="shrink-0 animate-bounce" />
-                        <span className="font-black text-[10px] sm:text-xs text-white">ORDER NOW</span>
+                        <ShoppingBag size={18} className="shrink-0 stroke-[3]" />
+                        <span className="font-black text-xs sm:text-sm text-white">ORDER NOW (POD)</span>
                       </button>
                     </div>
 
-                    <p className="hidden sm:block text-center text-[9px] text-slate-400 font-extrabold uppercase tracking-widest">
-                      📦 Nationwide Delivery Within 24-48 Hours | Pay Only When You Receive It
+                    <p className="block text-center text-xs text-slate-300 font-black uppercase tracking-widest">
+                      📦 Nationwide Express Delivery Within 24-48 Hours | Pay Only Upon Delivery
                     </p>
                   </div>
 
