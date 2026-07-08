@@ -81,6 +81,15 @@ export default function App() {
     if (params.get("page") === "return-policy" || params.get("page") === "returnpolicy" || params.has("return-policy")) {
       return "return-policy";
     }
+    if (params.has("package") || params.has("buy_package")) {
+      return "package-detail";
+    }
+    if (params.has("product") || params.has("buy_product")) {
+      return "product-detail";
+    }
+    if (params.has("blog")) {
+      return "blog-post";
+    }
     return "home";
   })());
   const [previousTab, setPreviousTab] = useState<typeof activeTab>("home");
@@ -381,51 +390,86 @@ export default function App() {
 
   useEffect(() => {
     // Deep Linking Logic: Check for buy_product, buy_package, product, package, or blog in URL
-    const handleDeepLinking = () => {
+    const handleDeepLinking = async () => {
       if (loading) return;
 
       const params = new URLSearchParams(window.location.search);
-      const keys = ['buy_product', 'buy_package', 'product', 'package', 'blog'];
-      const presentKeys = keys.filter(k => params.has(k));
-      
-      if (presentKeys.length === 0) return;
-
-      // 1. Handle Blog (Immediate)
+      const buyProductId = params.get('buy_product');
+      const buyPackageId = params.get('buy_package');
+      const productId = params.get('product');
+      const packageId = params.get('package');
       const blogId = params.get('blog');
-      if (blogId !== null && blogId) {
+
+      if (!buyProductId && !buyPackageId && !productId && !packageId && !blogId) return;
+
+      // 1. Handle Blog
+      if (blogId) {
         setSelectedBlogId(blogId);
         setActiveTab("blog-post");
       }
 
-      // 2. Handle Products/Packages (Needs Data)
-      const hasProductParams = presentKeys.some(k => k !== 'blog');
-      const dataReady = products.length > 0 || recommendedPackages.length > 0;
-
-      if (hasProductParams && !dataReady) {
-        return; // Wait for data
-      }
-
-      if (dataReady) {
-        const buyProductId = params.get('buy_product');
-        const buyPackageId = params.get('buy_package');
-        const productId = params.get('product');
-        const packageId = params.get('package');
-
-        if (buyProductId) {
-          const product = products.find(p => p.id === buyProductId || p.product_code === buyProductId);
-          if (product) openOrderDrawer(product, 'product');
-        }
-        if (buyPackageId || packageId) {
-          const targetId = buyPackageId || packageId;
-          const pkg = [...recommendedPackages, ...comboPackages].find(p => p.id === targetId || p.package_code === targetId);
-          if (pkg) {
-            setViewingPackage(pkg);
-            setActiveTab("package-detail");
+      // 2. Handle Package / Buy Package
+      const targetPackageId = buyPackageId || packageId;
+      if (targetPackageId) {
+        setActiveTab("package-detail");
+        const allPkgs = [...recommendedPackages, ...comboPackages];
+        let pkg = allPkgs.find(p => 
+          p.id?.toLowerCase() === targetPackageId.toLowerCase() || 
+          p.package_code?.toLowerCase() === targetPackageId.toLowerCase()
+        );
+        
+        if (pkg) {
+          setViewingPackage(pkg);
+          if (buyPackageId) openOrderDrawer(pkg, 'package');
+        } else {
+          try {
+            const res = await fetch(`/api/packages/${encodeURIComponent(targetPackageId)}`);
+            if (res.ok) {
+              const data = await res.json();
+              if (data && data.id) {
+                setViewingPackage(data);
+                if (buyPackageId) openOrderDrawer(data, 'package');
+              }
+            }
+          } catch (e) {
+            console.error("Failed to fetch deep link package:", e);
           }
         }
       }
 
-      // 3. Clear URL parameters to prevent "sticky" state
+      // 3. Handle Product / Buy Product
+      const targetProductId = buyProductId || productId;
+      if (targetProductId) {
+        setActiveTab("product-detail");
+        let prod = products.find(p => 
+          p.id?.toLowerCase() === targetProductId.toLowerCase() || 
+          p.product_code?.toLowerCase() === targetProductId.toLowerCase()
+        );
+        
+        if (prod) {
+          setSelectedProduct(prod);
+          if (buyProductId) openOrderDrawer(prod, 'product');
+        } else {
+          try {
+            const res = await fetch(`/api/products`);
+            if (res.ok) {
+              const prods: Product[] = await res.json();
+              const found = prods.find(p => 
+                p.id?.toLowerCase() === targetProductId.toLowerCase() || 
+                p.product_code?.toLowerCase() === targetProductId.toLowerCase()
+              );
+              if (found) {
+                setSelectedProduct(found);
+                if (buyProductId) openOrderDrawer(found, 'product');
+              }
+            }
+          } catch (e) {
+            console.error("Failed to fetch deep link product:", e);
+          }
+        }
+      }
+
+      // 4. Clear URL parameters to prevent "sticky" state
       const newUrl = window.location.pathname;
       window.history.replaceState({}, '', newUrl);
     };

@@ -775,6 +775,56 @@ export async function createServer() {
     }
   });
 
+  app.get("/api/packages/:id", async (req, res) => {
+    if (!supabase) return res.status(503).json({ error: "Database not initialized" });
+    const { id } = req.params;
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+    let query = supabase
+      .from('recommended_packages')
+      .select(`
+        *,
+        package_products (
+          products (*)
+        )
+      `);
+
+    if (uuidRegex.test(id)) {
+      query = query.or(`id.eq.${id},package_code.eq.${id}`);
+    } else {
+      query = query.eq('package_code', id);
+    }
+
+    const { data, error } = await query.maybeSingle();
+    if (error) return res.status(500).json({ error: error.message });
+    if (!data) {
+      const { data: fallbackData } = await supabase
+        .from('recommended_packages')
+        .select(`
+          *,
+          package_products (
+            products (*)
+          )
+        `)
+        .ilike('package_code', id)
+        .maybeSingle();
+      if (fallbackData) {
+        return res.json({
+          ...fallbackData,
+          is_combo: fallbackData.is_combo || false,
+          products: fallbackData.package_products?.map((pp: any) => pp.products).filter(Boolean) || []
+        });
+      }
+      return res.status(404).json({ error: "Package not found" });
+    }
+
+    res.json({
+      ...data,
+      is_combo: data.is_combo || false,
+      products: data.package_products?.map((pp: any) => pp.products).filter(Boolean) || []
+    });
+  });
+
   app.post("/api/consultations", async (req, res) => {
     if (!supabase) return res.status(503).json({ error: "Database not configured" });
     const { patient_name, phone, illness, symptoms, distributor_id } = req.body;
