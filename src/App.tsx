@@ -66,7 +66,7 @@ interface Consultation {
 }
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<"home" | "about" | "products" | "recommended" | "combo" | "consultation" | "history" | "product-detail" | "admin" | "blog" | "blog-post" | "search" | "testimonials" | "thank-you" | "return-policy">((() => {
+  const [activeTab, setActiveTab] = useState<"home" | "about" | "products" | "recommended" | "combo" | "consultation" | "history" | "product-detail" | "package-detail" | "admin" | "blog" | "blog-post" | "search" | "testimonials" | "thank-you" | "return-policy">((() => {
     const path = window.location.pathname;
     if (path === "/thank-you" || path.startsWith("/thank-you")) {
       return "thank-you";
@@ -106,6 +106,7 @@ export default function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [selectedPackage, setSelectedPackage] = useState<PackageData | null>(null);
+  const [viewingPackage, setViewingPackage] = useState<PackageData | null>(null);
   const [selectedBlogId, setSelectedBlogId] = useState<string | null>(null);
   const [isOrderDrawerOpen, setIsOrderDrawerOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -414,20 +415,13 @@ export default function App() {
           const product = products.find(p => p.id === buyProductId || p.product_code === buyProductId);
           if (product) openOrderDrawer(product, 'product');
         }
-        if (buyPackageId) {
-          const pkg = [...recommendedPackages, ...comboPackages].find(p => p.id === buyPackageId || p.package_code === buyPackageId);
-          if (pkg) openOrderDrawer(pkg, 'package');
-        }
-        if (productId) {
-          const product = products.find(p => p.id === productId || p.product_code === productId);
-          if (product) {
-            setViewingProduct(product);
-            setActiveTab("product-detail");
+        if (buyPackageId || packageId) {
+          const targetId = buyPackageId || packageId;
+          const pkg = [...recommendedPackages, ...comboPackages].find(p => p.id === targetId || p.package_code === targetId);
+          if (pkg) {
+            setViewingPackage(pkg);
+            setActiveTab("package-detail");
           }
-        }
-        if (packageId) {
-          const pkg = [...recommendedPackages, ...comboPackages].find(p => p.id === packageId || p.package_code === packageId);
-          if (pkg) setSelectedPackage(pkg);
         }
       }
 
@@ -1044,6 +1038,30 @@ export default function App() {
                   </div>
                 )}
               </div>
+            </motion.div>
+          )}
+
+          {activeTab === "package-detail" && viewingPackage && (
+            <motion.div
+              key="package-detail"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="max-w-[1600px] mx-auto px-4 md:px-8 lg:px-12 py-8 md:py-12 space-y-12 pb-32"
+            >
+              <PackageQuickView
+                isOpen={true}
+                onClose={() => navigateTo(previousTab === "package-detail" ? "recommended" : previousTab)}
+                onBack={() => navigateTo(previousTab === "package-detail" ? "recommended" : previousTab)}
+                data={viewingPackage}
+                allPackages={[...recommendedPackages, ...comboPackages]}
+                onOrder={(qty, optIdx) => openOrderDrawer(viewingPackage, 'package', qty, optIdx, true)}
+                onViewProduct={(product) => {
+                  setViewingProduct(product);
+                  setActiveTab("product-detail");
+                }}
+                isPage={true}
+              />
             </motion.div>
           )}
 

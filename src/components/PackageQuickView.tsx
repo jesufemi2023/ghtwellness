@@ -20,7 +20,8 @@ import {
   Award, 
   AlertCircle, 
   Gift,
-  Lock
+  Lock,
+  ArrowLeft
 } from 'lucide-react';
 import { CONFIG } from '../config';
 import { PackageData, Product } from '../types';
@@ -32,6 +33,8 @@ interface PackageQuickViewProps {
   allPackages?: PackageData[];
   onOrder?: (quantity: number, selectedOptionIndex?: number) => void;
   onViewProduct?: (product: Product) => void;
+  isPage?: boolean;
+  onBack?: () => void;
 }
 
 // Interactive testimonials based on categories for relevant matching social proof
@@ -129,7 +132,9 @@ export const PackageQuickView: React.FC<PackageQuickViewProps> = ({
   data,
   allPackages,
   onOrder,
-  onViewProduct
+  onViewProduct,
+  isPage,
+  onBack
 }) => {
   const [quantity, setQuantity] = useState(1);
   const [isCopied, setIsCopied] = useState(false);
@@ -185,7 +190,7 @@ export const PackageQuickView: React.FC<PackageQuickViewProps> = ({
   const activeTestimonial = getPackageTestimonial(data);
 
   const handleShare = async () => {
-    const shareUrl = `${window.location.origin}/?buy_package=${data.id}`;
+    const shareUrl = `${window.location.origin}/?package=${data.package_code || data.id}`;
     const shareData = {
       title: data.name,
       text: data.description,
@@ -209,29 +214,8 @@ export const PackageQuickView: React.FC<PackageQuickViewProps> = ({
     }
   };
 
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            onClick={onClose}
-            className="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-[100] cursor-pointer"
-          />
-
-          {/* Modal Container */}
-          <div className="fixed inset-0 z-[101] flex items-center justify-center p-0 sm:p-4 lg:p-6 pointer-events-none">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 15 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 15 }}
-              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-              className="bg-white w-full max-w-7xl h-full sm:h-[95vh] sm:max-h-[950px] rounded-none sm:rounded-[32px] shadow-2xl overflow-hidden pointer-events-auto flex flex-col lg:flex-row relative border border-slate-100"
-            >
+  const modalContent = (
+    <div className={`bg-white w-full ${isPage ? 'max-w-7xl mx-auto rounded-[32px] shadow-sm border border-slate-200' : 'max-w-7xl h-full sm:h-[95vh] sm:max-h-[950px] rounded-none sm:rounded-[32px] shadow-2xl'} overflow-hidden ${isPage ? '' : 'pointer-events-auto'} flex flex-col lg:flex-row relative border border-slate-100`}>
               {/* Floating Action Buttons Top Right */}
               <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
                 <button 
@@ -630,6 +614,50 @@ export const PackageQuickView: React.FC<PackageQuickViewProps> = ({
 
               </div>
 
+    </div>
+  );
+
+  if (isPage) {
+    return (
+      <div className="space-y-6">
+        {onBack && (
+          <button 
+            onClick={onBack}
+            className="flex items-center gap-3 text-slate-700 hover:text-emerald-600 font-black text-xl transition-colors group px-4 py-2 bg-white rounded-2xl border border-slate-200 shadow-sm w-fit cursor-pointer"
+          >
+            <ArrowLeft size={24} className="group-hover:-translate-x-1 transition-transform text-emerald-600 stroke-[3]" />
+            GO BACK
+          </button>
+        )}
+        {modalContent}
+      </div>
+    );
+  }
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={onClose}
+            className="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-[100] cursor-pointer"
+          />
+
+          {/* Modal Container */}
+          <div className="fixed inset-0 z-[101] flex items-center justify-center p-0 sm:p-4 lg:p-6 pointer-events-none">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+              className="contents"
+            >
+              {modalContent}
             </motion.div>
           </div>
         </>
