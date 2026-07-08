@@ -725,6 +725,36 @@ export async function createServer() {
     res.json(data || []);
   });
 
+  app.get("/api/products/:id", async (req, res) => {
+    if (!supabase) return res.status(503).json({ error: "Database not initialized" });
+    const { id } = req.params;
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+    let query = supabase.from('products').select('*');
+
+    if (uuidRegex.test(id)) {
+      query = query.or(`id.eq.${id},product_code.eq.${id}`);
+    } else {
+      query = query.eq('product_code', id);
+    }
+
+    const { data, error } = await query.maybeSingle();
+    if (error) return res.status(500).json({ error: error.message });
+    if (!data) {
+      const { data: fallbackData } = await supabase
+        .from('products')
+        .select('*')
+        .ilike('product_code', id)
+        .maybeSingle();
+      if (fallbackData) {
+        return res.json(fallbackData);
+      }
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    res.json(data);
+  });
+
   app.get("/api/recommended-packages", async (req, res) => {
     if (!supabase) return res.status(503).json({ error: "Database not initialized. Please ensure environment variables are set." });
     try {

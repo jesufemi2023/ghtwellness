@@ -149,7 +149,7 @@ export default function App() {
 
   const [isProductCopied, setIsProductCopied] = useState(false);
   const handleShareProduct = async (product: any) => {
-    const shareUrl = `${window.location.origin}/?buy_product=${product.id}`;
+    const shareUrl = `${window.location.origin}/?product=${product.product_code || product.id}`;
     const shareData = {
       title: product.name,
       text: product.short_desc,
@@ -173,6 +173,22 @@ export default function App() {
     }
   };
   const [viewingProduct, setViewingProduct] = useState<Product | null>(null);
+
+  const viewProductDetailPage = (product: Product) => {
+    setViewingProduct(product);
+    setActiveTab("product-detail");
+    const code = product.product_code || product.id;
+    window.history.pushState(null, '', `/?product=${code}`);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const viewPackageDetailPage = (pkg: PackageData) => {
+    setViewingPackage(pkg);
+    setActiveTab("package-detail");
+    const code = pkg.package_code || pkg.id;
+    window.history.pushState(null, '', `/?package=${code}`);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
@@ -447,20 +463,32 @@ export default function App() {
         );
         
         if (prod) {
+          setViewingProduct(prod);
           setSelectedProduct(prod);
           if (buyProductId) openOrderDrawer(prod, 'product');
         } else {
           try {
-            const res = await fetch(`/api/products`);
+            const res = await fetch(`/api/products/${encodeURIComponent(targetProductId)}`);
             if (res.ok) {
-              const prods: Product[] = await res.json();
-              const found = prods.find(p => 
-                p.id?.toLowerCase() === targetProductId.toLowerCase() || 
-                p.product_code?.toLowerCase() === targetProductId.toLowerCase()
-              );
-              if (found) {
-                setSelectedProduct(found);
-                if (buyProductId) openOrderDrawer(found, 'product');
+              const data = await res.json();
+              if (data && data.id) {
+                setViewingProduct(data);
+                setSelectedProduct(data);
+                if (buyProductId) openOrderDrawer(data, 'product');
+              }
+            } else {
+              const allRes = await fetch(`/api/products`);
+              if (allRes.ok) {
+                const prods: Product[] = await allRes.json();
+                const found = prods.find(p => 
+                  p.id?.toLowerCase() === targetProductId.toLowerCase() || 
+                  p.product_code?.toLowerCase() === targetProductId.toLowerCase()
+                );
+                if (found) {
+                  setViewingProduct(found);
+                  setSelectedProduct(found);
+                  if (buyProductId) openOrderDrawer(found, 'product');
+                }
               }
             }
           } catch (e) {
