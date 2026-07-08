@@ -81,7 +81,7 @@ export default function App() {
     if (params.get("page") === "return-policy" || params.get("page") === "returnpolicy" || params.has("return-policy")) {
       return "return-policy";
     }
-    if (params.has("package") || params.has("buy_package")) {
+    if (params.has("package") || params.has("buy_package") || params.has("combo") || params.has("buy_combo")) {
       return "package-detail";
     }
     if (params.has("product") || params.has("buy_product")) {
@@ -186,7 +186,8 @@ export default function App() {
     setViewingPackage(pkg);
     setActiveTab("package-detail");
     const code = pkg.package_code || pkg.id;
-    window.history.pushState(null, '', `/?package=${code}`);
+    const paramKey = pkg.is_combo ? 'combo' : 'package';
+    window.history.pushState(null, '', `/?${paramKey}=${code}`);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
   const [searchQuery, setSearchQuery] = useState("");
@@ -412,11 +413,13 @@ export default function App() {
       const params = new URLSearchParams(window.location.search);
       const buyProductId = params.get('buy_product');
       const buyPackageId = params.get('buy_package');
+      const buyComboId = params.get('buy_combo');
       const productId = params.get('product');
       const packageId = params.get('package');
+      const comboId = params.get('combo');
       const blogId = params.get('blog');
 
-      if (!buyProductId && !buyPackageId && !productId && !packageId && !blogId) return;
+      if (!buyProductId && !buyPackageId && !buyComboId && !productId && !packageId && !comboId && !blogId) return;
 
       // 1. Handle Blog
       if (blogId) {
@@ -424,8 +427,9 @@ export default function App() {
         setActiveTab("blog-post");
       }
 
-      // 2. Handle Package / Buy Package
-      const targetPackageId = buyPackageId || packageId;
+      // 2. Handle Package / Buy Package / Combo / Buy Combo
+      const targetPackageId = buyPackageId || packageId || buyComboId || comboId;
+      const isBuyAction = !!buyPackageId || !!buyComboId;
       if (targetPackageId) {
         setActiveTab("package-detail");
         const allPkgs = [...recommendedPackages, ...comboPackages];
@@ -436,7 +440,7 @@ export default function App() {
         
         if (pkg) {
           setViewingPackage(pkg);
-          if (buyPackageId) openOrderDrawer(pkg, 'package');
+          if (isBuyAction) openOrderDrawer(pkg, 'package');
         } else {
           try {
             const res = await fetch(`/api/packages/${encodeURIComponent(targetPackageId)}`);
@@ -444,11 +448,11 @@ export default function App() {
               const data = await res.json();
               if (data && data.id) {
                 setViewingPackage(data);
-                if (buyPackageId) openOrderDrawer(data, 'package');
+                if (isBuyAction) openOrderDrawer(data, 'package');
               }
             }
           } catch (e) {
-            console.error("Failed to fetch deep link package:", e);
+            console.error("Failed to fetch deep link package/combo:", e);
           }
         }
       }
@@ -888,7 +892,7 @@ export default function App() {
                 }}
                 onOrderProduct={(p) => openOrderDrawer(p, "product")}
                 onOrderPackage={(pkg) => openOrderDrawer(pkg, "package")}
-                onQuickView={setSelectedPackage}
+                onQuickView={viewPackageDetailPage}
               />
             </motion.div>
           )}
@@ -926,7 +930,7 @@ export default function App() {
                   navigateTo("blog-post");
                 }}
                 onOpenChat={() => setIsChatOpen(true)}
-                onQuickView={setSelectedPackage}
+                onQuickView={viewPackageDetailPage}
               />
             </motion.div>
           )}
@@ -1048,7 +1052,7 @@ export default function App() {
                       setViewingProduct(product);
                       navigateTo("product-detail");
                     }}
-                    onQuickView={setSelectedPackage}
+                    onQuickView={viewPackageDetailPage}
                   />
                 ))}
                 {recommendedPackages.length === 0 && (
@@ -1100,7 +1104,7 @@ export default function App() {
                       setViewingProduct(product);
                       navigateTo("product-detail");
                     }}
-                    onQuickView={setSelectedPackage}
+                    onQuickView={viewPackageDetailPage}
                   />
                 ))}
                 {comboPackages.length === 0 && (

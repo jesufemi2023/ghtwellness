@@ -190,7 +190,8 @@ export const PackageQuickView: React.FC<PackageQuickViewProps> = ({
   const activeTestimonial = getPackageTestimonial(data);
 
   const handleShare = async () => {
-    const shareUrl = `${window.location.origin}/?package=${data.package_code || data.id}`;
+    const paramKey = data.is_combo ? 'combo' : 'package';
+    const shareUrl = `${window.location.origin}/?${paramKey}=${data.package_code || data.id}`;
     const shareData = {
       title: data.name,
       text: data.description,
@@ -367,6 +368,17 @@ export const PackageQuickView: React.FC<PackageQuickViewProps> = ({
                     </h2>
                     <p className="text-slate-600 text-sm md:text-base font-bold leading-relaxed">
                       {data.description}
+                    </p>
+                  </div>
+
+                  {/* Senior & Family Care Guidance Banner */}
+                  <div className="bg-gradient-to-r from-emerald-900 to-teal-900 text-white rounded-3xl p-5 border border-emerald-800 shadow-lg space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xl">👵👴</span>
+                      <h4 className="text-xs font-black uppercase tracking-wider text-emerald-300">Senior Care & Family Friendly</h4>
+                    </div>
+                    <p className="text-xs text-slate-100 font-medium leading-relaxed">
+                      Specially formulated with 100% natural organic extracts safe for seniors. Free phone consultation and home delivery with Pay-on-Delivery available for elderly patients.
                     </p>
                   </div>
 
