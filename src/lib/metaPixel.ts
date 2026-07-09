@@ -36,15 +36,16 @@ export const initMetaPixel = () => {
     return;
   }
 
-  // 1. Get cached Pixel ID instantly from localStorage or fallback to Env/Hardcoded default
+  // 1. Get cached Pixel ID instantly from localStorage or fallback to Env
   const cachedPixelId = localStorage.getItem("meta_pixel_id_cache");
   const envPixelId = import.meta.env.VITE_META_PIXEL_ID;
-  const defaultFallbackId = '4024543217840998';
   
-  const initialPixelId = cachedPixelId || envPixelId || defaultFallbackId;
+  const initialPixelId = cachedPixelId || envPixelId || "";
 
-  // 2. Initialize the Pixel immediately with the initial ID to prevent any blocking/delay
-  runPixelScriptInjection(initialPixelId);
+  // 2. Initialize the Pixel immediately if an ID is present
+  if (initialPixelId) {
+    runPixelScriptInjection(initialPixelId);
+  }
 
   // 3. Fire-and-forget background fetch to update the cache with any runtime DB changes
   fetch("/api/settings")
