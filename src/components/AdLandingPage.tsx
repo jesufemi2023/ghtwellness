@@ -105,58 +105,6 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
         </div>
       </div>
 
-      {/* Hero Header Section - High Authority & Elder-Friendly */}
-      <div className="relative overflow-hidden bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 py-16 md:py-24 px-4 sm:px-6 lg:px-8 border-b border-slate-800">
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:24px_24px]"></div>
-        <div className="max-w-5xl mx-auto text-center relative z-10 space-y-6">
-          <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-emerald-500/15 border-2 border-emerald-500/50 text-emerald-400 text-sm md:text-base font-black uppercase tracking-wider">
-            <Sparkles size={20} className="text-emerald-400 animate-spin" />
-            100% NAFDAC Approved Natural Health Packages • 15,000 Healed
-          </div>
-          
-          <h1 className="text-3xl sm:text-5xl lg:text-7xl font-black text-white tracking-tight leading-[1.12]">
-            Select Your Healing Health Package Below
-          </h1>
-          
-          <p className="text-lg sm:text-2xl text-slate-300 font-bold max-w-3xl mx-auto leading-relaxed">
-            Formulated specifically for adults and seniors to restore vitality, normalize blood sugar, support joint health, cleanse vital organs, and boost total wellness naturally with zero side effects.
-          </p>
-
-          {/* Trust Guarantees */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 max-w-3xl mx-auto text-left">
-            <div className="bg-slate-900/90 border-2 border-emerald-500/30 p-4 rounded-2xl flex items-center gap-3 shadow-xl">
-              <div className="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
-                <Truck size={26} />
-              </div>
-              <div>
-                <p className="text-sm font-black text-white">Free Nationwide Delivery</p>
-                <p className="text-xs text-slate-400 font-semibold">Delivered in 24-48 hours</p>
-              </div>
-            </div>
-
-            <div className="bg-slate-900/90 border-2 border-emerald-500/30 p-4 rounded-2xl flex items-center gap-3 shadow-xl">
-              <div className="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
-                <ShieldCheck size={26} />
-              </div>
-              <div>
-                <p className="text-sm font-black text-white">Pay On Delivery (POD)</p>
-                <p className="text-xs text-slate-400 font-semibold">Inspect before you pay</p>
-              </div>
-            </div>
-
-            <div className="bg-slate-900/90 border-2 border-emerald-500/30 p-4 rounded-2xl flex items-center gap-3 shadow-xl">
-              <div className="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
-                <HeartHandshake size={26} />
-              </div>
-              <div>
-                <p className="text-sm font-black text-white">Free Medical Guidance</p>
-                <p className="text-xs text-slate-400 font-semibold">Talk to health experts</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Main Content Area */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16 pt-10">
 
