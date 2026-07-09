@@ -383,7 +383,7 @@ Payment: ${formData.payment_method === 'pod' ? 'Pay on Delivery' : 'Bank Transfe
                         Step {step} of 3
                       </div>
                       <h2 className="text-3xl font-black text-slate-900">
-                        {step === 1 && (hasOptions ? "Customise Order" : "Who are you?")}
+                        {step === 1 && (hasOptions ? "Customer Order Form" : "Who are you?")}
                         {step === 2 && (hasOptions ? "Your Information" : "Where & When?")}
                         {step === 3 && "Payment Choice"}
                       </h2>
@@ -573,19 +573,7 @@ Payment: ${formData.payment_method === 'pod' ? 'Pay on Delivery' : 'Bank Transfe
                             />
                           </div>
                         </div>
-                        <div className="space-y-4">
-                          <label className="block text-sm font-black text-slate-400 uppercase tracking-widest">Nearest Landmark (Optional)</label>
-                          <div className="relative">
-                            <Building2 className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300" size={24} />
-                            <input 
-                              type="text"
-                              placeholder="e.g. Near the big church or market"
-                              className="w-full h-20 bg-slate-50 border-2 border-slate-100 rounded-3xl px-16 text-lg font-bold focus:border-emerald-500 focus:bg-white transition-all outline-none"
-                              value={formData.landmark}
-                              onChange={e => setFormData({ ...formData, landmark: e.target.value })}
-                            />
-                          </div>
-                        </div>
+
                         <div className="space-y-4">
                           <label className="block text-sm font-black text-slate-400 uppercase tracking-widest">When should we deliver?</label>
                           <div className="grid grid-cols-3 gap-4">
