@@ -212,7 +212,7 @@ export const TestimonialCard = ({ data }: { data: TestimonialData }) => {
 };
 
 // --- Main Testimonials Section ---
-export const Testimonials = ({ onViewAll }: { onViewAll?: () => void }) => {
+export const Testimonials = ({ onViewAll, isDark = false }: { onViewAll?: () => void, isDark?: boolean }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const scroll = (direction: 'left' | 'right') => {
@@ -224,7 +224,7 @@ export const Testimonials = ({ onViewAll }: { onViewAll?: () => void }) => {
   };
 
   return (
-    <section className="py-24 bg-slate-50 overflow-hidden" id="testimonials">
+    <section className={`py-24 overflow-hidden ${isDark ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'}`} id="testimonials">
       <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
@@ -232,7 +232,7 @@ export const Testimonials = ({ onViewAll }: { onViewAll?: () => void }) => {
             <motion.span 
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              className="text-[12px] font-black text-emerald-600 uppercase tracking-[0.3em] mb-4 block"
+              className={`text-[12px] font-black uppercase tracking-[0.3em] mb-4 block ${isDark ? 'text-emerald-400' : 'text-emerald-600'}`}
             >
               Real Stories
             </motion.span>
@@ -240,9 +240,9 @@ export const Testimonials = ({ onViewAll }: { onViewAll?: () => void }) => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="text-5xl md:text-6xl font-serif italic text-slate-900 leading-tight"
+              className={`text-4xl md:text-6xl font-serif italic leading-tight ${isDark ? 'text-white' : 'text-slate-900'}`}
             >
-              Stories of <span className="text-emerald-600">Transformation</span>
+              Stories of <span className="text-emerald-500">Transformation</span>
             </motion.h2>
           </div>
           
@@ -250,7 +250,7 @@ export const Testimonials = ({ onViewAll }: { onViewAll?: () => void }) => {
             {onViewAll && (
               <button 
                 onClick={onViewAll}
-                className="hidden md:flex items-center gap-2 text-emerald-600 font-black text-sm uppercase tracking-widest hover:gap-3 transition-all mr-4"
+                className="hidden md:flex items-center gap-2 text-emerald-500 font-black text-sm uppercase tracking-widest hover:gap-3 transition-all mr-4 cursor-pointer"
               >
                 View All <ArrowRight size={18} />
               </button>
@@ -258,13 +258,13 @@ export const Testimonials = ({ onViewAll }: { onViewAll?: () => void }) => {
             <div className="flex gap-4">
               <button 
                 onClick={() => scroll('left')}
-                className="w-14 h-14 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:border-emerald-600 hover:text-emerald-600 transition-all"
+                className={`w-14 h-14 rounded-full border flex items-center justify-center transition-all cursor-pointer ${isDark ? 'border-slate-800 text-slate-300 hover:border-emerald-500 hover:text-emerald-400 bg-slate-900' : 'border-slate-200 text-slate-400 hover:border-emerald-600 hover:text-emerald-600'}`}
               >
                 <ChevronLeft size={24} />
               </button>
               <button 
                 onClick={() => scroll('right')}
-                className="w-14 h-14 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:border-emerald-600 hover:text-emerald-600 transition-all"
+                className={`w-14 h-14 rounded-full border flex items-center justify-center transition-all cursor-pointer ${isDark ? 'border-slate-800 text-slate-300 hover:border-emerald-500 hover:text-emerald-400 bg-slate-900' : 'border-slate-200 text-slate-400 hover:border-emerald-600 hover:text-emerald-600'}`}
               >
                 <ChevronRight size={24} />
               </button>
@@ -295,7 +295,7 @@ export const Testimonials = ({ onViewAll }: { onViewAll?: () => void }) => {
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          className="mt-16 p-12 bg-emerald-900 rounded-[48px] text-center relative overflow-hidden"
+          className={`mt-16 p-12 rounded-[48px] text-center relative overflow-hidden border ${isDark ? 'bg-slate-900 border-emerald-500/30' : 'bg-emerald-900 border-transparent'}`}
         >
           <div className="absolute inset-0 opacity-10 leaf-pattern pointer-events-none" />
           <h3 className="text-3xl md:text-4xl font-serif italic text-white mb-6 relative z-10">
@@ -304,7 +304,7 @@ export const Testimonials = ({ onViewAll }: { onViewAll?: () => void }) => {
           <p className="text-emerald-100/70 max-w-xl mx-auto mb-10 relative z-10">
             Join thousands of others who have transformed their lives with GHT Healthcare's natural solutions.
           </p>
-          <button className="bg-white text-emerald-900 px-10 py-5 rounded-full font-black uppercase tracking-widest text-xs hover:bg-emerald-50 transition-all shadow-2xl relative z-10">
+          <button className="bg-white text-emerald-900 px-10 py-5 rounded-full font-black uppercase tracking-widest text-xs hover:bg-emerald-50 transition-all shadow-2xl relative z-10 cursor-pointer">
             Explore All Products
           </button>
         </motion.div>

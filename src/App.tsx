@@ -51,6 +51,7 @@ import AdminDashboard from "./components/AdminDashboard";
 import { TestimonialsPage } from "./components/TestimonialsPage";
 import { ThankYouPage } from "./components/ThankYouPage";
 import { ReturnPolicy } from "./components/ReturnPolicy";
+import { AdLandingPage } from "./components/AdLandingPage";
 import { Product, PackageData } from "./types";
 import { trackPageView, trackConsultation, trackWhatsAppClick, trackBlogView } from "./lib/analytics";
 
@@ -66,7 +67,7 @@ interface Consultation {
 }
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<"home" | "about" | "products" | "recommended" | "combo" | "consultation" | "history" | "product-detail" | "package-detail" | "admin" | "blog" | "blog-post" | "search" | "testimonials" | "thank-you" | "return-policy">((() => {
+  const [activeTab, setActiveTab] = useState<"home" | "ad" | "about" | "products" | "recommended" | "combo" | "consultation" | "history" | "product-detail" | "package-detail" | "admin" | "blog" | "blog-post" | "search" | "testimonials" | "thank-you" | "return-policy">((() => {
     const path = window.location.pathname;
     if (path === "/thank-you" || path.startsWith("/thank-you")) {
       return "thank-you";
@@ -74,12 +75,18 @@ export default function App() {
     if (path === "/return-policy" || path.startsWith("/return-policy")) {
       return "return-policy";
     }
+    if (path === "/ad" || path.startsWith("/ad")) {
+      return "ad";
+    }
     const params = new URLSearchParams(window.location.search);
     if (params.get("page") === "thank-you" || params.get("page") === "thankyou" || params.has("thank-you")) {
       return "thank-you";
     }
     if (params.get("page") === "return-policy" || params.get("page") === "returnpolicy" || params.has("return-policy")) {
       return "return-policy";
+    }
+    if (params.get("page") === "ad" || params.has("ad")) {
+      return "ad";
     }
     if (params.has("package") || params.has("buy_package") || params.has("combo") || params.has("buy_combo")) {
       return "package-detail";
@@ -99,6 +106,8 @@ export default function App() {
     setActiveTab(tab);
     if (tab === "return-policy") {
       window.history.pushState(null, '', '/return-policy');
+    } else if (tab === "ad") {
+      window.history.pushState(null, '', '/ad');
     } else if (tab === "home") {
       window.history.pushState(null, '', '/');
     }
@@ -175,6 +184,7 @@ export default function App() {
   const [viewingProduct, setViewingProduct] = useState<Product | null>(null);
 
   const viewProductDetailPage = (product: Product) => {
+    setPreviousTab(activeTab);
     setViewingProduct(product);
     setActiveTab("product-detail");
     const code = product.product_code || product.id;
@@ -183,6 +193,7 @@ export default function App() {
   };
 
   const viewPackageDetailPage = (pkg: PackageData) => {
+    setPreviousTab(activeTab);
     setViewingPackage(pkg);
     setActiveTab("package-detail");
     const code = pkg.package_code || pkg.id;
@@ -865,13 +876,35 @@ export default function App() {
       </div>
 
       <main className={`mx-auto transition-all duration-500 ${
-        activeTab === "home" || activeTab === "about" || activeTab === "search" || activeTab === "testimonials" || activeTab === "product-detail"
+        activeTab === "home" || activeTab === "about" || activeTab === "search" || activeTab === "testimonials" || activeTab === "product-detail" || activeTab === "ad"
           ? "max-w-none px-0 py-0 bg-slate-50 min-h-screen" 
           : activeTab === "combo" 
             ? "max-w-[1440px] px-4 py-8 md:py-12" 
             : "max-w-7xl px-4 py-8 md:py-12"
       }`}>
         <AnimatePresence mode="wait">
+          {activeTab === "ad" && (
+            <motion.div
+              key="ad"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="pt-0"
+            >
+              <AdLandingPage 
+                products={products}
+                packages={recommendedPackages}
+                combos={comboPackages}
+                onOrderProduct={(p, qty) => openOrderDrawer(p, 'product', qty || 1)}
+                onOrderPackage={(pkg, type, qty, optIdx) => openOrderDrawer(pkg, type, qty || 1, optIdx || 0, true)}
+                onViewProduct={(p) => {
+                  setViewingProduct(p);
+                  navigateTo("product-detail");
+                }}
+                onViewPackage={(pkg) => viewPackageDetailPage(pkg)}
+              />
+            </motion.div>
+          )}
           {activeTab === "search" && (
             <motion.div
               key="search"
@@ -1133,8 +1166,7 @@ export default function App() {
                 allPackages={[...recommendedPackages, ...comboPackages]}
                 onOrder={(qty, optIdx) => openOrderDrawer(viewingPackage, 'package', qty, optIdx, true)}
                 onViewProduct={(product) => {
-                  setViewingProduct(product);
-                  setActiveTab("product-detail");
+                  viewProductDetailPage(product);
                 }}
                 isPage={true}
               />
