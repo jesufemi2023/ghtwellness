@@ -108,6 +108,60 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
       {/* Main Content Area */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16 pt-10">
 
+        {/* Highly Responsive, Aesthetic & Convincing Headline Hero Section */}
+        <div className="relative overflow-hidden bg-gradient-to-br from-emerald-950/80 via-slate-900 to-slate-950 p-6 sm:p-12 md:p-16 rounded-[32px] sm:rounded-[48px] border-2 border-emerald-500/40 shadow-2xl">
+          <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none"></div>
+          <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+          
+          <div className="relative z-10 max-w-4xl mx-auto text-center space-y-6 sm:space-y-8">
+            <div className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-emerald-500/20 border-2 border-emerald-500/50 text-emerald-300 text-xs sm:text-sm font-black uppercase tracking-widest shadow-lg">
+              <Sparkles size={18} className="text-emerald-400 animate-spin" />
+              100% NAFDAC Approved Natural Health Packages • 15,000 Healed
+            </div>
+            
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.15]">
+              Regain Your Vitality & Freedom Naturally — <span className="text-emerald-400 italic font-serif">Trusted by Over 15,000 Seniors</span>
+            </h1>
+            
+            <p className="text-base sm:text-xl text-slate-300 font-semibold max-w-3xl mx-auto leading-relaxed">
+              Clinically formulated herbal solutions to normalize blood sugar, relieve joint stiffness, cleanse vital organs, and restore lifelong wellness with zero side effects.
+            </p>
+
+            {/* Trust Badges Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 text-left max-w-3xl mx-auto">
+              <div className="bg-slate-900/90 border border-emerald-500/30 p-4 rounded-2xl flex items-center gap-3.5 shadow-xl">
+                <div className="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                  <Truck size={24} />
+                </div>
+                <div>
+                  <p className="text-xs sm:text-sm font-black text-white">Free Nationwide Delivery</p>
+                  <p className="text-[11px] text-slate-400 font-semibold">Delivered in 24-48 hours</p>
+                </div>
+              </div>
+
+              <div className="bg-slate-900/90 border border-emerald-500/30 p-4 rounded-2xl flex items-center gap-3.5 shadow-xl">
+                <div className="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                  <ShieldCheck size={24} />
+                </div>
+                <div>
+                  <p className="text-xs sm:text-sm font-black text-white">Pay On Delivery (POD)</p>
+                  <p className="text-[11px] text-slate-400 font-semibold">Inspect before you pay</p>
+                </div>
+              </div>
+
+              <div className="bg-slate-900/90 border border-emerald-500/30 p-4 rounded-2xl flex items-center gap-3.5 shadow-xl">
+                <div className="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                  <HeartHandshake size={24} />
+                </div>
+                <div>
+                  <p className="text-xs sm:text-sm font-black text-white">Free Medical Guidance</p>
+                  <p className="text-[11px] text-slate-400 font-semibold">Talk to health experts</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* HEALTH PACKAGES & COMBOS (PRIMARY FOCUS) */}
         <div className="space-y-10">
           <div className="bg-gradient-to-r from-emerald-950/90 via-slate-900 to-slate-950 p-6 md:p-10 rounded-3xl border-2 border-emerald-500/50 shadow-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">

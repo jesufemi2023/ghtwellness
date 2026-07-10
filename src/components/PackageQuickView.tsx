@@ -366,9 +366,51 @@ export const PackageQuickView: React.FC<PackageQuickViewProps> = ({
                     <h2 className="text-3xl md:text-5xl font-black text-slate-950 leading-tight">
                       {data.name}
                     </h2>
-                    <p className="text-slate-800 text-lg md:text-xl font-bold leading-relaxed bg-slate-50 p-5 rounded-3xl border border-slate-200">
-                      {data.description}
-                    </p>
+                    
+                    {/* Professionally Formatted & Structured Description */}
+                    {(() => {
+                      const desc = data.description || "";
+                      const sentences = desc.split(/(?<=[.!?])\s+/).filter(Boolean);
+                      const leadSentence = sentences[0] || desc;
+                      const remainingSentences = sentences.slice(1);
+
+                      return (
+                        <div className="space-y-4 pt-1">
+                          {/* Lead Summary Callout Card */}
+                          <div className="bg-gradient-to-br from-emerald-50 via-teal-50/50 to-white p-6 rounded-3xl border-2 border-emerald-500/30 shadow-md relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
+                            <div className="flex items-start gap-3.5 relative z-10">
+                              <div className="w-10 h-10 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-lg mt-0.5">
+                                <Sparkles size={20} />
+                              </div>
+                              <div className="space-y-1">
+                                <span className="text-[10px] uppercase tracking-widest font-black text-emerald-700 block">Clinically Formulated Overview</span>
+                                <p className="text-slate-900 text-lg md:text-xl font-black leading-snug">
+                                  {leadSentence}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Detailed Takeaways Breakdown */}
+                          {remainingSentences.length > 0 && (
+                            <div className="bg-slate-50 border border-slate-200 p-5 rounded-3xl space-y-3">
+                              <span className="text-xs uppercase tracking-wider font-black text-slate-500 block">Key Clinical Takeaways:</span>
+                              <ul className="space-y-2.5">
+                                {remainingSentences.map((sentence, idx) => (
+                                  <li key={idx} className="flex items-start gap-3 text-slate-800 text-sm md:text-base font-semibold leading-relaxed">
+                                    <div className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5 font-black text-xs">
+                                      ✓
+                                    </div>
+                                    <span>{sentence}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })()}
                   </div>
 
                   {/* Step-by-Step Clinical Healing Process (Optimized for Adults & Seniors) */}
