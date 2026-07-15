@@ -1181,7 +1181,8 @@ const SettingsAdminView = ({ adminPassword }: { adminPassword: string }) => {
     bank_name: "",
     account_number: "",
     account_name: "",
-    meta_pixel_id: ""
+    meta_pixel_id: "",
+    google_tag_id: ""
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -1291,6 +1292,23 @@ const SettingsAdminView = ({ adminPassword }: { adminPassword: string }) => {
             />
             <p className="text-[10px] text-slate-400 font-medium leading-relaxed pl-1">
               Enter your Facebook custom Pixel ID above. Changes are applied instantly across all pages and events. Leaving this empty disables Facebook tracking or falls back to your VITE_META_PIXEL_ID env configuration.
+            </p>
+          </div>
+
+          <div className="border-t border-slate-100 pt-6 space-y-2">
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Google Tag / AdWords ID</label>
+              <span className="text-[9px] bg-emerald-100 text-emerald-700 font-extrabold px-2 py-0.5 rounded-full uppercase tracking-widest">Active Tracker</span>
+            </div>
+            <input 
+              type="text"
+              value={settings.google_tag_id || ""}
+              onChange={e => setSettings({ ...settings, google_tag_id: e.target.value })}
+              className="w-full h-14 bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 font-bold text-slate-900 focus:border-emerald-500 outline-none transition-all font-mono"
+              placeholder="e.g. AW-1234567890"
+            />
+            <p className="text-[10px] text-slate-400 font-medium leading-relaxed pl-1">
+              Enter your Google Tag (gtag.js / Google Ads) ID above. Changes are applied instantly. Leaving this empty disables the tracker or falls back to your VITE_GOOGLE_TAG_ID env variable.
             </p>
           </div>
         </div>
