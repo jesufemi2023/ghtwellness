@@ -13,6 +13,7 @@ import {
   ChevronUp
 } from "lucide-react";
 import { Consultation } from "../types";
+import { openWhatsAppLink } from "../utils/whatsapp";
 
 interface ConsultationsAdminViewProps {
   data: Consultation[];
@@ -48,7 +49,7 @@ export default function ConsultationsAdminView({ data, adminPassword, fetchData 
 
   const openWhatsApp = (phone: string, name: string, illness?: string) => {
     const message = `Hello ${name}, I'm a consultant from SD GHT Health Care. I've reviewed your consultation regarding ${illness || 'your health inquiry'}...`;
-    window.open(`https://wa.me/${phone.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`, '_blank');
+    openWhatsAppLink(phone, message);
   };
 
   if (data.length === 0) {

@@ -20,6 +20,7 @@ import {
   ShoppingBag
 } from "lucide-react";
 import { Order, OrderStatus } from "../types";
+import { openWhatsAppLink } from "../utils/whatsapp";
 
 interface OrdersAdminViewProps {
   data: Order[];
@@ -113,7 +114,7 @@ export default function OrdersAdminView({ data, adminPassword, fetchData }: Orde
   const openWhatsApp = (phone?: string, name?: string, orderId?: string) => {
     if (!phone) return;
     const message = `Hello ${name || 'Customer'}, I'm from SD GHT Health Care regarding your order #${orderId?.slice(0, 8).toUpperCase()}...`;
-    window.open(`https://wa.me/${phone.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`, '_blank');
+    openWhatsAppLink(phone, message);
   };
 
   if (data.length === 0) {

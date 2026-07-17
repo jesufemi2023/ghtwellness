@@ -1,4 +1,34 @@
 /**
+ * Cleans any phone number to ensure it is in the exact international format required by WhatsApp,
+ * with no leading zero after the country code, no spaces, no symbols, and with the proper country code.
+ * Optimized specifically for Nigerian numbers (+234) and standard international formatting.
+ */
+export const cleanWhatsAppNumber = (phoneNumber: string): string => {
+  if (!phoneNumber) return "";
+  
+  // 1. Remove all non-digits
+  let digits = phoneNumber.replace(/\D/g, "");
+
+  // 2. Handle Nigerian number edge cases
+  // Nigeria country code: 234. Local numbers always start with 0 (e.g. 07060734773).
+  // A very common mistake is entering "+234 (0) 706 073 4773" or "23407060734773".
+  // WhatsApp will fail with "link could not be opened" if there is a '0' right after '234'.
+  if (digits.startsWith("2340")) {
+    digits = "234" + digits.substring(4);
+  }
+  // If user entered a local Nigerian number like "07060734773" (11 digits, starts with 0)
+  else if (digits.startsWith("0") && digits.length === 11) {
+    digits = "234" + digits.substring(1);
+  }
+  // If user entered local number without leading 0 or country code (10 digits, starts with 7, 8, or 9)
+  else if (digits.length === 10 && /^[789]/.test(digits)) {
+    digits = "234" + digits;
+  }
+
+  return digits;
+};
+
+/**
  * Opens a WhatsApp link in a way that is highly compatible with all browsers and devices,
  * especially iOS (iPhone Safari), and handles iframe constraints seamlessly.
  * 
@@ -12,14 +42,14 @@
 export const openWhatsAppLink = (phoneNumber: string, message: string) => {
   if (typeof window === "undefined") return;
 
-  // Clean the phone number (remove any non-digits)
-  const cleanPhone = phoneNumber.replace(/\D/g, "");
+  // Clean the phone number (using robust international cleaning rules)
+  const cleanPhone = cleanWhatsAppNumber(phoneNumber);
   
   // Use api.whatsapp.com/send for maximum reliability on iOS and inside iframes
   const encodedText = encodeURIComponent(message);
   const url = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodedText}`;
 
-  console.log(`[WhatsApp Utility] Initiating redirection: ${url}`);
+  console.log(`[WhatsApp Utility] Initiating redirection for cleaned number ${cleanPhone}: ${url}`);
 
   // To support both standard mobile browsing and iframe-embedded previews (e.g., iPhone inside the AI Studio preview),
   // we MUST open in a new tab/window using a dynamically created anchor element with target="_blank".

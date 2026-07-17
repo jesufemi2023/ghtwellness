@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Product, PackageData } from '../types';
 import { CONFIG } from '../config';
 import { Testimonials } from './Testimonials';
-import { openWhatsAppLink } from '../utils/whatsapp';
+import { openWhatsAppLink, cleanWhatsAppNumber } from '../utils/whatsapp';
 import { 
   ShieldCheck, 
   Phone, 
@@ -41,7 +41,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
 }) => {
   const [copiedLink, setCopiedLink] = useState<string | null>(null);
 
-  const whatsappNumber = CONFIG.whatsapp.number.replace(/\D/g, '');
+  const whatsappNumber = cleanWhatsAppNumber(CONFIG.whatsapp.number);
   const adUrl = "https://ghtwellness.vercel.app/ad";
 
   const handleCopyLink = (url: string, key: string) => {
