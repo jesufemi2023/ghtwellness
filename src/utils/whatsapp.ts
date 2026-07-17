@@ -19,39 +19,37 @@ export const openWhatsAppLink = (phoneNumber: string, message: string) => {
   const encodedText = encodeURIComponent(message);
   const url = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodedText}`;
 
-  console.log(`[WhatsApp Utility] Redirecting to: ${url}`);
+  console.log(`[WhatsApp Utility] Initiating redirection: ${url}`);
 
-  // Detect iOS / Android mobile devices
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-  if (isMobile) {
-    // Direct location change is 100% reliable on mobile and does not trigger popup blockers.
-    // It also smoothly launches the native WhatsApp application.
-    window.location.href = url;
-  } else {
-    // On desktop, try window.open first
-    try {
-      const newWindow = window.open(url, "_blank", "noopener,noreferrer");
-      
-      // If blocked or returns null (due to popup blockers or iframe restrictions), fall back to anchor click
-      if (!newWindow || newWindow.closed || typeof newWindow.closed === "undefined") {
-        const anchor = document.createElement("a");
-        anchor.href = url;
-        anchor.target = "_blank";
-        anchor.rel = "noopener noreferrer";
-        document.body.appendChild(anchor);
-        anchor.click();
+  // To support both standard mobile browsing and iframe-embedded previews (e.g., iPhone inside the AI Studio preview),
+  // we MUST open in a new tab/window using a dynamically created anchor element with target="_blank".
+  // Setting window.location.href inside an iframe fails because api.whatsapp.com prevents embedding via X-Frame-Options.
+  // Using a dynamic anchor with target="_blank" bypasses popup blockers (when triggered by click) and escapes the iframe context.
+  try {
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.target = "_blank";
+    anchor.rel = "noopener noreferrer";
+    
+    // Append to body, click, and remove
+    document.body.appendChild(anchor);
+    anchor.click();
+    
+    // Small delay to ensure browser processed the click before cleaning up the element
+    setTimeout(() => {
+      try {
         document.body.removeChild(anchor);
+      } catch (e) {
+        // Ignored if already removed or not found
       }
-    } catch (e) {
-      // Fallback if window.open throws security error
-      const anchor = document.createElement("a");
-      anchor.href = url;
-      anchor.target = "_blank";
-      anchor.rel = "noopener noreferrer";
-      document.body.appendChild(anchor);
-      anchor.click();
-      document.body.removeChild(anchor);
+    }, 100);
+  } catch (error) {
+    console.error("[WhatsApp Utility] Anchor click failed, falling back to window.open:", error);
+    try {
+      window.open(url, "_blank", "noopener,noreferrer");
+    } catch (e2) {
+      // Direct window location fallback
+      window.location.href = url;
     }
   }
 };
