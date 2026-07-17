@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Product, PackageData } from '../types';
 import { CONFIG } from '../config';
 import { Testimonials } from './Testimonials';
+import { openWhatsAppLink } from '../utils/whatsapp';
 import { 
   ShieldCheck, 
   Phone, 
@@ -94,7 +95,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
               <Share2 size={14} /> Share
             </button>
             <a 
-              href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent("Hello SD GHT Health Care, I saw your Ad and I want to order a health package.")}`}
+              href={`https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent("Hello SD GHT Health Care, I saw your Ad and I want to order a health package.")}`}
               target="_blank"
               rel="noopener noreferrer"
               className="bg-white text-emerald-900 px-3 py-1.5 rounded-lg hover:bg-emerald-100 transition-colors flex items-center gap-1 shadow-sm font-black"
@@ -252,7 +253,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                       <button
                         onClick={() => {
                           const message = `Hello SD GHT Health Care, I am interested in ${pkg.name}. I would like to chat with a health consultant first.`;
-                          window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
+                          openWhatsAppLink(whatsappNumber, message);
                         }}
                         className="h-14 bg-white text-slate-950 rounded-2xl font-black text-xs uppercase tracking-wider hover:bg-slate-100 transition-all flex items-center justify-center gap-1.5 shadow-xl cursor-pointer active:scale-95"
                       >

@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { CONFIG } from '../config';
 import { PackageData, Product } from '../types';
+import { openWhatsAppLink } from '../utils/whatsapp';
 
 interface PackageQuickViewProps {
   isOpen: boolean;
@@ -680,7 +681,7 @@ export const PackageQuickView: React.FC<PackageQuickViewProps> = ({
                     <button 
                       onClick={() => {
                         const message = `Hello SD GHT Health Care, I am interested in the ${data.name} package ${selectedOption ? `(${selectedOption.bottles})` : ""}. I would like to chat with a health consultant first.`;
-                        window.open(`https://wa.me/${CONFIG.whatsapp.number}?text=${encodeURIComponent(message)}`, '_blank');
+                        openWhatsAppLink(CONFIG.whatsapp.number, message);
                       }}
                       className="h-14 sm:h-16 bg-white border-2 border-slate-300 text-slate-950 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider hover:bg-slate-100 transition-all flex items-center justify-center gap-2 shadow-xl cursor-pointer active:scale-95"
                     >

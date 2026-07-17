@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { MessageCircle } from 'lucide-react';
 import { CONFIG } from '../config';
+import { openWhatsAppLink } from '../utils/whatsapp';
 
 export function WhatsAppButton() {
   const { number, defaultMessage } = CONFIG.whatsapp;
@@ -9,8 +10,7 @@ export function WhatsAppButton() {
   if (!number) return null;
 
   const handleClick = () => {
-    const url = `https://wa.me/${number}?text=${encodeURIComponent(defaultMessage)}`;
-    window.open(url, '_blank');
+    openWhatsAppLink(number, defaultMessage);
   };
 
   return (

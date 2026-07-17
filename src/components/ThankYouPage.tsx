@@ -15,6 +15,7 @@ import {
   Tag
 } from "lucide-react";
 import { CONFIG } from "../config";
+import { openWhatsAppLink } from "../utils/whatsapp";
 
 interface ThankYouPageProps {
   onNavigate: (tab: "home" | "products" | "recommended" | "combo") => void;
@@ -41,10 +42,7 @@ ${deliveryDate ? `Expected Delivery: ${deliveryDate}` : ""}
 ${paymentMethod ? `Payment Method: ${paymentMethod === "pod" ? "Pay on Delivery (POD)" : "Bank Transfer"}` : ""}
 Please confirm my order and expedite fast delivery! Thank you.`;
 
-    window.open(
-      `https://wa.me/${CONFIG.company.phone.replace(/\D/g, "")}?text=${encodeURIComponent(textMessage)}`,
-      "_blank"
-    );
+    openWhatsAppLink(CONFIG.company.phone, textMessage);
   };
 
   return (

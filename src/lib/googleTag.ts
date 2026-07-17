@@ -37,49 +37,33 @@ export const initGoogleTag = () => {
 
   if (!activeTagId) return;
 
-  // 2. Execution block to inject the tracking tag
-  const injectScript = () => {
-    // Prevent duplicate injections (Don't add more than one Google tag to each page)
-    const existingScript = document.querySelector(`script[src*="googletagmanager.com/gtag/js"]`);
-    if (existingScript) {
-      console.log("[Google Tag] Script already exists on page. Skipping injection.");
-      return;
-    }
-
-    try {
-      const script = document.createElement("script");
-      script.async = true;
-      script.src = `https://www.googletagmanager.com/gtag/js?id=${activeTagId}`;
-      
-      window.dataLayer = window.dataLayer || [];
-      window.gtag = window.gtag || function () {
-        window.dataLayer.push(arguments);
-      };
-      
-      window.gtag('js', new Date());
-      window.gtag('config', activeTagId);
-
-      document.head.appendChild(script);
-      console.log(`[Google Tag] Dynamically loaded tracking ID: ${activeTagId}`);
-    } catch (error) {
-      console.error("[Google Tag] Error during script injection:", error);
-    }
-  };
-
-  // 3. Performance Optimization: Load when idle or deferred to preserve page load speed
-  if (typeof (window as any).requestIdleCallback === 'function') {
-    (window as any).requestIdleCallback(() => injectScript());
-  } else {
-    if (document.readyState === "complete") {
-      setTimeout(injectScript, 1000);
-    } else {
-      window.addEventListener("load", () => {
-        setTimeout(injectScript, 1000);
-      });
-    }
+  // 2. Immediate synchronous injection for 100% reliable detection by Google Ads crawlers
+  const existingScript = document.querySelector(`script[src*="googletagmanager.com/gtag/js"]`);
+  if (existingScript) {
+    console.log("[Google Tag] Script already exists on page. Skipping injection.");
+    return;
   }
 
-  // 4. Background fetch to keep the cache synchronized with database settings
+  try {
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${activeTagId}`;
+    
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = window.gtag || function () {
+      window.dataLayer.push(arguments);
+    };
+    
+    window.gtag('js', new Date());
+    window.gtag('config', activeTagId);
+
+    document.head.appendChild(script);
+    console.log(`[Google Tag] Successfully initialized synchronously with ID: ${activeTagId}`);
+  } catch (error) {
+    console.error("[Google Tag] Error during script injection:", error);
+  }
+
+  // 3. Background fetch to keep the cache synchronized with database settings
   fetch("/api/settings")
     .then((res) => {
       if (res.ok) return res.json();

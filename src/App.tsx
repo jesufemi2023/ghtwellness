@@ -35,6 +35,7 @@ import {
 import { motion, AnimatePresence } from "motion/react";
 import { CONFIG } from "./config";
 import { CacheService } from "./utils/cache";
+import { openWhatsAppLink } from "./utils/whatsapp";
 
 import { Home } from "./components/Home";
 import { About } from "./components/About";
@@ -622,7 +623,7 @@ export default function App() {
 
   const handleWhatsAppClick = (location: string) => {
     trackWhatsAppClick(location);
-    window.open(`https://wa.me/${CONFIG.whatsapp.number.replace(/\D/g, '')}?text=${encodeURIComponent(CONFIG.whatsapp.defaultMessage)}`, '_blank');
+    openWhatsAppLink(CONFIG.whatsapp.number, CONFIG.whatsapp.defaultMessage);
   };
 
   return (
@@ -1307,7 +1308,7 @@ export default function App() {
                     <button 
                       onClick={() => {
                         const message = `Hello SD GHT Health Care, I am reading about ${viewingProduct.name}. I would like to chat with a health consultant first.`;
-                        window.open(`https://wa.me/${CONFIG.whatsapp.number}?text=${encodeURIComponent(message)}`, '_blank');
+                        openWhatsAppLink(CONFIG.whatsapp.number, message);
                       }}
                       className="flex-1 bg-white border-4 border-emerald-600 text-emerald-800 py-6 rounded-3xl font-black text-2xl hover:bg-emerald-50 transition-all flex items-center justify-center gap-3 shadow-md cursor-pointer"
                     >
@@ -1337,7 +1338,7 @@ export default function App() {
                         <button 
                           onClick={() => {
                             const message = `Hello SD GHT Health Care, I am reading about ${viewingProduct.name}. I would like to chat with a health consultant first.`;
-                            window.open(`https://wa.me/${CONFIG.whatsapp.number}?text=${encodeURIComponent(message)}`, '_blank');
+                            openWhatsAppLink(CONFIG.whatsapp.number, message);
                           }}
                           className="h-14 sm:h-16 px-6 bg-white border-2 border-slate-300 text-slate-950 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider hover:bg-slate-100 transition-all flex items-center justify-center gap-2 shadow-xl cursor-pointer active:scale-95"
                         >
@@ -2118,7 +2119,7 @@ export default function App() {
                       <button 
                         onClick={() => {
                           const message = `Hello SD GHT Health Care, I am interested in ${selectedProduct.name}. I would like to chat with a health consultant first.`;
-                          window.open(`https://wa.me/${CONFIG.whatsapp.number}?text=${encodeURIComponent(message)}`, '_blank');
+                          openWhatsAppLink(CONFIG.whatsapp.number, message);
                         }}
                         className="h-14 sm:h-16 bg-white border-2 border-slate-300 text-slate-950 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider hover:bg-slate-100 transition-all flex items-center justify-center gap-2 shadow-xl cursor-pointer active:scale-95"
                       >
