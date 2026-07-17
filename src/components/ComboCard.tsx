@@ -5,6 +5,7 @@ import { PackageData, Product } from "../types";
 import { CONFIG } from "../config";
 import { PackageQuickView } from "./PackageQuickView";
 import { getOptimizedImageUrl } from "../utils/cloudinary";
+import { openWhatsAppLink } from "../utils/whatsapp";
 
 interface ComboCardProps {
   data: PackageData;
@@ -206,7 +207,7 @@ export const ComboCard: React.FC<ComboCardProps> = ({ data, onOrder, onProductCl
                 onClick={(e) => {
                   e.stopPropagation();
                   const message = `Hello SD GHT Health Care, I am interested in the ${data.name} master kit. Could you please provide more information on how I can place an order?`;
-                  window.open(`https://wa.me/${CONFIG.company.phone.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`, '_blank');
+                  openWhatsAppLink(CONFIG.company.phone, message);
                 }}
                 className="flex-1 bg-white border-2 border-slate-200 text-slate-600 h-16 rounded-2xl font-black text-sm hover:bg-slate-50 transition-all flex items-center justify-center gap-3 uppercase tracking-widest"
               >

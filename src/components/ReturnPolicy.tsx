@@ -13,6 +13,7 @@ import {
   FileText
 } from "lucide-react";
 import { CONFIG } from "../config";
+import { openWhatsAppLink } from "../utils/whatsapp";
 
 interface ReturnPolicyProps {
   onNavigate: (tab: "home" | "products" | "recommended" | "combo") => void;
@@ -171,15 +172,16 @@ export const ReturnPolicy: React.FC<ReturnPolicyProps> = ({ onNavigate }) => {
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-lg mx-auto">
-            <a
-              href={`https://wa.me/${CONFIG.company.phone.replace(/\D/g, "")}?text=${encodeURIComponent("Hello SD GHT Health Care, I would like to enquire about a return or product exchange based on your Return Policy.")}`}
-              target="_blank"
-              rel="noreferrer"
-              className="w-full sm:flex-1 h-12 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 shadow-md transition-colors"
+            <button
+              onClick={() => {
+                const message = "Hello SD GHT Health Care, I would like to enquire about a return or product exchange based on your Return Policy.";
+                openWhatsAppLink(CONFIG.company.phone, message);
+              }}
+              className="w-full sm:flex-1 h-12 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 shadow-md transition-colors cursor-pointer"
             >
               <Phone size={14} />
               WhatsApp Support
-            </a>
+            </button>
             
             <a
               href="mailto:support@ghtwellness.com"

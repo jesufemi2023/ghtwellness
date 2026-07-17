@@ -3,6 +3,7 @@ import { Star, ShieldCheck, ChevronRight, CheckCircle2, Globe, Leaf, Activity, A
 import { CONFIG } from '../config';
 import { Product } from '../types';
 import { getOptimizedImageUrl } from '../utils/cloudinary';
+import { openWhatsAppLink } from '../utils/whatsapp';
 
 interface ProductCardProps {
   product: Product;
@@ -192,7 +193,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
               onClick={(e) => {
                 e.stopPropagation();
                 const message = `Hello SD GHT Health Care, I am interested in ${product.name}. Could you please provide more information on how I can place an order?`;
-                window.open(`https://wa.me/${CONFIG.company.phone.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`, '_blank');
+                openWhatsAppLink(CONFIG.company.phone, message);
               }}
               className="flex-1 bg-white border border-slate-200 text-slate-600 py-2 md:py-2.5 rounded-lg md:rounded-xl font-black text-[10px] md:text-xs hover:bg-slate-50 transition-all flex items-center justify-center gap-1.5 uppercase tracking-widest"
             >

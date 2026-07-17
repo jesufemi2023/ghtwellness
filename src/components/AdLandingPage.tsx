@@ -94,14 +94,12 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
             >
               <Share2 size={14} /> Share
             </button>
-            <a 
-              href={`https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent("Hello SD GHT Health Care, I saw your Ad and I want to order a health package.")}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-white text-emerald-900 px-3 py-1.5 rounded-lg hover:bg-emerald-100 transition-colors flex items-center gap-1 shadow-sm font-black"
+            <button 
+              onClick={() => openWhatsAppLink(whatsappNumber, "Hello SD GHT Health Care, I saw your Ad and I want to order a health package.")}
+              className="bg-white text-emerald-900 px-3 py-1.5 rounded-lg hover:bg-emerald-100 transition-colors flex items-center gap-1 shadow-sm font-black cursor-pointer"
             >
               <Phone size={14} className="stroke-[3]" /> CHAT
-            </a>
+            </button>
           </div>
         </div>
       </div>

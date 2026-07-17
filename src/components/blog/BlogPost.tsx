@@ -28,6 +28,7 @@ import { getOptimizedImageUrl } from '../../utils/cloudinary';
 import { trackBlogView } from '../../lib/analytics';
 import { motion, AnimatePresence } from 'motion/react';
 import { WhatsAppSuccessHub } from './WhatsAppSuccessHub';
+import { openWhatsAppLink } from '../../utils/whatsapp';
 
 // Robust helper to extract raw text from react children
 const getRawText = (node: any): string => {
@@ -280,7 +281,7 @@ export function BlogPost({ id, onBack, onOrderPackage }: BlogPostProps) {
               <button 
                 onClick={() => {
                   const message = `Hello SD GHT Health Care, I am reading the article "${post.title}" and I am interested in the ${post.recommended_package.name} solution. Could you please provide more information?`;
-                  window.open(`https://wa.me/${CONFIG.company.phone.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`, '_blank');
+                  openWhatsAppLink(CONFIG.company.phone, message);
                 }}
                 className="flex items-center gap-2 bg-white border border-slate-200 text-slate-600 px-4 py-2 rounded-full font-bold text-xs uppercase tracking-widest hover:bg-slate-50 transition-colors"
               >
@@ -416,7 +417,7 @@ export function BlogPost({ id, onBack, onOrderPackage }: BlogPostProps) {
                         <button 
                           onClick={() => {
                             const message = `Hello SD GHT Health Care, I am reading the article "${post.title}" and I am interested in the ${post.recommended_package.name} solution. Could you please provide more information?`;
-                            window.open(`https://wa.me/${CONFIG.company.phone.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`, '_blank');
+                            openWhatsAppLink(CONFIG.company.phone, message);
                           }}
                           className="flex-1 bg-white border border-slate-200 text-slate-600 py-4 rounded-xl font-black text-sm uppercase tracking-widest hover:bg-slate-50 transition-all flex items-center justify-center gap-2"
                         >
@@ -725,7 +726,7 @@ export function BlogPost({ id, onBack, onOrderPackage }: BlogPostProps) {
                       <button 
                         onClick={() => {
                           const message = `Hello SD GHT Health Care, I am reading the article "${post.title}" and I am interested in the ${post.recommended_package.name} solution. Could you please provide more information?`;
-                          window.open(`https://wa.me/${CONFIG.company.phone.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`, '_blank');
+                          openWhatsAppLink(CONFIG.company.phone, message);
                         }}
                         className="flex-1 bg-white border border-slate-200 text-slate-600 py-4 rounded-xl font-black text-sm uppercase tracking-widest hover:bg-slate-50 transition-all flex items-center justify-center gap-2"
                       >
@@ -777,7 +778,7 @@ export function BlogPost({ id, onBack, onOrderPackage }: BlogPostProps) {
             <button 
               onClick={() => {
                 const message = `Hello SD GHT Health Care, I am reading the article "${post.title}" and I am interested in the ${post.recommended_package.name} solution. Could you please provide more information?`;
-                window.open(`https://wa.me/${CONFIG.company.phone.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`, '_blank');
+                openWhatsAppLink(CONFIG.company.phone, message);
               }}
               className="flex-1 bg-white border border-slate-200 text-slate-600 py-3 px-4 rounded-xl font-black text-sm uppercase tracking-widest hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
             >

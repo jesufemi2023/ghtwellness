@@ -33,11 +33,11 @@ export const cleanWhatsAppNumber = (phoneNumber: string): string => {
  * especially iOS (iPhone Safari), and handles iframe constraints seamlessly.
  * 
  * Key optimizations for iPhone/iOS:
- * 1. Uses 'https://api.whatsapp.com/send' instead of 'wa.me' as it bypasses redirects
- *    and triggers iOS Universal Links natively.
- * 2. On mobile/iOS, uses direct window.location.href instead of window.open to bypass
- *    Safari's strict popup blocker (especially inside webviews or after tracking handlers).
- * 3. Falls back to a dynamically generated synchronous anchor click if window.open fails.
+ * 1. Uses 'https://wa.me' instead of legacy formats to guarantee immediate, native
+ *    iOS Universal Links registration and trigger direct WhatsApp app opening.
+ * 2. Cleans Nigerian formatting anomalies (such as invalid '2340...' codes) which cause
+ *    strict iOS WhatsApp app validation to throw "link could not be opened" errors.
+ * 3. Escapes iframe contexts and bypasses Safari's strict popup blocker using a dynamic anchor click.
  */
 export const openWhatsAppLink = (phoneNumber: string, message: string) => {
   if (typeof window === "undefined") return;
@@ -45,9 +45,9 @@ export const openWhatsAppLink = (phoneNumber: string, message: string) => {
   // Clean the phone number (using robust international cleaning rules)
   const cleanPhone = cleanWhatsAppNumber(phoneNumber);
   
-  // Use api.whatsapp.com/send for maximum reliability on iOS and inside iframes
+  // Use wa.me for modern, reliable WhatsApp Click-to-Chat that handles Universal Links perfectly on iOS
   const encodedText = encodeURIComponent(message);
-  const url = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodedText}`;
+  const url = `https://wa.me/${cleanPhone}?text=${encodedText}`;
 
   console.log(`[WhatsApp Utility] Initiating redirection for cleaned number ${cleanPhone}: ${url}`);
 
