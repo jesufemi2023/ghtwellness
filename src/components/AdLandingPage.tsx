@@ -183,7 +183,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {allPackagesAndCombos.map((pkg) => {
-              const primaryOption = pkg.options?.[0] || { bottles: '1 Month Supply', price: pkg.price, products: [] };
+              const finalPrice = pkg.price * (1 - ((pkg.discount || 0) / 100));
               const imageUrl = pkg.package_image_url || 'https://picsum.photos/seed/health-pkg/800/600';
               return (
                 <div 
@@ -233,10 +233,20 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
 
                       <div className="pt-2">
                         <div className="text-xs text-slate-400 font-bold uppercase text-emerald-400">Package Price:</div>
-                        <div className="flex items-baseline gap-3">
+                        <div className="flex items-baseline gap-3 flex-wrap">
                           <span className="text-3xl font-black text-white">
-                            ₦{primaryOption.price.toLocaleString()}
+                            ₦{finalPrice.toLocaleString()}
                           </span>
+                          {pkg.discount > 0 && (
+                            <span className="text-sm text-slate-400 line-through font-bold">
+                              ₦{pkg.price.toLocaleString()}
+                            </span>
+                          )}
+                          {pkg.discount > 0 && (
+                            <span className="text-xs bg-red-500/20 text-red-300 font-black px-2 py-0.5 rounded-md border border-red-500/30">
+                              SAVE {pkg.discount}%
+                            </span>
+                          )}
                           <span className="text-xs bg-emerald-500/20 text-emerald-300 font-black px-2.5 py-1 rounded-lg">
                             Free Shipping
                           </span>
@@ -259,7 +269,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                         CHAT WITH US
                       </button>
                       <button
-                        onClick={() => onOrderPackage(pkg, 'package', 1, 0)}
+                        onClick={() => onOrderPackage(pkg, 'package', 1)}
                         className="h-14 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-2xl font-black text-xs uppercase tracking-wider transition-all shadow-xl active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer animate-pulse border-b-4 border-emerald-900"
                       >
                         <ShoppingBag size={16} className="stroke-[3]" />

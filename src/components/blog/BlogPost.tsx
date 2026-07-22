@@ -403,10 +403,12 @@ export function BlogPost({ id, onBack, onOrderPackage }: BlogPostProps) {
 
                       <div className="border-t border-slate-100 pt-6 mb-6">
                         <div className="flex items-end gap-2 mb-1">
-                          <span className="text-3xl font-black text-emerald-600">₦{post.recommended_package.price.toLocaleString()}</span>
+                          <span className="text-3xl font-black text-emerald-600">
+                            ₦{Math.round(post.recommended_package.price * (1 - (post.recommended_package.discount || 0) / 100)).toLocaleString()}
+                          </span>
                           {post.recommended_package.discount > 0 && (
                             <span className="text-sm font-bold text-slate-400 line-through mb-1">
-                              ₦{Math.round(post.recommended_package.price / (1 - post.recommended_package.discount / 100)).toLocaleString()}
+                              ₦{post.recommended_package.price.toLocaleString()}
                             </span>
                           )}
                         </div>
@@ -492,10 +494,12 @@ export function BlogPost({ id, onBack, onOrderPackage }: BlogPostProps) {
                   <div className="flex flex-col sm:flex-row items-center gap-4 border-t border-white/10 pt-6">
                     <div className="text-center sm:text-left">
                       <div className="flex items-baseline gap-2 justify-center sm:justify-start">
-                        <span className="text-3xl md:text-4xl font-black text-emerald-400">₦{post.recommended_package.price.toLocaleString()}</span>
+                        <span className="text-3xl md:text-4xl font-black text-emerald-400">
+                          ₦{Math.round(post.recommended_package.price * (1 - (post.recommended_package.discount || 0) / 100)).toLocaleString()}
+                        </span>
                         {post.recommended_package.discount > 0 && (
                           <span className="text-sm font-bold text-slate-400 line-through">
-                            ₦{Math.round(post.recommended_package.price / (1 - post.recommended_package.discount / 100)).toLocaleString()}
+                            ₦{post.recommended_package.price.toLocaleString()}
                           </span>
                         )}
                       </div>
@@ -712,10 +716,12 @@ export function BlogPost({ id, onBack, onOrderPackage }: BlogPostProps) {
 
                     <div className="border-t border-slate-100 pt-6 mb-6">
                       <div className="flex items-end gap-2 mb-1">
-                        <span className="text-3xl font-black text-emerald-600">₦{post.recommended_package.price.toLocaleString()}</span>
+                        <span className="text-3xl font-black text-emerald-600">
+                          ₦{Math.round(post.recommended_package.price * (1 - (post.recommended_package.discount || 0) / 100)).toLocaleString()}
+                        </span>
                         {post.recommended_package.discount > 0 && (
                           <span className="text-sm font-bold text-slate-400 line-through mb-1">
-                            ₦{Math.round(post.recommended_package.price / (1 - post.recommended_package.discount / 100)).toLocaleString()}
+                            ₦{post.recommended_package.price.toLocaleString()}
                           </span>
                         )}
                       </div>
