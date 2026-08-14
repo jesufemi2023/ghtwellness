@@ -81,11 +81,11 @@ export const OrderDrawer: React.FC<OrderDrawerProps> = ({
   useEffect(() => {
     if (isOpen) {
       setQuantity(initialQuantity);
-      if (type === 'package' && (item as PackageData).options?.length) {
-        const options = (item as PackageData).options!;
-        const selectedOpt = (initialOptionIndex !== undefined && options[initialOptionIndex])
-          ? options[initialOptionIndex]
-          : (options.find(o => o.bottles.toLowerCase().includes('3 bottle')) || options[0]);
+      const itemOptions = (item as PackageData | Product).options;
+      if (itemOptions && itemOptions.length > 0) {
+        const selectedOpt = (initialOptionIndex !== undefined && itemOptions[initialOptionIndex])
+          ? itemOptions[initialOptionIndex]
+          : (itemOptions.find(o => o.bottles.toLowerCase().includes('3 bottle')) || itemOptions[0]);
         setSelectedOption(selectedOpt);
       } else {
         setSelectedOption(null);
@@ -176,7 +176,10 @@ export const OrderDrawer: React.FC<OrderDrawerProps> = ({
     }
   };
 
-  const hasOptions = type === 'package' && (item as PackageData).options && (item as PackageData).options!.length > 0;
+  const hasOptions = Boolean(
+    (type === 'package' && (item as PackageData).options && (item as PackageData).options!.length > 0) ||
+    (type === 'product' && (item as Product).options && (item as Product).options!.length > 0)
+  );
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -214,7 +217,7 @@ export const OrderDrawer: React.FC<OrderDrawerProps> = ({
         const prod = item as Product;
         orderItems = [{
           id: prod.id,
-          name: prod.name,
+          name: selectedOption ? `${prod.name} (${selectedOption.bottles})` : prod.name,
           quantity: quantity,
           price_at_time: basePrice,
           is_package: false
@@ -292,7 +295,7 @@ Name: ${formData.full_name}
 Delivery Date: ${formData.delivery_date}
 Payment: ${formData.payment_method === 'pod' ? 'Pay on Delivery' : 'Bank Transfer'}`;
     
-    openWhatsAppLink(CONFIG.company.phone, message);
+    openWhatsAppLink(CONFIG.whatsapp.number, message);
   };
 
   const nextStep = () => setStep(s => Math.min(s + 1, 3));
@@ -433,14 +436,18 @@ Payment: ${formData.payment_method === 'pod' ? 'Pay on Delivery' : 'Bank Transfe
                           </div>
                         </div>
 
-                        {type === 'package' && (item as PackageData).options && (item as PackageData).options!.length > 0 && (
+                        {hasOptions && (item as PackageData | Product).options && (item as PackageData | Product).options!.length > 0 && (
                           <div className="space-y-4">
                             <div className="flex items-center justify-between">
-                              <label className="text-sm font-black text-slate-400 uppercase tracking-widest">Select Package Size</label>
-                              <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">Most Popular</span>
+                              <label className="text-sm font-black text-slate-400 uppercase tracking-widest">
+                                {type === 'package' ? 'Select Package Size' : 'Select Bottle Option / Quantity'}
+                              </label>
+                              <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
+                                {type === 'package' ? 'Most Popular' : 'Best Value'}
+                              </span>
                             </div>
                             <div className="grid grid-cols-1 gap-3">
-                              {(item as PackageData).options!.map((opt, i) => (
+                              {(item as PackageData | Product).options!.map((opt, i) => (
                                 <button
                                   key={i}
                                   onClick={() => setSelectedOption(opt)}
@@ -456,12 +463,14 @@ Payment: ${formData.payment_method === 'pod' ? 'Pay on Delivery' : 'Bank Transfe
                                     </div>
                                   )}
 
-                                  <div className="flex justify-between items-center mb-3">
+                                  <div className="flex justify-between items-center mb-1">
                                     <div className="flex flex-col">
                                       <span className={`text-lg font-black leading-none ${selectedOption === opt ? 'text-emerald-700' : 'text-slate-900'}`}>
                                         {opt.bottles}
                                       </span>
-                                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Full Treatment</span>
+                                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
+                                        {type === 'package' ? 'Full Treatment' : 'Direct Supply'}
+                                      </span>
                                     </div>
                                     <div className="text-right">
                                       <div className={`text-2xl font-black ${selectedOption === opt ? 'text-emerald-700' : 'text-slate-900'}`}>
@@ -470,26 +479,28 @@ Payment: ${formData.payment_method === 'pod' ? 'Pay on Delivery' : 'Bank Transfe
                                     </div>
                                   </div>
 
-                                  <div className="pt-4 border-t border-slate-100/50">
-                                    <div className="flex items-center gap-2 mb-2">
-                                      <Package size={12} className={selectedOption === opt ? 'text-emerald-600' : 'text-slate-400'} />
-                                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Package Includes:</span>
+                                  {'products' in opt && Array.isArray((opt as any).products) && (opt as any).products.length > 0 && (
+                                    <div className="pt-4 border-t border-slate-100/50 mt-3">
+                                      <div className="flex items-center gap-2 mb-2">
+                                        <Package size={12} className={selectedOption === opt ? 'text-emerald-600' : 'text-slate-400'} />
+                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Package Includes:</span>
+                                      </div>
+                                      <div className="flex flex-wrap gap-1.5">
+                                        {(opt as any).products.map((p: string, j: number) => (
+                                          <span 
+                                            key={j} 
+                                            className={`text-[10px] font-bold px-2 py-1 rounded-lg border transition-colors ${
+                                              selectedOption === opt 
+                                                ? 'bg-white border-emerald-200 text-emerald-700' 
+                                                : 'bg-slate-50 border-slate-100 text-slate-500'
+                                            }`}
+                                          >
+                                            {p}
+                                          </span>
+                                        ))}
+                                      </div>
                                     </div>
-                                    <div className="flex flex-wrap gap-1.5">
-                                      {opt.products.map((p, j) => (
-                                        <span 
-                                          key={j} 
-                                          className={`text-[10px] font-bold px-2 py-1 rounded-lg border transition-colors ${
-                                            selectedOption === opt 
-                                              ? 'bg-white border-emerald-200 text-emerald-700' 
-                                              : 'bg-slate-50 border-slate-100 text-slate-500'
-                                          }`}
-                                        >
-                                          {p}
-                                        </span>
-                                      ))}
-                                    </div>
-                                  </div>
+                                  )}
                                 </button>
                               ))}
                             </div>

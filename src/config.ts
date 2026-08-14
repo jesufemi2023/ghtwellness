@@ -17,7 +17,7 @@ export const CONFIG = {
   company: {
     name: getEnv('VITE_COMPANY_NAME', "SD GHT HEALTH CARE"),
     subtitle: getEnv('VITE_COMPANY_SUBTITLE', "NIGERIA LTD"),
-    phone: getEnv('VITE_CONTACT_PHONE', "+234 (0) 123 456 789"),
+    phone: getEnv('VITE_CONTACT_PHONE', "+234 706 073 4773"),
     logoUrl: getEnv('VITE_LOGO_URL', ""),
     bankDetails: {
       bankName: getEnv('VITE_BANK_NAME', "ZENITH BANK"),

@@ -30,6 +30,7 @@ import {
   Share2,
   Check,
   FileText,
+  Sparkles,
   Home as HomeIcon
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
@@ -124,6 +125,7 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [viewingProduct, setViewingProduct] = useState<Product | null>(null);
   const [selectedPackage, setSelectedPackage] = useState<PackageData | null>(null);
   const [viewingPackage, setViewingPackage] = useState<PackageData | null>(null);
   const [selectedBlogId, setSelectedBlogId] = useState<string | null>(null);
@@ -133,6 +135,8 @@ export default function App() {
   const [distributorId, setDistributorId] = useState(CONFIG.defaults.distributorId);
   const [detailQuantity, setDetailQuantity] = useState(1);
   const [quickViewQuantity, setQuickViewQuantity] = useState(1);
+  const [selectedProdOptIdx, setSelectedProdOptIdx] = useState<number>(0);
+  const [selectedDetailProdOptIdx, setSelectedDetailProdOptIdx] = useState<number>(0);
   const [openedFromQuickView, setOpenedFromQuickView] = useState<'product' | 'package' | null>(null);
 
   useEffect(() => {
@@ -142,8 +146,24 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (selectedProduct) setQuickViewQuantity(1);
+    if (selectedProduct) {
+      setQuickViewQuantity(1);
+      const defIdx = selectedProduct.options?.length 
+        ? Math.max(0, selectedProduct.options.findIndex(o => o.bottles.toLowerCase().includes('3 bottle')))
+        : 0;
+      setSelectedProdOptIdx(defIdx >= 0 ? defIdx : 0);
+    }
   }, [selectedProduct]);
+
+  useEffect(() => {
+    if (viewingProduct) {
+      setDetailQuantity(1);
+      const defIdx = viewingProduct.options?.length 
+        ? Math.max(0, viewingProduct.options.findIndex(o => o.bottles.toLowerCase().includes('3 bottle')))
+        : 0;
+      setSelectedDetailProdOptIdx(defIdx >= 0 ? defIdx : 0);
+    }
+  }, [viewingProduct]);
 
   const openOrderDrawer = (item: any, type: 'package' | 'product', qty: number = 1, optIdx?: number, fromQuickView: boolean = false) => {
     setOrderItem({ item, type, qty, optIdx });
@@ -182,7 +202,6 @@ export default function App() {
       }
     }
   };
-  const [viewingProduct, setViewingProduct] = useState<Product | null>(null);
 
   const viewProductDetailPage = (product: Product) => {
     setPreviousTab(activeTab);
@@ -1264,13 +1283,66 @@ export default function App() {
                     </div>
                   </div>
 
+                  {/* Product Option Selector if available */}
+                  {viewingProduct.options && viewingProduct.options.length > 0 && (
+                    <div className="space-y-4 p-6 bg-slate-100 border-2 border-slate-300 rounded-3xl">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-black text-slate-900 uppercase tracking-widest flex items-center gap-2">
+                          <Sparkles size={18} className="text-emerald-700" />
+                          Select Bottle Option / Quantity:
+                        </span>
+                        <span className="text-xs bg-emerald-200 text-emerald-900 px-3 py-1 rounded-lg font-black uppercase tracking-wider">
+                          Best Value
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        {viewingProduct.options.map((opt, idx) => {
+                          const isSelected = selectedDetailProdOptIdx === idx;
+                          return (
+                            <button
+                              key={idx}
+                              onClick={() => setSelectedDetailProdOptIdx(idx)}
+                              className={`p-4 rounded-2xl border-2 text-left transition-all duration-300 relative overflow-hidden flex flex-col justify-between cursor-pointer min-h-[100px] ${
+                                isSelected
+                                  ? 'border-emerald-600 bg-white ring-4 ring-emerald-500/20 shadow-lg'
+                                  : 'border-slate-300 bg-white hover:border-slate-400 hover:bg-slate-50'
+                              }`}
+                            >
+                              {isSelected && (
+                                <div className="absolute top-3 right-3 text-emerald-600">
+                                  <div className="w-5 h-5 bg-emerald-600 rounded-full flex items-center justify-center text-white">
+                                    <Check size={12} strokeWidth={4} />
+                                  </div>
+                                </div>
+                              )}
+                              <div>
+                                <span className={`text-sm md:text-base font-black uppercase tracking-wider block pr-6 ${isSelected ? 'text-emerald-800' : 'text-slate-900'}`}>
+                                  {opt.bottles}
+                                </span>
+                              </div>
+                              <div className="mt-2">
+                                <span className="text-lg md:text-xl font-black text-slate-950 block">
+                                  ₦{opt.price.toLocaleString()}
+                                </span>
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
                   <div className="bg-slate-100 border-2 border-slate-200 rounded-3xl p-6 space-y-2">
                     <span className="text-sm font-black text-slate-600 uppercase tracking-widest block">SPECIAL DIRECT DISTRIBUTOR PRICE:</span>
                     <div className="flex items-baseline gap-4 flex-wrap">
                       <span className="text-5xl md:text-6xl font-black text-emerald-700">
-                        ₦{(viewingProduct.price_naira * (1 - viewingProduct.discount_percent / 100)).toLocaleString()}
+                        ₦{(
+                          viewingProduct.options && viewingProduct.options.length > 0 && viewingProduct.options[selectedDetailProdOptIdx]
+                            ? viewingProduct.options[selectedDetailProdOptIdx].price
+                            : viewingProduct.price_naira * (1 - viewingProduct.discount_percent / 100)
+                        ).toLocaleString()}
                       </span>
-                      {viewingProduct.discount_percent > 0 && (
+                      {viewingProduct.discount_percent > 0 && !(viewingProduct.options && viewingProduct.options.length > 0) && (
                         <span className="text-2xl md:text-3xl text-slate-500 line-through font-extrabold">
                           Original: ₦{viewingProduct.price_naira.toLocaleString()}
                         </span>
@@ -1316,7 +1388,12 @@ export default function App() {
                       CHAT WITH US
                     </button>
                     <button 
-                      onClick={() => openOrderDrawer(viewingProduct, 'product', detailQuantity)}
+                      onClick={() => openOrderDrawer(
+                        viewingProduct, 
+                        'product', 
+                        detailQuantity, 
+                        viewingProduct.options && viewingProduct.options.length > 0 ? selectedDetailProdOptIdx : undefined
+                      )}
                       className="flex-[1.5] bg-emerald-600 text-white py-6 rounded-3xl font-black text-2xl hover:bg-emerald-700 transition-all shadow-2xl shadow-emerald-200 active:scale-[0.98] flex items-center justify-center gap-3 border-b-4 border-emerald-800 cursor-pointer"
                     >
                       <ShoppingBag size={28} className="stroke-[3]" />
@@ -1331,7 +1408,13 @@ export default function App() {
                         <img src={viewingProduct.image_url} alt="" className="w-12 h-12 object-contain bg-white rounded-xl p-1" />
                         <div>
                           <h4 className="font-black text-white text-base truncate max-w-xs">{viewingProduct.name}</h4>
-                          <p className="text-xs text-emerald-400 font-extrabold">₦{(viewingProduct.price_naira * (1 - viewingProduct.discount_percent / 100) * detailQuantity).toLocaleString()} (Qty: {detailQuantity})</p>
+                          <p className="text-xs text-emerald-400 font-extrabold">
+                            ₦{(
+                              (viewingProduct.options && viewingProduct.options.length > 0 && viewingProduct.options[selectedDetailProdOptIdx]
+                                ? viewingProduct.options[selectedDetailProdOptIdx].price
+                                : viewingProduct.price_naira * (1 - viewingProduct.discount_percent / 100)) * detailQuantity
+                            ).toLocaleString()} (Qty: {detailQuantity})
+                          </p>
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-3 w-full sm:w-auto">
@@ -1346,7 +1429,12 @@ export default function App() {
                           CHAT WITH US
                         </button>
                         <button 
-                          onClick={() => openOrderDrawer(viewingProduct, 'product', detailQuantity)}
+                          onClick={() => openOrderDrawer(
+                            viewingProduct, 
+                            'product', 
+                            detailQuantity, 
+                            viewingProduct.options && viewingProduct.options.length > 0 ? selectedDetailProdOptIdx : undefined
+                          )}
                           className="h-14 sm:h-16 px-6 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all shadow-2xl active:scale-[0.98] flex items-center justify-center gap-2 border-b-4 border-emerald-900 ring-4 ring-emerald-500/30 cursor-pointer animate-pulse"
                         >
                           <ShoppingBag size={18} className="shrink-0 stroke-[3]" />
@@ -2007,90 +2095,156 @@ export default function App() {
                       </div>
                     </div>
 
+                    {/* Bottle Option Selector if available */}
+                    {selectedProduct.options && selectedProduct.options.length > 0 && (
+                      <div className="space-y-3 p-4 bg-slate-50 border border-slate-200 rounded-3xl">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest flex items-center gap-1.5">
+                            <Sparkles size={14} className="text-emerald-700" />
+                            Select Bottle Option:
+                          </span>
+                          <span className="text-[9px] bg-emerald-200 text-emerald-900 px-2 py-0.5 rounded font-black uppercase tracking-wider">
+                            Best Value
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                          {selectedProduct.options.map((opt, idx) => {
+                            const isSelected = selectedProdOptIdx === idx;
+                            return (
+                              <button
+                                key={idx}
+                                onClick={() => setSelectedProdOptIdx(idx)}
+                                className={`p-3 rounded-2xl border text-left transition-all duration-300 relative overflow-hidden flex flex-col justify-between cursor-pointer min-h-[85px] ${
+                                  isSelected
+                                    ? 'border-emerald-600 bg-white ring-2 ring-emerald-500/20 shadow-md'
+                                    : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
+                                }`}
+                              >
+                                {isSelected && (
+                                  <div className="absolute top-2.5 right-2.5 text-emerald-600">
+                                    <div className="w-4 h-4 bg-emerald-600 rounded-full flex items-center justify-center text-white">
+                                      <Check size={10} strokeWidth={4} />
+                                    </div>
+                                  </div>
+                                )}
+                                <div>
+                                  <span className={`text-xs font-black uppercase tracking-wider block pr-4 ${isSelected ? 'text-emerald-800' : 'text-slate-900'}`}>
+                                    {opt.bottles}
+                                  </span>
+                                </div>
+                                <div className="mt-2">
+                                  <span className="text-sm font-black text-slate-950 block">
+                                    ₦{opt.price.toLocaleString()}
+                                  </span>
+                                </div>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
                     {/* Pricing, Deal Status and Scarcity */}
-                    <div className="bg-slate-950 text-white rounded-3xl p-4 md:p-5 border border-white/10 relative overflow-hidden">
-                      <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/10 rounded-full blur-2xl pointer-events-none" />
-                      
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        <div>
-                          <span className="text-[9px] font-black uppercase text-amber-400 tracking-wider">Today's Promotion Applied</span>
-                          <div className="flex items-baseline gap-2.5">
-                            <span className="text-2xl md:text-3xl font-black text-emerald-400">
-                              ₦{(selectedProduct.price_naira * (1 - selectedProduct.discount_percent / 100)).toLocaleString()}
-                            </span>
-                            {selectedProduct.discount_percent > 0 && (
-                              <span className="text-xs text-slate-400 line-through font-bold">
-                                ₦{selectedProduct.price_naira.toLocaleString()}
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-[9px] text-slate-400 font-semibold mt-0.5">Pay Cash or Bank Transfer upon Delivery</p>
-                        </div>
+                    {(() => {
+                      const activeOpt = selectedProduct.options && selectedProduct.options.length > 0 && selectedProduct.options[selectedProdOptIdx]
+                        ? selectedProduct.options[selectedProdOptIdx]
+                        : null;
+                      const currentUnitPrice = activeOpt 
+                        ? activeOpt.price 
+                        : selectedProduct.price_naira * (1 - selectedProduct.discount_percent / 100);
 
-                        {selectedProduct.discount_percent > 0 && (
-                          <div className="bg-red-950/80 border border-red-500/30 p-2 px-3 rounded-2xl shrink-0 sm:text-right">
-                            <div className="text-[9px] font-black text-red-400 uppercase tracking-widest flex items-center gap-1 sm:justify-end">
-                              <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
-                              Low Stock: Only 5 Left!
+                      return (
+                        <>
+                          <div className="bg-slate-950 text-white rounded-3xl p-4 md:p-5 border border-white/10 relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/10 rounded-full blur-2xl pointer-events-none" />
+                            
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                              <div>
+                                <span className="text-[9px] font-black uppercase text-amber-400 tracking-wider">Today's Promotion Applied</span>
+                                <div className="flex items-baseline gap-2.5">
+                                  <span className="text-2xl md:text-3xl font-black text-emerald-400">
+                                    ₦{currentUnitPrice.toLocaleString()}
+                                  </span>
+                                  {!activeOpt && selectedProduct.discount_percent > 0 && (
+                                    <span className="text-xs text-slate-400 line-through font-bold">
+                                      ₦{selectedProduct.price_naira.toLocaleString()}
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-[9px] text-slate-400 font-semibold mt-0.5">Pay Cash or Bank Transfer upon Delivery</p>
+                              </div>
+
+                              {selectedProduct.discount_percent > 0 && (
+                                <div className="bg-red-950/80 border border-red-500/30 p-2 px-3 rounded-2xl shrink-0 sm:text-right">
+                                  <div className="text-[9px] font-black text-red-400 uppercase tracking-widest flex items-center gap-1 sm:justify-end">
+                                    <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
+                                    Low Stock: Only 5 Left!
+                                  </div>
+                                  <p className="text-[10px] text-slate-200 font-bold mt-0.5">Special {selectedProduct.discount_percent}% Senior Discount Included</p>
+                                </div>
+                              )}
                             </div>
-                            <p className="text-[10px] text-slate-200 font-bold mt-0.5">Special {selectedProduct.discount_percent}% Senior Discount Included</p>
                           </div>
-                        )}
-                      </div>
-                    </div>
 
-                    {/* Curated Local Testimonial for Immediate Social Proof */}
-                    <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl space-y-1.5">
-                      <span className="text-[9px] font-black uppercase tracking-wider text-slate-400">Verified Patient Success</span>
-                      <p className="text-slate-600 italic font-semibold text-xs md:text-sm leading-relaxed">
-                        "{matchedTestimonial.text}"
-                      </p>
-                      <p className="text-[10px] font-bold text-slate-500 border-t border-slate-200/50 pt-1.5">
-                        — {matchedTestimonial.author} ✅
-                      </p>
-                    </div>
-
-                    {/* PAYMENT RECEIPT PREVIEW (NEW & HIGHLY AESTHETIC) */}
-                    <div className="bg-slate-50 border border-slate-200 rounded-3xl p-5 font-mono text-xs text-slate-700 space-y-3 relative overflow-hidden">
-                      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-indigo-500 to-emerald-500" />
-                      <div className="flex justify-between items-center text-slate-400 font-bold border-b border-dashed border-slate-300 pb-2">
-                        <span>ORDER INVOICE / RECEIPT PREVIEW</span>
-                        <span className="text-[9px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">POD Confirmed</span>
-                      </div>
-                      <div className="space-y-1.5">
-                        <div className="flex justify-between">
-                          <span className="text-slate-500">Selected Item:</span>
-                          <span className="font-extrabold text-slate-900 truncate max-w-[200px]">{selectedProduct.name}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-slate-500">Quantity:</span>
-                          <span className="font-extrabold text-slate-900">{quickViewQuantity} Unit(s)</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-slate-500">Retail Value:</span>
-                          <span className="font-extrabold text-slate-900">₦{(selectedProduct.price_naira * quickViewQuantity).toLocaleString()}</span>
-                        </div>
-                        {selectedProduct.discount_percent > 0 && (
-                          <div className="flex justify-between text-emerald-600 font-bold">
-                            <span>Subsidy Rebate Applied ({selectedProduct.discount_percent}%):</span>
-                            <span>-₦{Math.round(selectedProduct.price_naira * (selectedProduct.discount_percent / 100) * quickViewQuantity).toLocaleString()}</span>
+                          {/* Curated Local Testimonial for Immediate Social Proof */}
+                          <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl space-y-1.5">
+                            <span className="text-[9px] font-black uppercase tracking-wider text-slate-400">Verified Patient Success</span>
+                            <p className="text-slate-600 italic font-semibold text-xs md:text-sm leading-relaxed">
+                              "{matchedTestimonial.text}"
+                            </p>
+                            <p className="text-[10px] font-bold text-slate-500 border-t border-slate-200/50 pt-1.5">
+                              — {matchedTestimonial.author} ✅
+                            </p>
                           </div>
-                        )}
-                        <div className="flex justify-between text-slate-500">
-                          <span>Nationwide Dispatch Fee:</span>
-                          <span className="font-bold text-emerald-600">₦0.00 (FREE)</span>
-                        </div>
-                      </div>
-                      <div className="border-t border-dashed border-slate-300 pt-2.5 flex justify-between items-baseline">
-                        <span className="font-black text-slate-800 uppercase text-xs">Total Due at Delivery:</span>
-                        <span className="text-xl font-black text-slate-950">
-                          ₦{Math.round(selectedProduct.price_naira * (1 - selectedProduct.discount_percent / 100) * quickViewQuantity).toLocaleString()}
-                        </span>
-                      </div>
-                      <p className="text-[9px] text-slate-400 text-center font-semibold pt-1 leading-tight">
-                        *This is a cash-on-delivery summary. Pay on physical arrival of your items via Cash or Bank Transfer.
-                      </p>
-                    </div>
+
+                          {/* PAYMENT RECEIPT PREVIEW (NEW & HIGHLY AESTHETIC) */}
+                          <div className="bg-slate-50 border border-slate-200 rounded-3xl p-5 font-mono text-xs text-slate-700 space-y-3 relative overflow-hidden">
+                            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-indigo-500 to-emerald-500" />
+                            <div className="flex justify-between items-center text-slate-400 font-bold border-b border-dashed border-slate-300 pb-2">
+                              <span>ORDER INVOICE / RECEIPT PREVIEW</span>
+                              <span className="text-[9px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">POD Confirmed</span>
+                            </div>
+                            <div className="space-y-1.5">
+                              <div className="flex justify-between">
+                                <span className="text-slate-500">Selected Item:</span>
+                                <span className="font-extrabold text-slate-900 truncate max-w-[200px]">
+                                  {activeOpt ? `${selectedProduct.name} (${activeOpt.bottles})` : selectedProduct.name}
+                                </span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-slate-500">Quantity:</span>
+                                <span className="font-extrabold text-slate-900">{quickViewQuantity} Unit(s)</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-slate-500">Retail Value:</span>
+                                <span className="font-extrabold text-slate-900">
+                                  ₦{( (activeOpt ? activeOpt.price : selectedProduct.price_naira) * quickViewQuantity).toLocaleString()}
+                                </span>
+                              </div>
+                              {!activeOpt && selectedProduct.discount_percent > 0 && (
+                                <div className="flex justify-between text-emerald-600 font-bold">
+                                  <span>Subsidy Rebate Applied ({selectedProduct.discount_percent}%):</span>
+                                  <span>-₦{Math.round(selectedProduct.price_naira * (selectedProduct.discount_percent / 100) * quickViewQuantity).toLocaleString()}</span>
+                                </div>
+                              )}
+                              <div className="flex justify-between text-slate-500">
+                                <span>Nationwide Dispatch Fee:</span>
+                                <span className="font-bold text-emerald-600">₦0.00 (FREE)</span>
+                              </div>
+                            </div>
+                            <div className="border-t border-dashed border-slate-300 pt-2.5 flex justify-between items-baseline">
+                              <span className="font-black text-slate-800 uppercase text-xs">Total Due at Delivery:</span>
+                              <span className="text-xl font-black text-slate-950">
+                                ₦{(currentUnitPrice * quickViewQuantity).toLocaleString()}
+                              </span>
+                            </div>
+                            <p className="text-[9px] text-slate-400 text-center font-semibold pt-1 leading-tight">
+                              *This is a cash-on-delivery summary. Pay on physical arrival of your items via Cash or Bank Transfer.
+                            </p>
+                          </div>
+                        </>
+                      );
+                    })()}
 
                     <button 
                       onClick={() => {
@@ -2128,7 +2282,13 @@ export default function App() {
                       </button>
                       <button 
                         onClick={() => {
-                          openOrderDrawer(selectedProduct, 'product', quickViewQuantity, undefined, true);
+                          openOrderDrawer(
+                            selectedProduct, 
+                            'product', 
+                            quickViewQuantity, 
+                            selectedProduct.options && selectedProduct.options.length > 0 ? selectedProdOptIdx : undefined, 
+                            true
+                          );
                         }}
                         className="h-14 sm:h-16 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all shadow-2xl active:scale-[0.98] flex items-center justify-center gap-2 border-b-4 border-emerald-900 ring-4 ring-emerald-500/30 cursor-pointer animate-pulse"
                       >

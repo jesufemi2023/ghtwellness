@@ -1,3 +1,8 @@
+export interface ProductOption {
+  bottles: string;
+  price: number;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -15,6 +20,7 @@ export interface Product {
   warning?: string;
   stock_quantity?: number;
   nafdac_no?: string;
+  options?: ProductOption[];
 }
 
 export interface PackageOption {

@@ -42,7 +42,7 @@ ${deliveryDate ? `Expected Delivery: ${deliveryDate}` : ""}
 ${paymentMethod ? `Payment Method: ${paymentMethod === "pod" ? "Pay on Delivery (POD)" : "Bank Transfer"}` : ""}
 Please confirm my order and expedite fast delivery! Thank you.`;
 
-    openWhatsAppLink(CONFIG.company.phone, textMessage);
+    openWhatsAppLink(CONFIG.whatsapp.number, textMessage);
   };
 
   return (

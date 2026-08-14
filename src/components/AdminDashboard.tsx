@@ -238,6 +238,9 @@ export default function AdminDashboard({ adminPassword, onLogout }: AdminDashboa
     if (activeTable === "recommended_packages" && item.package_products) {
       form.product_ids = (item.package_products || []).map((pp: any) => pp.product_id);
     }
+    if (activeTable === "products" || activeTable === "recommended_packages") {
+      form.options = item.options || [];
+    }
     setEditForm(form);
     setIsAdding(false);
   };
@@ -262,6 +265,7 @@ export default function AdminDashboard({ adminPassword, onLogout }: AdminDashboa
       defaults.image_url = "";
       defaults.image_desc_url = "";
       defaults.stock_quantity = 0;
+      defaults.options = [];
     } else if (activeTable === "recommended_packages") {
       defaults.name = "";
       defaults.description = "";
@@ -466,22 +470,29 @@ export default function AdminDashboard({ adminPassword, onLogout }: AdminDashboa
 
     if (key === "options") {
       const options = value || [];
+      const isProduct = activeTable === "products";
       return (
         <div key={key} className="space-y-4 col-span-full bg-slate-50 p-6 rounded-2xl border border-slate-200">
           <div className="flex items-center justify-between">
             <div>
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Pricing Options / Variants</label>
-              <p className="text-[9px] text-slate-400 font-medium lowercase">Define different bottle quantities and prices for this package</p>
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Pricing Options / Bottle Variants</label>
+              <p className="text-[9px] text-slate-400 font-medium lowercase">
+                {isProduct 
+                  ? "Define bottle quantities and pricing for this product (e.g. 1 Bottle, 2 Bottles, 3 Bottles)" 
+                  : "Define different bottle quantities and prices for this package"}
+              </p>
             </div>
             <button 
               type="button"
               onClick={() => {
-                const newOptions = [...options, { bottles: "", price: 0, products: [] }];
+                const newOptions = isProduct 
+                  ? [...options, { bottles: "", price: 0 }]
+                  : [...options, { bottles: "", price: 0, products: [] }];
                 setEditForm({ ...editForm, options: newOptions });
               }}
               className="flex items-center gap-2 bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-sm"
             >
-              <Plus size={14} /> Add Option
+              <Plus size={14} /> Add Bottle Option
             </button>
           </div>
           
@@ -501,9 +512,9 @@ export default function AdminDashboard({ adminPassword, onLogout }: AdminDashboa
                     <Trash2 size={16} />
                   </button>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className={`grid grid-cols-1 gap-4 ${isProduct ? 'md:grid-cols-2' : 'md:grid-cols-2 lg:grid-cols-3'}`}>
                     <div className="space-y-1">
-                      <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Option Label (e.g. 2 Bottles)</label>
+                      <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Option Label (e.g. 1 Bottle, 2 Bottles)</label>
                       <input 
                         className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold focus:ring-2 focus:ring-emerald-500 outline-none"
                         value={opt.bottles}
@@ -512,7 +523,7 @@ export default function AdminDashboard({ adminPassword, onLogout }: AdminDashboa
                           newOptions[index].bottles = e.target.value;
                           setEditForm({ ...editForm, options: newOptions });
                         }}
-                        placeholder="e.g. 3 Bottles"
+                        placeholder="e.g. 2 Bottles (Full Month)"
                       />
                     </div>
                     <div className="space-y-1">
@@ -526,24 +537,27 @@ export default function AdminDashboard({ adminPassword, onLogout }: AdminDashboa
                           newOptions[index].price = parseFloat(e.target.value) || 0;
                           setEditForm({ ...editForm, options: newOptions });
                         }}
+                        placeholder="e.g. 25000"
                       />
                     </div>
-                    <div className="space-y-1 lg:col-span-1 md:col-span-2">
-                      <div className="flex justify-between items-center">
-                        <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Included Products</label>
-                        <span className="text-[8px] text-emerald-500 font-bold">Comma separated</span>
+                    {!isProduct && (
+                      <div className="space-y-1 lg:col-span-1 md:col-span-2">
+                        <div className="flex justify-between items-center">
+                          <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Included Products</label>
+                          <span className="text-[8px] text-emerald-500 font-bold">Comma separated</span>
+                        </div>
+                        <input 
+                          className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold focus:ring-2 focus:ring-emerald-500 outline-none"
+                          value={opt.products?.join(", ") || ""}
+                          onChange={(e) => {
+                            const newOptions = [...options];
+                            newOptions[index].products = e.target.value.split(",").map((s: string) => s.trim()).filter((s: string) => s !== "");
+                            setEditForm({ ...editForm, options: newOptions });
+                          }}
+                          placeholder="Product1, Product2..."
+                        />
                       </div>
-                      <input 
-                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold focus:ring-2 focus:ring-emerald-500 outline-none"
-                        value={opt.products?.join(", ") || ""}
-                        onChange={(e) => {
-                          const newOptions = [...options];
-                          newOptions[index].products = e.target.value.split(",").map(s => s.trim()).filter(s => s !== "");
-                          setEditForm({ ...editForm, options: newOptions });
-                        }}
-                        placeholder="Product1, Product2..."
-                      />
-                    </div>
+                    )}
                   </div>
                 </div>
               ))}
@@ -551,7 +565,7 @@ export default function AdminDashboard({ adminPassword, onLogout }: AdminDashboa
           ) : (
             <div className="text-center py-8 border-2 border-dashed border-slate-200 rounded-xl bg-white">
               <Package size={24} className="mx-auto text-slate-300 mb-2" />
-              <p className="text-xs font-bold text-slate-400 italic">No options defined. Click "Add Option" to create variations for this package.</p>
+              <p className="text-xs font-bold text-slate-400 italic">No bottle options defined. Click "Add Bottle Option" to create variations with different bottle counts and prices.</p>
             </div>
           )}
         </div>

@@ -466,14 +466,16 @@ export async function createServer() {
     const { data, error } = await supabase.from(table).insert([body]).select().single();
     
     if (error) {
-      // If is_combo is the reason for failure, try without it
-      if (table === 'recommended_packages' && error.message?.includes("is_combo")) {
-        console.warn("Retrying insert without is_combo...");
-        const { is_combo, ...safeBody } = body;
+      // If is_combo or options is the reason for failure, try without it
+      if (error.message?.includes("is_combo") || error.message?.includes("options")) {
+        console.warn(`Retrying insert on ${table} without missing column...`);
+        const safeBody = { ...body };
+        if (error.message?.includes("is_combo")) delete safeBody.is_combo;
+        if (error.message?.includes("options")) delete safeBody.options;
         const { data: retryData, error: retryError } = await supabase.from(table).insert([safeBody]).select().single();
         if (retryError) return res.status(500).json({ error: retryError.message });
         
-        if (Array.isArray(product_ids)) {
+        if (table === 'recommended_packages' && Array.isArray(product_ids)) {
           const junctionData = product_ids.map(pid => ({ package_id: retryData.id, product_id: pid }));
           await supabase.from('package_products').insert(junctionData);
         }
@@ -522,14 +524,16 @@ export async function createServer() {
     const { data, error } = await supabase.from(table).update(cleanBody).eq('id', id).select().single();
     
     if (error) {
-      // If is_combo is the reason for failure, try without it
-      if (table === 'recommended_packages' && error.message?.includes("is_combo")) {
-        console.warn("Retrying update without is_combo...");
-        const { is_combo, ...safeBody } = cleanBody;
+      // If is_combo or options is the reason for failure, try without it
+      if (error.message?.includes("is_combo") || error.message?.includes("options")) {
+        console.warn(`Retrying update on ${table} without missing column...`);
+        const safeBody = { ...cleanBody };
+        if (error.message?.includes("is_combo")) delete safeBody.is_combo;
+        if (error.message?.includes("options")) delete safeBody.options;
         const { data: retryData, error: retryError } = await supabase.from(table).update(safeBody).eq('id', id).select().single();
         if (retryError) return res.status(500).json({ error: retryError.message });
         
-        if (Array.isArray(product_ids)) {
+        if (table === 'recommended_packages' && Array.isArray(product_ids)) {
           await supabase.from('package_products').delete().eq('package_id', id);
           if (product_ids.length > 0) {
             const junctionData = product_ids.map(pid => ({ package_id: id, product_id: pid }));

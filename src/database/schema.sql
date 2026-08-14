@@ -32,6 +32,7 @@ CREATE TABLE products (
     image_url TEXT,
     image_desc_url TEXT,
     stock_quantity INTEGER DEFAULT 0 CHECK (stock_quantity >= 0),
+    options JSONB DEFAULT '[]',
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );

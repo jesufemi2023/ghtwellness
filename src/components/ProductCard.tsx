@@ -175,6 +175,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
                 )}
               </div>
               <div className="flex flex-col items-end shrink-0">
+                {product.options && product.options.length > 0 && (
+                  <div className="bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest mb-1 border border-indigo-100">
+                    {product.options.length} Options Available
+                  </div>
+                )}
                 <div className="text-[8px] md:text-[9px] font-black text-red-600 uppercase tracking-tighter mb-0.5">
                   Only 5 Left!
                 </div>
@@ -193,7 +198,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
               onClick={(e) => {
                 e.stopPropagation();
                 const message = `Hello SD GHT Health Care, I am interested in ${product.name}. Could you please provide more information on how I can place an order?`;
-                openWhatsAppLink(CONFIG.company.phone, message);
+                openWhatsAppLink(CONFIG.whatsapp.number, message);
               }}
               className="flex-1 bg-white border border-slate-200 text-slate-600 py-2 md:py-2.5 rounded-lg md:rounded-xl font-black text-[10px] md:text-xs hover:bg-slate-50 transition-all flex items-center justify-center gap-1.5 uppercase tracking-widest"
             >

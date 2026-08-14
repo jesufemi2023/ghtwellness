@@ -175,7 +175,7 @@ export const ReturnPolicy: React.FC<ReturnPolicyProps> = ({ onNavigate }) => {
             <button
               onClick={() => {
                 const message = "Hello SD GHT Health Care, I would like to enquire about a return or product exchange based on your Return Policy.";
-                openWhatsAppLink(CONFIG.company.phone, message);
+                openWhatsAppLink(CONFIG.whatsapp.number, message);
               }}
               className="w-full sm:flex-1 h-12 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 shadow-md transition-colors cursor-pointer"
             >

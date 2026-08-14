@@ -40,6 +40,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
   onViewPackage
 }) => {
   const [copiedLink, setCopiedLink] = useState<string | null>(null);
+  const [packageOptionSelections, setPackageOptionSelections] = useState<Record<string, number>>({});
 
   const whatsappNumber = cleanWhatsAppNumber(CONFIG.whatsapp.number);
   const adUrl = "https://ghtwellness.vercel.app/ad";
@@ -67,6 +68,17 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
 
   // Combine packages and combos into one unified "Health Packages & Combos" list
   const allPackagesAndCombos = [...packages, ...combos];
+
+  const getSelectedOptionIdx = (pkg: PackageData) => {
+    if (packageOptionSelections[pkg.id] !== undefined) {
+      return packageOptionSelections[pkg.id];
+    }
+    if (pkg.options && pkg.options.length > 0) {
+      const idx3 = pkg.options.findIndex(o => o.bottles.toLowerCase().includes('3 bottle'));
+      return idx3 >= 0 ? idx3 : 0;
+    }
+    return 0;
+  };
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans pb-32">
@@ -183,8 +195,22 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {allPackagesAndCombos.map((pkg) => {
-              const finalPrice = pkg.price * (1 - ((pkg.discount || 0) / 100));
+              const selectedOptIdx = getSelectedOptionIdx(pkg);
+              const activeOpt = pkg.options && pkg.options.length > 0 && pkg.options[selectedOptIdx]
+                ? pkg.options[selectedOptIdx]
+                : null;
+              const finalPrice = Math.round(
+                activeOpt
+                  ? activeOpt.price
+                  : pkg.price * (1 - ((pkg.discount || 0) / 100))
+              );
+              const originalPrice = Math.round(
+                activeOpt
+                  ? activeOpt.price * 1.2
+                  : pkg.price
+              );
               const imageUrl = pkg.package_image_url || 'https://picsum.photos/seed/health-pkg/800/600';
+              
               return (
                 <div 
                   key={pkg.id} 
@@ -217,6 +243,45 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                         {pkg.description}
                       </p>
 
+                      {/* Package Option Selector if available */}
+                      {pkg.options && pkg.options.length > 0 && (
+                        <div className="space-y-2.5 p-3.5 bg-slate-950/80 border border-emerald-500/30 rounded-2xl">
+                          <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-wider text-emerald-400">
+                            <span>Select Course Option:</span>
+                            <span className="text-[9px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/30">
+                              Direct Price
+                            </span>
+                          </div>
+                          <div className="grid grid-cols-3 gap-2">
+                            {pkg.options.map((opt, optI) => {
+                              const isSelected = selectedOptIdx === optI;
+                              return (
+                                <button
+                                  key={optI}
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setPackageOptionSelections(prev => ({ ...prev, [pkg.id]: optI }));
+                                  }}
+                                  className={`p-2 rounded-xl border text-center transition-all cursor-pointer ${
+                                    isSelected
+                                      ? 'border-emerald-400 bg-emerald-950 text-white ring-2 ring-emerald-500/30'
+                                      : 'border-slate-800 bg-slate-900 text-slate-400 hover:border-slate-700'
+                                  }`}
+                                >
+                                  <span className="block text-[11px] font-black uppercase truncate">
+                                    {opt.bottles}
+                                  </span>
+                                  <span className="block text-xs font-black text-emerald-400 mt-0.5">
+                                    ₦{opt.price.toLocaleString()}
+                                  </span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+
                       {pkg.health_benefits && pkg.health_benefits.length > 0 && (
                         <div className="space-y-2 pt-2 border-t border-slate-800">
                           <p className="text-xs uppercase tracking-widest text-emerald-400 font-black">Key Benefits:</p>
@@ -237,12 +302,12 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                           <span className="text-3xl font-black text-white">
                             ₦{finalPrice.toLocaleString()}
                           </span>
-                          {pkg.discount > 0 && (
+                          {(activeOpt || pkg.discount > 0) && (
                             <span className="text-sm text-slate-400 line-through font-bold">
-                              ₦{pkg.price.toLocaleString()}
+                              ₦{originalPrice.toLocaleString()}
                             </span>
                           )}
-                          {pkg.discount > 0 && (
+                          {pkg.discount > 0 && !activeOpt && (
                             <span className="text-xs bg-red-500/20 text-red-300 font-black px-2 py-0.5 rounded-md border border-red-500/30">
                               SAVE {pkg.discount}%
                             </span>
@@ -260,7 +325,8 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                     <div className="grid grid-cols-2 gap-3">
                       <button
                         onClick={() => {
-                          const message = `Hello SD GHT Health Care, I am interested in ${pkg.name}. I would like to chat with a health consultant first.`;
+                          const optionText = activeOpt ? ` (${activeOpt.bottles})` : '';
+                          const message = `Hello SD GHT Health Care, I am interested in ${pkg.name}${optionText}. I would like to chat with a health consultant first.`;
                           openWhatsAppLink(whatsappNumber, message);
                         }}
                         className="h-14 bg-white text-slate-950 rounded-2xl font-black text-xs uppercase tracking-wider hover:bg-slate-100 transition-all flex items-center justify-center gap-1.5 shadow-xl cursor-pointer active:scale-95"
@@ -269,7 +335,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                         CHAT WITH US
                       </button>
                       <button
-                        onClick={() => onOrderPackage(pkg, 'package', 1)}
+                        onClick={() => onOrderPackage(pkg, 'package', 1, selectedOptIdx)}
                         className="h-14 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-2xl font-black text-xs uppercase tracking-wider transition-all shadow-xl active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer animate-pulse border-b-4 border-emerald-900"
                       >
                         <ShoppingBag size={16} className="stroke-[3]" />

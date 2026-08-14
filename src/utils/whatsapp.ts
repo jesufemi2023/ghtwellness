@@ -1,13 +1,20 @@
+import { CONFIG } from "../config";
+
 /**
  * Cleans any phone number to ensure it is in the exact international format required by WhatsApp,
  * with no leading zero after the country code, no spaces, no symbols, and with the proper country code.
  * Optimized specifically for Nigerian numbers (+234) and standard international formatting.
  */
-export const cleanWhatsAppNumber = (phoneNumber: string): string => {
-  if (!phoneNumber) return "";
+export const cleanWhatsAppNumber = (phoneNumber?: string): string => {
+  if (!phoneNumber) return "2347060734773";
   
   // 1. Remove all non-digits
   let digits = phoneNumber.replace(/\D/g, "");
+
+  // If number is a placeholder or too short, fallback to business number
+  if (!digits || digits.includes("123456789") || digits.length < 8) {
+    return CONFIG?.whatsapp?.number ? CONFIG.whatsapp.number.replace(/\D/g, "") : "2347060734773";
+  }
 
   // 2. Handle Nigerian number edge cases
   // Nigeria country code: 234. Local numbers always start with 0 (e.g. 07060734773).
@@ -33,52 +40,59 @@ export const cleanWhatsAppNumber = (phoneNumber: string): string => {
  * especially iOS (iPhone Safari), and handles iframe constraints seamlessly.
  * 
  * Key optimizations for iPhone/iOS:
- * 1. Uses 'https://wa.me' instead of legacy formats to guarantee immediate, native
- *    iOS Universal Links registration and trigger direct WhatsApp app opening.
- * 2. Cleans Nigerian formatting anomalies (such as invalid '2340...' codes) which cause
- *    strict iOS WhatsApp app validation to throw "link could not be opened" errors.
- * 3. Escapes iframe contexts and bypasses Safari's strict popup blocker using a dynamic anchor click.
+ * 1. Uses 'https://wa.me' with cleaned E.164 phone numbers to guarantee native
+ *    iOS Universal Links registration and direct WhatsApp app opening.
+ * 2. Protects against placeholder/dummy numbers that trigger the iOS WhatsApp error
+ *    "This link could not be opened. Check the link and try again."
+ * 3. Handles iframe contexts and popup blocker bypassing.
  */
 export const openWhatsAppLink = (phoneNumber: string, message: string) => {
   if (typeof window === "undefined") return;
 
-  // Clean the phone number (using robust international cleaning rules)
-  const cleanPhone = cleanWhatsAppNumber(phoneNumber);
+  // Clean the phone number (using robust international cleaning rules + fallback)
+  const cleanPhone = cleanWhatsAppNumber(phoneNumber || CONFIG?.whatsapp?.number);
   
   // Use wa.me for modern, reliable WhatsApp Click-to-Chat that handles Universal Links perfectly on iOS
-  const encodedText = encodeURIComponent(message);
+  const encodedText = encodeURIComponent(message || "");
   const url = `https://wa.me/${cleanPhone}?text=${encodedText}`;
 
   console.log(`[WhatsApp Utility] Initiating redirection for cleaned number ${cleanPhone}: ${url}`);
 
-  // To support both standard mobile browsing and iframe-embedded previews (e.g., iPhone inside the AI Studio preview),
-  // we MUST open in a new tab/window using a dynamically created anchor element with target="_blank".
-  // Setting window.location.href inside an iframe fails because api.whatsapp.com prevents embedding via X-Frame-Options.
-  // Using a dynamic anchor with target="_blank" bypasses popup blockers (when triggered by click) and escapes the iframe context.
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+  // If running inside an iframe
+  const inIframe = window.self !== window.top;
+
   try {
     const anchor = document.createElement("a");
     anchor.href = url;
-    anchor.target = "_blank";
+    // For iOS outside iframe, target="_blank" triggers the Universal Link prompt cleanly
+    anchor.target = inIframe ? "_top" : "_blank";
     anchor.rel = "noopener noreferrer";
     
     // Append to body, click, and remove
     document.body.appendChild(anchor);
     anchor.click();
     
-    // Small delay to ensure browser processed the click before cleaning up the element
     setTimeout(() => {
       try {
         document.body.removeChild(anchor);
       } catch (e) {
-        // Ignored if already removed or not found
+        // Ignored
       }
-    }, 100);
+    }, 200);
   } catch (error) {
-    console.error("[WhatsApp Utility] Anchor click failed, falling back to window.open:", error);
+    console.error("[WhatsApp Utility] Anchor click failed, falling back:", error);
     try {
-      window.open(url, "_blank", "noopener,noreferrer");
+      if (inIframe) {
+        window.top!.location.href = url;
+      } else if (isIOS) {
+        window.location.href = url;
+      } else {
+        window.open(url, "_blank", "noopener,noreferrer");
+      }
     } catch (e2) {
-      // Direct window location fallback
       window.location.href = url;
     }
   }
