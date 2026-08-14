@@ -1298,6 +1298,10 @@ export default function App() {
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         {viewingProduct.options.map((opt, idx) => {
                           const isSelected = selectedDetailProdOptIdx === idx;
+                          const optDiscount = Number(opt.discount) || 0;
+                          const optPrice = Number(opt.price) || 0;
+                          const effectiveOptPrice = optDiscount > 0 ? Math.round(optPrice * (1 - optDiscount / 100)) : optPrice;
+
                           return (
                             <button
                               key={idx}
@@ -1316,13 +1320,25 @@ export default function App() {
                                 </div>
                               )}
                               <div>
-                                <span className={`text-sm md:text-base font-black uppercase tracking-wider block pr-6 ${isSelected ? 'text-emerald-800' : 'text-slate-900'}`}>
-                                  {opt.bottles}
-                                </span>
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                  <span className={`text-sm md:text-base font-black uppercase tracking-wider block ${isSelected ? 'text-emerald-800' : 'text-slate-900'}`}>
+                                    {opt.bottles}
+                                  </span>
+                                  {optDiscount > 0 && (
+                                    <span className="text-[10px] bg-red-100 text-red-700 font-black px-2 py-0.5 rounded-md">
+                                      SAVE {optDiscount}%
+                                    </span>
+                                  )}
+                                </div>
                               </div>
                               <div className="mt-2">
+                                {optDiscount > 0 && (
+                                  <span className="text-xs text-slate-400 line-through font-bold block">
+                                    ₦{optPrice.toLocaleString()}
+                                  </span>
+                                )}
                                 <span className="text-lg md:text-xl font-black text-slate-950 block">
-                                  ₦{opt.price.toLocaleString()}
+                                  ₦{effectiveOptPrice.toLocaleString()}
                                 </span>
                               </div>
                             </button>
@@ -1332,23 +1348,39 @@ export default function App() {
                     </div>
                   )}
 
-                  <div className="bg-slate-100 border-2 border-slate-200 rounded-3xl p-6 space-y-2">
-                    <span className="text-sm font-black text-slate-600 uppercase tracking-widest block">SPECIAL DIRECT DISTRIBUTOR PRICE:</span>
-                    <div className="flex items-baseline gap-4 flex-wrap">
-                      <span className="text-5xl md:text-6xl font-black text-emerald-700">
-                        ₦{(
-                          viewingProduct.options && viewingProduct.options.length > 0 && viewingProduct.options[selectedDetailProdOptIdx]
-                            ? viewingProduct.options[selectedDetailProdOptIdx].price
-                            : viewingProduct.price_naira * (1 - viewingProduct.discount_percent / 100)
-                        ).toLocaleString()}
-                      </span>
-                      {viewingProduct.discount_percent > 0 && !(viewingProduct.options && viewingProduct.options.length > 0) && (
-                        <span className="text-2xl md:text-3xl text-slate-500 line-through font-extrabold">
-                          Original: ₦{viewingProduct.price_naira.toLocaleString()}
-                        </span>
-                      )}
-                    </div>
-                  </div>
+                  {(() => {
+                    const activeOpt = viewingProduct.options && viewingProduct.options.length > 0 && viewingProduct.options[selectedDetailProdOptIdx]
+                      ? viewingProduct.options[selectedDetailProdOptIdx]
+                      : null;
+                    const activeOptDiscount = activeOpt ? (Number(activeOpt.discount) || 0) : 0;
+                    const effectivePrice = activeOpt
+                      ? (activeOptDiscount > 0 ? Math.round(activeOpt.price * (1 - activeOptDiscount / 100)) : activeOpt.price)
+                      : Math.round(viewingProduct.price_naira * (1 - (viewingProduct.discount_percent || 0) / 100));
+                    const originalPrice = activeOpt ? activeOpt.price : viewingProduct.price_naira;
+                    const hasDiscount = activeOpt ? activeOptDiscount > 0 : viewingProduct.discount_percent > 0;
+                    const discountPercent = activeOpt ? activeOptDiscount : viewingProduct.discount_percent;
+
+                    return (
+                      <div className="bg-slate-100 border-2 border-slate-200 rounded-3xl p-6 space-y-2">
+                        <span className="text-sm font-black text-slate-600 uppercase tracking-widest block">SPECIAL DIRECT DISTRIBUTOR PRICE:</span>
+                        <div className="flex items-baseline gap-4 flex-wrap">
+                          <span className="text-5xl md:text-6xl font-black text-emerald-700">
+                            ₦{effectivePrice.toLocaleString()}
+                          </span>
+                          {hasDiscount && (
+                            <span className="text-2xl md:text-3xl text-slate-500 line-through font-extrabold">
+                              Original: ₦{originalPrice.toLocaleString()}
+                            </span>
+                          )}
+                          {hasDiscount && (
+                            <span className="text-sm bg-red-600 text-white font-black px-3 py-1 rounded-xl uppercase tracking-wider">
+                              SAVE {discountPercent}% TODAY
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })()}
 
                   <p className="text-2xl text-slate-850 leading-relaxed font-bold border-l-4 border-emerald-500 pl-4 bg-emerald-50/20 py-2">
                     {viewingProduct.short_desc}
@@ -1410,9 +1442,16 @@ export default function App() {
                           <h4 className="font-black text-white text-base truncate max-w-xs">{viewingProduct.name}</h4>
                           <p className="text-xs text-emerald-400 font-extrabold">
                             ₦{(
-                              (viewingProduct.options && viewingProduct.options.length > 0 && viewingProduct.options[selectedDetailProdOptIdx]
-                                ? viewingProduct.options[selectedDetailProdOptIdx].price
-                                : viewingProduct.price_naira * (1 - viewingProduct.discount_percent / 100)) * detailQuantity
+                              (() => {
+                                const activeOpt = viewingProduct.options && viewingProduct.options.length > 0 && viewingProduct.options[selectedDetailProdOptIdx]
+                                  ? viewingProduct.options[selectedDetailProdOptIdx]
+                                  : null;
+                                const activeOptDiscount = activeOpt ? (Number(activeOpt.discount) || 0) : 0;
+                                const unitPrice = activeOpt
+                                  ? (activeOptDiscount > 0 ? Math.round(activeOpt.price * (1 - activeOptDiscount / 100)) : activeOpt.price)
+                                  : Math.round(viewingProduct.price_naira * (1 - (viewingProduct.discount_percent || 0) / 100));
+                                return unitPrice * detailQuantity;
+                              })()
                             ).toLocaleString()} (Qty: {detailQuantity})
                           </p>
                         </div>
@@ -2110,6 +2149,10 @@ export default function App() {
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                           {selectedProduct.options.map((opt, idx) => {
                             const isSelected = selectedProdOptIdx === idx;
+                            const optDiscount = Number(opt.discount) || 0;
+                            const optPrice = Number(opt.price) || 0;
+                            const effectiveOptPrice = optDiscount > 0 ? Math.round(optPrice * (1 - optDiscount / 100)) : optPrice;
+
                             return (
                               <button
                                 key={idx}
@@ -2128,13 +2171,25 @@ export default function App() {
                                   </div>
                                 )}
                                 <div>
-                                  <span className={`text-xs font-black uppercase tracking-wider block pr-4 ${isSelected ? 'text-emerald-800' : 'text-slate-900'}`}>
-                                    {opt.bottles}
-                                  </span>
+                                  <div className="flex items-center gap-1 flex-wrap">
+                                    <span className={`text-xs font-black uppercase tracking-wider block ${isSelected ? 'text-emerald-800' : 'text-slate-900'}`}>
+                                      {opt.bottles}
+                                    </span>
+                                    {optDiscount > 0 && (
+                                      <span className="text-[8px] bg-red-100 text-red-700 font-black px-1.5 py-0.5 rounded">
+                                        -{optDiscount}%
+                                      </span>
+                                    )}
+                                  </div>
                                 </div>
                                 <div className="mt-2">
+                                  {optDiscount > 0 && (
+                                    <span className="text-[10px] text-slate-400 line-through font-bold block">
+                                      ₦{optPrice.toLocaleString()}
+                                    </span>
+                                  )}
                                   <span className="text-sm font-black text-slate-950 block">
-                                    ₦{opt.price.toLocaleString()}
+                                    ₦{effectiveOptPrice.toLocaleString()}
                                   </span>
                                 </div>
                               </button>
@@ -2149,9 +2204,12 @@ export default function App() {
                       const activeOpt = selectedProduct.options && selectedProduct.options.length > 0 && selectedProduct.options[selectedProdOptIdx]
                         ? selectedProduct.options[selectedProdOptIdx]
                         : null;
+                      const activeOptDiscount = activeOpt ? (Number(activeOpt.discount) || 0) : 0;
                       const currentUnitPrice = activeOpt 
-                        ? activeOpt.price 
-                        : selectedProduct.price_naira * (1 - selectedProduct.discount_percent / 100);
+                        ? (activeOptDiscount > 0 ? Math.round(activeOpt.price * (1 - activeOptDiscount / 100)) : activeOpt.price)
+                        : Math.round(selectedProduct.price_naira * (1 - (selectedProduct.discount_percent || 0) / 100));
+                      const originalUnitPrice = activeOpt ? activeOpt.price : selectedProduct.price_naira;
+                      const effectiveDiscount = activeOpt ? activeOptDiscount : selectedProduct.discount_percent;
 
                       return (
                         <>
@@ -2165,22 +2223,22 @@ export default function App() {
                                   <span className="text-2xl md:text-3xl font-black text-emerald-400">
                                     ₦{currentUnitPrice.toLocaleString()}
                                   </span>
-                                  {!activeOpt && selectedProduct.discount_percent > 0 && (
+                                  {effectiveDiscount > 0 && (
                                     <span className="text-xs text-slate-400 line-through font-bold">
-                                      ₦{selectedProduct.price_naira.toLocaleString()}
+                                      ₦{originalUnitPrice.toLocaleString()}
                                     </span>
                                   )}
                                 </div>
                                 <p className="text-[9px] text-slate-400 font-semibold mt-0.5">Pay Cash or Bank Transfer upon Delivery</p>
                               </div>
 
-                              {selectedProduct.discount_percent > 0 && (
+                              {effectiveDiscount > 0 && (
                                 <div className="bg-red-950/80 border border-red-500/30 p-2 px-3 rounded-2xl shrink-0 sm:text-right">
                                   <div className="text-[9px] font-black text-red-400 uppercase tracking-widest flex items-center gap-1 sm:justify-end">
                                     <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
                                     Low Stock: Only 5 Left!
                                   </div>
-                                  <p className="text-[10px] text-slate-200 font-bold mt-0.5">Special {selectedProduct.discount_percent}% Senior Discount Included</p>
+                                  <p className="text-[10px] text-slate-200 font-bold mt-0.5">Special {effectiveDiscount}% Discount Included</p>
                                 </div>
                               )}
                             </div>
@@ -2218,13 +2276,13 @@ export default function App() {
                               <div className="flex justify-between">
                                 <span className="text-slate-500">Retail Value:</span>
                                 <span className="font-extrabold text-slate-900">
-                                  ₦{( (activeOpt ? activeOpt.price : selectedProduct.price_naira) * quickViewQuantity).toLocaleString()}
+                                  ₦{(originalUnitPrice * quickViewQuantity).toLocaleString()}
                                 </span>
                               </div>
-                              {!activeOpt && selectedProduct.discount_percent > 0 && (
+                              {effectiveDiscount > 0 && (
                                 <div className="flex justify-between text-emerald-600 font-bold">
-                                  <span>Subsidy Rebate Applied ({selectedProduct.discount_percent}%):</span>
-                                  <span>-₦{Math.round(selectedProduct.price_naira * (selectedProduct.discount_percent / 100) * quickViewQuantity).toLocaleString()}</span>
+                                  <span>Subsidy Rebate Applied ({effectiveDiscount}%):</span>
+                                  <span>-₦{((originalUnitPrice - currentUnitPrice) * quickViewQuantity).toLocaleString()}</span>
                                 </div>
                               )}
                               <div className="flex justify-between text-slate-500">

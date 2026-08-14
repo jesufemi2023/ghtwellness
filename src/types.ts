@@ -1,6 +1,7 @@
 export interface ProductOption {
   bottles: string;
   price: number;
+  discount?: number;
 }
 
 export interface Product {
@@ -26,7 +27,8 @@ export interface Product {
 export interface PackageOption {
   bottles: string;
   price: number;
-  products: string[];
+  discount?: number;
+  products?: string[];
 }
 
 export interface PackageData {

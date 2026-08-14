@@ -110,10 +110,11 @@ export const OrderDrawer: React.FC<OrderDrawerProps> = ({
     payment_receipt_url: ''
   });
 
+  const selectedOptDiscount = selectedOption ? (Number(selectedOption.discount) || 0) : 0;
   const basePrice = selectedOption 
-    ? selectedOption.price 
+    ? (selectedOptDiscount > 0 ? Math.round(selectedOption.price * (1 - selectedOptDiscount / 100)) : selectedOption.price)
     : (type === 'package' 
-        ? (item as PackageData).price * (1 - (item as PackageData).discount / 100)
+        ? (item as PackageData).price * (1 - ((item as PackageData).discount || 0) / 100)
         : (item as Product).price_naira * (1 - ((item as Product).discount_percent || 0) / 100));
 
   const totalPrice = basePrice * quantity;
@@ -447,62 +448,80 @@ Payment: ${formData.payment_method === 'pod' ? 'Pay on Delivery' : 'Bank Transfe
                               </span>
                             </div>
                             <div className="grid grid-cols-1 gap-3">
-                              {(item as PackageData | Product).options!.map((opt, i) => (
-                                <button
-                                  key={i}
-                                  onClick={() => setSelectedOption(opt)}
-                                  className={`group p-6 rounded-3xl border-2 text-left transition-all duration-300 relative overflow-hidden ${
-                                    selectedOption === opt 
-                                      ? 'bg-emerald-50 border-emerald-600 shadow-xl shadow-emerald-900/5' 
-                                      : 'bg-white border-slate-100 hover:border-slate-300 hover:bg-slate-50'
-                                  }`}
-                                >
-                                  {selectedOption === opt && (
-                                    <div className="absolute top-0 right-0 w-16 h-16 bg-emerald-600 translate-x-8 -translate-y-8 rotate-45 flex items-end justify-center pb-2">
-                                      <CheckCircle2 size={12} className="text-white -rotate-45" />
-                                    </div>
-                                  )}
+                              {(item as PackageData | Product).options!.map((opt, i) => {
+                                const optDiscount = Number(opt.discount) || 0;
+                                const optPrice = Number(opt.price) || 0;
+                                const effectiveOptPrice = optDiscount > 0 ? Math.round(optPrice * (1 - optDiscount / 100)) : optPrice;
 
-                                  <div className="flex justify-between items-center mb-1">
-                                    <div className="flex flex-col">
-                                      <span className={`text-lg font-black leading-none ${selectedOption === opt ? 'text-emerald-700' : 'text-slate-900'}`}>
-                                        {opt.bottles}
-                                      </span>
-                                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
-                                        {type === 'package' ? 'Full Treatment' : 'Direct Supply'}
-                                      </span>
-                                    </div>
-                                    <div className="text-right">
-                                      <div className={`text-2xl font-black ${selectedOption === opt ? 'text-emerald-700' : 'text-slate-900'}`}>
-                                        ₦{opt.price.toLocaleString()}
+                                return (
+                                  <button
+                                    key={i}
+                                    onClick={() => setSelectedOption(opt)}
+                                    className={`group p-6 rounded-3xl border-2 text-left transition-all duration-300 relative overflow-hidden ${
+                                      selectedOption === opt 
+                                        ? 'bg-emerald-50 border-emerald-600 shadow-xl shadow-emerald-900/5' 
+                                        : 'bg-white border-slate-100 hover:border-slate-300 hover:bg-slate-50'
+                                    }`}
+                                  >
+                                    {selectedOption === opt && (
+                                      <div className="absolute top-0 right-0 w-16 h-16 bg-emerald-600 translate-x-8 -translate-y-8 rotate-45 flex items-end justify-center pb-2">
+                                        <CheckCircle2 size={12} className="text-white -rotate-45" />
                                       </div>
-                                    </div>
-                                  </div>
+                                    )}
 
-                                  {'products' in opt && Array.isArray((opt as any).products) && (opt as any).products.length > 0 && (
-                                    <div className="pt-4 border-t border-slate-100/50 mt-3">
-                                      <div className="flex items-center gap-2 mb-2">
-                                        <Package size={12} className={selectedOption === opt ? 'text-emerald-600' : 'text-slate-400'} />
-                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Package Includes:</span>
-                                      </div>
-                                      <div className="flex flex-wrap gap-1.5">
-                                        {(opt as any).products.map((p: string, j: number) => (
-                                          <span 
-                                            key={j} 
-                                            className={`text-[10px] font-bold px-2 py-1 rounded-lg border transition-colors ${
-                                              selectedOption === opt 
-                                                ? 'bg-white border-emerald-200 text-emerald-700' 
-                                                : 'bg-slate-50 border-slate-100 text-slate-500'
-                                            }`}
-                                          >
-                                            {p}
+                                    <div className="flex justify-between items-center mb-1">
+                                      <div className="flex flex-col">
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                          <span className={`text-lg font-black leading-none ${selectedOption === opt ? 'text-emerald-700' : 'text-slate-900'}`}>
+                                            {opt.bottles}
                                           </span>
-                                        ))}
+                                          {optDiscount > 0 && (
+                                            <span className="text-[10px] bg-red-100 text-red-700 font-black px-2 py-0.5 rounded-full border border-red-200">
+                                              SAVE {optDiscount}%
+                                            </span>
+                                          )}
+                                        </div>
+                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
+                                          {type === 'package' ? 'Full Treatment' : 'Direct Supply'}
+                                        </span>
+                                      </div>
+                                      <div className="text-right">
+                                        {optDiscount > 0 && (
+                                          <div className="text-xs text-slate-400 line-through font-bold">
+                                            ₦{optPrice.toLocaleString()}
+                                          </div>
+                                        )}
+                                        <div className={`text-2xl font-black ${selectedOption === opt ? 'text-emerald-700' : 'text-slate-900'}`}>
+                                          ₦{effectiveOptPrice.toLocaleString()}
+                                        </div>
                                       </div>
                                     </div>
-                                  )}
-                                </button>
-                              ))}
+
+                                    {'products' in opt && Array.isArray((opt as any).products) && (opt as any).products.length > 0 && (
+                                      <div className="pt-4 border-t border-slate-100/50 mt-3">
+                                        <div className="flex items-center gap-2 mb-2">
+                                          <Package size={12} className={selectedOption === opt ? 'text-emerald-600' : 'text-slate-400'} />
+                                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Package Includes:</span>
+                                        </div>
+                                        <div className="flex flex-wrap gap-1.5">
+                                          {(opt as any).products.map((p: string, j: number) => (
+                                            <span 
+                                              key={j} 
+                                              className={`text-[10px] font-bold px-2 py-1 rounded-lg border transition-colors ${
+                                                selectedOption === opt 
+                                                  ? 'bg-white border-emerald-200 text-emerald-700' 
+                                                  : 'bg-slate-50 border-slate-100 text-slate-500'
+                                              }`}
+                                            >
+                                              {p}
+                                            </span>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
+                                  </button>
+                                );
+                              })}
                             </div>
                           </div>
                         )}

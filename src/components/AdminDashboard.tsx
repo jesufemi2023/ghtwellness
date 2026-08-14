@@ -478,16 +478,16 @@ export default function AdminDashboard({ adminPassword, onLogout }: AdminDashboa
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Pricing Options / Bottle Variants</label>
               <p className="text-[9px] text-slate-400 font-medium lowercase">
                 {isProduct 
-                  ? "Define bottle quantities and pricing for this product (e.g. 1 Bottle, 2 Bottles, 3 Bottles)" 
-                  : "Define different bottle quantities and prices for this package"}
+                  ? "Define bottle quantities, regular prices, and discounts for this product (e.g. 1 Bottle, 2 Bottles, 3 Bottles)" 
+                  : "Define different bottle quantities, prices, and discounts for this package"}
               </p>
             </div>
             <button 
               type="button"
               onClick={() => {
                 const newOptions = isProduct 
-                  ? [...options, { bottles: "", price: 0 }]
-                  : [...options, { bottles: "", price: 0, products: [] }];
+                  ? [...options, { bottles: "", price: 0, discount: 0 }]
+                  : [...options, { bottles: "", price: 0, discount: 0, products: [] }];
                 setEditForm({ ...editForm, options: newOptions });
               }}
               className="flex items-center gap-2 bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-sm"
@@ -498,74 +498,118 @@ export default function AdminDashboard({ adminPassword, onLogout }: AdminDashboa
           
           {options.length > 0 ? (
             <div className="grid grid-cols-1 gap-4">
-              {options.map((opt: any, index: number) => (
-                <div key={index} className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4 relative group">
-                  <button 
-                    type="button"
-                    onClick={() => {
-                      const newOptions = options.filter((_: any, i: number) => i !== index);
-                      setEditForm({ ...editForm, options: newOptions });
-                    }}
-                    className="absolute top-4 right-4 text-slate-300 hover:text-red-500 transition-colors p-1"
-                    title="Remove Option"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                  
-                  <div className={`grid grid-cols-1 gap-4 ${isProduct ? 'md:grid-cols-2' : 'md:grid-cols-2 lg:grid-cols-3'}`}>
-                    <div className="space-y-1">
-                      <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Option Label (e.g. 1 Bottle, 2 Bottles)</label>
-                      <input 
-                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold focus:ring-2 focus:ring-emerald-500 outline-none"
-                        value={opt.bottles}
-                        onChange={(e) => {
-                          const newOptions = [...options];
-                          newOptions[index].bottles = e.target.value;
-                          setEditForm({ ...editForm, options: newOptions });
-                        }}
-                        placeholder="e.g. 2 Bottles (Full Month)"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Price (₦)</label>
-                      <input 
-                        type="number"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold focus:ring-2 focus:ring-emerald-500 outline-none"
-                        value={opt.price}
-                        onChange={(e) => {
-                          const newOptions = [...options];
-                          newOptions[index].price = parseFloat(e.target.value) || 0;
-                          setEditForm({ ...editForm, options: newOptions });
-                        }}
-                        placeholder="e.g. 25000"
-                      />
-                    </div>
-                    {!isProduct && (
-                      <div className="space-y-1 lg:col-span-1 md:col-span-2">
-                        <div className="flex justify-between items-center">
-                          <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Included Products</label>
-                          <span className="text-[8px] text-emerald-500 font-bold">Comma separated</span>
-                        </div>
+              {options.map((opt: any, index: number) => {
+                const optDiscount = Number(opt.discount) || 0;
+                const optPrice = Number(opt.price) || 0;
+                const effectivePrice = optDiscount > 0 ? Math.round(optPrice * (1 - optDiscount / 100)) : optPrice;
+
+                return (
+                  <div key={index} className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4 relative group">
+                    <button 
+                      type="button"
+                      onClick={() => {
+                        const newOptions = options.filter((_: any, i: number) => i !== index);
+                        setEditForm({ ...editForm, options: newOptions });
+                      }}
+                      className="absolute top-4 right-4 text-slate-300 hover:text-red-500 transition-colors p-1"
+                      title="Remove Option"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                    
+                    <div className={`grid grid-cols-1 gap-4 ${isProduct ? 'md:grid-cols-3' : 'md:grid-cols-2 lg:grid-cols-4'}`}>
+                      <div className="space-y-1">
+                        <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Option Label (e.g. 1 Bottle, 2 Bottles)</label>
                         <input 
                           className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold focus:ring-2 focus:ring-emerald-500 outline-none"
-                          value={opt.products?.join(", ") || ""}
+                          value={opt.bottles}
                           onChange={(e) => {
                             const newOptions = [...options];
-                            newOptions[index].products = e.target.value.split(",").map((s: string) => s.trim()).filter((s: string) => s !== "");
+                            newOptions[index].bottles = e.target.value;
                             setEditForm({ ...editForm, options: newOptions });
                           }}
-                          placeholder="Product1, Product2..."
+                          placeholder="e.g. 2 Bottles (Full Month)"
                         />
                       </div>
-                    )}
+                      <div className="space-y-1">
+                        <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Price (₦)</label>
+                        <input 
+                          type="number"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold focus:ring-2 focus:ring-emerald-500 outline-none"
+                          value={opt.price}
+                          onChange={(e) => {
+                            const newOptions = [...options];
+                            newOptions[index].price = parseFloat(e.target.value) || 0;
+                            setEditForm({ ...editForm, options: newOptions });
+                          }}
+                          placeholder="e.g. 25000"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <div className="flex justify-between items-center">
+                          <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Discount (%)</label>
+                          {optDiscount > 0 && (
+                            <span className="text-[9px] bg-red-100 text-red-700 font-black px-1.5 py-0.5 rounded">
+                              SAVE {optDiscount}%
+                            </span>
+                          )}
+                        </div>
+                        <input 
+                          type="number"
+                          min="0"
+                          max="100"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold focus:ring-2 focus:ring-emerald-500 outline-none"
+                          value={opt.discount ?? 0}
+                          onChange={(e) => {
+                            const newOptions = [...options];
+                            newOptions[index].discount = parseFloat(e.target.value) || 0;
+                            setEditForm({ ...editForm, options: newOptions });
+                          }}
+                          placeholder="e.g. 15"
+                        />
+                      </div>
+                      {!isProduct && (
+                        <div className="space-y-1 lg:col-span-1 md:col-span-2">
+                          <div className="flex justify-between items-center">
+                            <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Included Products</label>
+                            <span className="text-[8px] text-emerald-500 font-bold">Comma separated</span>
+                          </div>
+                          <input 
+                            className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold focus:ring-2 focus:ring-emerald-500 outline-none"
+                            value={opt.products?.join(", ") || ""}
+                            onChange={(e) => {
+                              const newOptions = [...options];
+                              newOptions[index].products = e.target.value.split(",").map((s: string) => s.trim()).filter((s: string) => s !== "");
+                              setEditForm({ ...editForm, options: newOptions });
+                            }}
+                            placeholder="Product1, Product2..."
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Live Effective Price Preview */}
+                    <div className="flex items-center justify-between text-xs pt-2 border-t border-slate-100 bg-slate-50/50 px-3 py-2 rounded-lg">
+                      <span className="text-[10px] font-black uppercase text-slate-400">Calculated Final Price:</span>
+                      <div className="flex items-center gap-2">
+                        {optDiscount > 0 && (
+                          <span className="text-slate-400 line-through text-xs font-bold">
+                            ₦{optPrice.toLocaleString()}
+                          </span>
+                        )}
+                        <span className="font-black text-emerald-700 text-sm">
+                          ₦{effectivePrice.toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <div className="text-center py-8 border-2 border-dashed border-slate-200 rounded-xl bg-white">
               <Package size={24} className="mx-auto text-slate-300 mb-2" />
-              <p className="text-xs font-bold text-slate-400 italic">No bottle options defined. Click "Add Bottle Option" to create variations with different bottle counts and prices.</p>
+              <p className="text-xs font-bold text-slate-400 italic">No bottle options defined. Click "Add Bottle Option" to create variations with different bottle counts, prices, and discounts.</p>
             </div>
           )}
         </div>

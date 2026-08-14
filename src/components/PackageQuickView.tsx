@@ -147,8 +147,11 @@ export const PackageQuickView: React.FC<PackageQuickViewProps> = ({
   const [selectedOptionIdx, setSelectedOptionIdx] = useState(defaultIdx >= 0 ? defaultIdx : 0);
 
   const selectedOption = data.options && data.options[selectedOptionIdx] ? data.options[selectedOptionIdx] : null;
+  const selectedOptDiscount = selectedOption ? (Number(selectedOption.discount) || 0) : 0;
   const basePrice = selectedOption ? selectedOption.price : data.price;
-  const discountedPrice = selectedOption ? selectedOption.price : (data.price * (1 - (data.discount / 100)));
+  const discountedPrice = selectedOption 
+    ? (selectedOptDiscount > 0 ? Math.round(selectedOption.price * (1 - selectedOptDiscount / 100)) : selectedOption.price)
+    : (data.price * (1 - (data.discount / 100)));
 
   // Countdown timer & dynamic stock simulation
   useEffect(() => {
@@ -486,6 +489,10 @@ export const PackageQuickView: React.FC<PackageQuickViewProps> = ({
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         {data.options.map((opt, idx) => {
                           const isSelected = selectedOptionIdx === idx;
+                          const optDiscount = Number(opt.discount) || 0;
+                          const optPrice = Number(opt.price) || 0;
+                          const effectiveOptPrice = optDiscount > 0 ? Math.round(optPrice * (1 - optDiscount / 100)) : optPrice;
+
                           return (
                             <button
                               key={idx}
@@ -504,16 +511,29 @@ export const PackageQuickView: React.FC<PackageQuickViewProps> = ({
                                 </div>
                               )}
                               <div>
-                                <span className={`text-sm md:text-base font-black uppercase tracking-wider block pr-6 ${isSelected ? 'text-emerald-800' : 'text-slate-900'}`}>
-                                  {opt.bottles}
-                                </span>
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                  <span className={`text-sm md:text-base font-black uppercase tracking-wider block ${isSelected ? 'text-emerald-800' : 'text-slate-900'}`}>
+                                    {opt.bottles}
+                                  </span>
+                                  {optDiscount > 0 && (
+                                    <span className="text-[10px] bg-red-100 text-red-700 font-black px-2 py-0.5 rounded-md">
+                                      SAVE {optDiscount}%
+                                    </span>
+                                  )}
+                                </div>
                               </div>
                               <div className="mt-3">
-                                <span className="text-xs text-slate-500 block font-bold line-through">
-                                  ₦{(opt.price * 1.2).toLocaleString()}
-                                </span>
+                                {optDiscount > 0 ? (
+                                  <span className="text-xs text-slate-400 block font-bold line-through">
+                                    ₦{optPrice.toLocaleString()}
+                                  </span>
+                                ) : (
+                                  <span className="text-xs text-slate-500 block font-bold line-through">
+                                    ₦{Math.round(optPrice * 1.2).toLocaleString()}
+                                  </span>
+                                )}
                                 <span className="text-lg md:text-xl font-black text-slate-950 block mt-0.5">
-                                  ₦{opt.price.toLocaleString()}
+                                  ₦{effectiveOptPrice.toLocaleString()}
                                 </span>
                               </div>
                             </button>
@@ -532,11 +552,19 @@ export const PackageQuickView: React.FC<PackageQuickViewProps> = ({
                         <span className="text-xs font-black uppercase text-emerald-400 tracking-wider">Subsidized Direct Clinical Price</span>
                         <div className="flex items-baseline gap-3">
                           <span className="text-4xl md:text-5xl font-black text-emerald-400">₦{discountedPrice.toLocaleString()}</span>
-                          {(selectedOption || data.discount > 0) && (
-                            <span className="text-sm md:text-base text-slate-400 line-through font-extrabold">
-                              ₦{(selectedOption ? selectedOption.price * 1.2 : data.price).toLocaleString()}
-                            </span>
-                          )}
+                          {(() => {
+                            const optDiscount = selectedOption ? (Number(selectedOption.discount) || 0) : 0;
+                            const hasDiscount = selectedOption ? optDiscount > 0 : data.discount > 0;
+                            const originalVal = selectedOption 
+                              ? (optDiscount > 0 ? selectedOption.price : selectedOption.price * 1.2) 
+                              : data.price;
+                            
+                            return hasDiscount ? (
+                              <span className="text-sm md:text-base text-slate-400 line-through font-extrabold">
+                                ₦{Math.round(originalVal).toLocaleString()}
+                              </span>
+                            ) : null;
+                          })()}
                         </div>
                         <p className="text-xs md:text-sm text-slate-300 font-bold">Includes FREE Nationwide Delivery & Cash / Transfer on Delivery (POD)</p>
                       </div>
@@ -645,12 +673,20 @@ export const PackageQuickView: React.FC<PackageQuickViewProps> = ({
                         <span className="text-slate-600 font-bold">Retail Value:</span>
                         <span className="font-black text-slate-950">₦{((selectedOption ? selectedOption.price : data.price) * quantity).toLocaleString()}</span>
                       </div>
-                      {data.discount > 0 && (
-                        <div className="flex justify-between text-emerald-700 font-black">
-                          <span>Subsidy Rebate Applied:</span>
-                          <span>-₦{Math.round((selectedOption ? selectedOption.price : data.price) * (data.discount / 100) * quantity).toLocaleString()}</span>
-                        </div>
-                      )}
+                      {(() => {
+                        const optDiscount = selectedOption ? (Number(selectedOption.discount) || 0) : 0;
+                        const hasDiscount = selectedOption ? optDiscount > 0 : data.discount > 0;
+                        const discPercent = selectedOption ? optDiscount : data.discount;
+                        const rawPrice = selectedOption ? selectedOption.price : data.price;
+                        const rebateAmount = hasDiscount ? Math.round(rawPrice * (discPercent / 100) * quantity) : 0;
+
+                        return hasDiscount ? (
+                          <div className="flex justify-between text-emerald-700 font-black">
+                            <span>Subsidy Rebate ({discPercent}% OFF):</span>
+                            <span>-₦{rebateAmount.toLocaleString()}</span>
+                          </div>
+                        ) : null;
+                      })()}
                       <div className="flex justify-between text-slate-600">
                         <span className="font-bold">Nationwide Dispatch Fee:</span>
                         <span className="font-black text-emerald-700">₦0.00 (FREE)</span>
