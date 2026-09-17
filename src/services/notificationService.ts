@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 import { Telegraf } from 'telegraf';
-import { formatProductNameWithBottles, extractBottleCount } from '../utils/bottleFormatter';
+import { formatProductNameWithBottles, extractBottleCount } from '../utils/bottleFormatter.js';
 
 // --- Gmail Configuration ---
 // We use a singleton pattern to reuse the transporter connection
