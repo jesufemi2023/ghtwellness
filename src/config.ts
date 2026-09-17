@@ -83,4 +83,11 @@ export const CONFIG = {
     {id: "history", label: "View Order Status"},
     {id: "admin", label: "Admin"},
   ],
+  developer: {
+    name: "Jesufemi Temitope Solomon",
+    role: "Lead Full-Stack Software Engineer",
+    linkedin: "https://www.linkedin.com/in/temitope-solomon-jesufemi-2620ab275/",
+    email: "ogungbetemitope@gmail.com",
+    avatarUrl: getEnv('VITE_DEVELOPER_PHOTO_URL', "/developer-photo.jpg")
+  }
 };

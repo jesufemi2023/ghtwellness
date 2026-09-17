@@ -142,6 +142,10 @@ export default function App() {
   const [selectedDetailProdOptIdx, setSelectedDetailProdOptIdx] = useState<number>(0);
   const [openedFromQuickView, setOpenedFromQuickView] = useState<'product' | 'package' | null>(null);
   const [isDevCaseStudyOpen, setIsDevCaseStudyOpen] = useState(false);
+  const [developerPhoto, setDeveloperPhoto] = useState<string>(() => {
+    const saved = typeof window !== 'undefined' ? localStorage.getItem('developer_photo_url') : null;
+    return (saved && saved.length > 5) ? saved : (CONFIG.developer.avatarUrl || '');
+  });
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -1996,13 +2000,29 @@ export default function App() {
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3 text-xs">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/90 border border-slate-700/80 text-slate-300 shadow-sm">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span className="text-[11px]">Architected &amp; Built by <strong className="text-white font-bold">Jesufemi Temitope Solomon</strong></span>
-            </div>
+            <button
+              type="button"
+              onClick={() => setIsDevCaseStudyOpen(true)}
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/90 hover:bg-slate-800 border border-slate-700/80 text-slate-300 shadow-sm transition-all cursor-pointer group"
+              title="Click to view Developer Technical Case Study"
+            >
+              <div className="w-5 h-5 rounded-full overflow-hidden bg-slate-700 border border-emerald-400 shrink-0 flex items-center justify-center text-[9px] font-black text-emerald-400">
+                {developerPhoto ? (
+                  <img 
+                    src={developerPhoto} 
+                    alt={CONFIG.developer.name} 
+                    className="w-full h-full object-cover" 
+                    onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
+                  />
+                ) : (
+                  <span>JS</span>
+                )}
+              </div>
+              <span className="text-[11px]">Architected &amp; Built by <strong className="text-white font-bold group-hover:text-emerald-400 transition-colors">Jesufemi Temitope Solomon</strong></span>
+            </button>
 
             <a 
-              href="https://www.linkedin.com/in/temitope-solomon-jesufemi-2620ab275/"
+              href={CONFIG.developer.linkedin}
               target="_blank"
               rel="noreferrer noopener"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 hover:text-blue-300 border border-blue-500/30 transition-all text-[11px] font-semibold cursor-pointer"
@@ -2556,7 +2576,9 @@ export default function App() {
       {/* Developer Case Study & Portfolio Modal */}
       <DeveloperCaseStudyModal 
         isOpen={isDevCaseStudyOpen} 
-        onClose={() => setIsDevCaseStudyOpen(false)} 
+        onClose={() => setIsDevCaseStudyOpen(false)}
+        currentPhotoUrl={developerPhoto}
+        onPhotoUpdate={(url) => setDeveloperPhoto(url)}
       />
     </div>
   );

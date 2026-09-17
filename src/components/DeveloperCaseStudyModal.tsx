@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Linkedin, 
   ExternalLink, 
-  Code2, 
   Database, 
   Server, 
   Layers, 
@@ -12,22 +11,79 @@ import {
   Zap, 
   X, 
   Award,
-  Terminal,
-  Cpu
+  Camera,
+  Upload,
+  UserCheck,
+  Check
 } from 'lucide-react';
+import { CONFIG } from '../config';
 
 interface DeveloperCaseStudyModalProps {
   isOpen: boolean;
   onClose: () => void;
+  currentPhotoUrl?: string;
+  onPhotoUpdate?: (url: string) => void;
 }
 
-export const DeveloperCaseStudyModal: React.FC<DeveloperCaseStudyModalProps> = ({ isOpen, onClose }) => {
+export const DeveloperCaseStudyModal: React.FC<DeveloperCaseStudyModalProps> = ({ 
+  isOpen, 
+  onClose,
+  currentPhotoUrl,
+  onPhotoUpdate
+}) => {
+  const [photoUrl, setPhotoUrl] = useState<string>(() => {
+    const saved = typeof window !== 'undefined' ? localStorage.getItem('developer_photo_url') : null;
+    return currentPhotoUrl || ((saved && saved.length > 5) ? saved : CONFIG.developer.avatarUrl) || '';
+  });
+  const [isEditingPhoto, setIsEditingPhoto] = useState(false);
+  const [inputUrl, setInputUrl] = useState('');
+  const [imgError, setImgError] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
+  useEffect(() => {
+    if (currentPhotoUrl) {
+      setPhotoUrl(currentPhotoUrl);
+    }
+  }, [currentPhotoUrl]);
+
   if (!isOpen) return null;
 
+  const handleSavePhotoUrl = (url: string) => {
+    const trimmed = url.trim();
+    if (!trimmed) return;
+    setPhotoUrl(trimmed);
+    setImgError(false);
+    localStorage.setItem('developer_photo_url', trimmed);
+    if (onPhotoUpdate) onPhotoUpdate(trimmed);
+    setIsEditingPhoto(false);
+    setSaveSuccess(true);
+    setTimeout(() => setSaveSuccess(false), 2500);
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Check size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Please upload an image smaller than 5MB.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result as string;
+      if (dataUrl) {
+        handleSavePhotoUrl(dataUrl);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
   return (
-    <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 sm:p-6 md:p-8 bg-slate-950/80 backdrop-blur-md overflow-y-auto animate-fadeIn">
+    <div className="fixed inset-0 z-[120] flex items-center justify-center p-3 sm:p-6 bg-slate-950/80 backdrop-blur-md overflow-y-auto animate-fadeIn">
       <div 
-        className="relative w-full max-w-4xl bg-white border border-slate-200 rounded-3xl shadow-2xl overflow-hidden my-auto max-h-[90vh] flex flex-col"
+        className="relative w-full max-w-4xl bg-white border border-slate-200 rounded-3xl shadow-2xl overflow-hidden my-auto max-h-[92vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header Bar */}
@@ -39,12 +95,12 @@ export const DeveloperCaseStudyModal: React.FC<DeveloperCaseStudyModalProps> = (
             type="button"
             onClick={onClose}
             aria-label="Close modal"
-            className="absolute top-6 right-6 p-2 rounded-full bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white transition-colors cursor-pointer"
+            className="absolute top-6 right-6 p-2 rounded-full bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white transition-colors cursor-pointer z-10"
           >
             <X size={20} />
           </button>
 
-          <div className="flex flex-wrap items-center gap-3 mb-3">
+          <div className="flex flex-wrap items-center gap-3 mb-4">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
               <Award size={13} /> Full-Stack Engineering Showcase
             </span>
@@ -53,17 +109,117 @@ export const DeveloperCaseStudyModal: React.FC<DeveloperCaseStudyModalProps> = (
             </span>
           </div>
 
-          <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white mb-2">
-            Engineering & Architecture Case Study
-          </h2>
-          <p className="text-slate-300 text-sm sm:text-base max-w-2xl font-normal leading-relaxed">
-            Designed, architected, and engineered end-to-end by <strong className="text-emerald-400 font-bold">Jesufemi Temitope Solomon</strong>.
-          </p>
+          {/* Profile Header with Avatar */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 mt-2">
+            
+            {/* Avatar container */}
+            <div className="relative group shrink-0">
+              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden bg-slate-800 border-2 border-emerald-500/50 shadow-lg flex items-center justify-center relative">
+                {photoUrl && !imgError ? (
+                  <img 
+                    src={photoUrl} 
+                    alt={CONFIG.developer.name} 
+                    onError={() => setImgError(true)}
+                    className="w-full h-full object-cover object-top"
+                    referrerPolicy="no-referrer"
+                  />
+                ) : (
+                  <div className="flex flex-col items-center justify-center text-emerald-400">
+                    <span className="text-xl sm:text-2xl font-black tracking-tight">JS</span>
+                    <span className="text-[9px] uppercase font-bold text-slate-400">Solomon</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Edit Photo Trigger Button */}
+              <button
+                type="button"
+                onClick={() => setIsEditingPhoto(!isEditingPhoto)}
+                className="absolute -bottom-1.5 -right-1.5 p-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 rounded-lg shadow transition-colors cursor-pointer"
+                title="Add or update your picture"
+              >
+                <Camera size={13} />
+              </button>
+            </div>
+
+            {/* Profile Info */}
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
+                  {CONFIG.developer.name}
+                </h2>
+                <span title="Verified Lead Developer" className="inline-flex text-emerald-400">
+                  <UserCheck size={18} />
+                </span>
+              </div>
+              <p className="text-emerald-400 font-semibold text-xs sm:text-sm mt-0.5">
+                {CONFIG.developer.role}
+              </p>
+              <p className="text-slate-300 text-xs sm:text-sm font-normal leading-relaxed mt-1 max-w-xl">
+                System Architect &amp; Software Developer behind the SD GHT Health Care enterprise platform.
+              </p>
+            </div>
+          </div>
+
+          {/* Photo Uploader / URL Input Popover */}
+          {isEditingPhoto && (
+            <div className="mt-5 p-4 rounded-2xl bg-slate-900 border border-slate-700 space-y-3 animate-fadeIn">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <Camera size={14} /> Update Your Profile Picture
+                </p>
+                <button 
+                  onClick={() => setIsEditingPhoto(false)}
+                  className="text-slate-400 hover:text-white text-xs cursor-pointer"
+                >
+                  Cancel
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                {/* Option 1: File Upload */}
+                <label className="flex items-center justify-center gap-2 p-3 rounded-xl border border-dashed border-slate-600 hover:border-emerald-500 bg-slate-800/60 hover:bg-slate-800 text-slate-300 hover:text-white text-xs font-semibold transition-all cursor-pointer">
+                  <Upload size={14} className="text-emerald-400" />
+                  <span>Upload photo from device</span>
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    onChange={handleFileUpload}
+                    className="hidden" 
+                  />
+                </label>
+
+                {/* Option 2: Image URL */}
+                <div className="flex gap-2">
+                  <input 
+                    type="url"
+                    placeholder="Or paste an image URL..."
+                    value={inputUrl}
+                    onChange={(e) => setInputUrl(e.target.value)}
+                    className="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 outline-none focus:border-emerald-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleSavePhotoUrl(inputUrl)}
+                    className="px-3 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-xl transition-colors cursor-pointer"
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {saveSuccess && (
+            <div className="mt-3 inline-flex items-center gap-1.5 text-xs text-emerald-400 font-bold bg-emerald-500/10 px-3 py-1 rounded-lg border border-emerald-500/20">
+              <Check size={14} /> Profile picture successfully updated!
+            </div>
+          )}
 
           {/* Quick Links */}
           <div className="flex flex-wrap items-center gap-3 mt-5 pt-4 border-t border-slate-800">
             <a 
-              href="https://www.linkedin.com/in/temitope-solomon-jesufemi-2620ab275/" 
+              href={CONFIG.developer.linkedin} 
               target="_blank" 
               rel="noreferrer noopener"
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-bold shadow-sm transition-all cursor-pointer"
@@ -72,10 +228,10 @@ export const DeveloperCaseStudyModal: React.FC<DeveloperCaseStudyModalProps> = (
               <ExternalLink size={13} className="opacity-75" />
             </a>
             <a 
-              href="mailto:ogungbetemitope@gmail.com" 
+              href={`mailto:${CONFIG.developer.email}`}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white text-xs sm:text-sm font-semibold transition-all border border-slate-700 cursor-pointer"
             >
-              <Mail size={16} /> ogungbetemitope@gmail.com
+              <Mail size={16} /> {CONFIG.developer.email}
             </a>
           </div>
         </div>
@@ -85,7 +241,7 @@ export const DeveloperCaseStudyModal: React.FC<DeveloperCaseStudyModalProps> = (
           
           {/* Executive Overview */}
           <div>
-            <h3 className="text-xs font-black uppercase tracking-wider text-emerald-600 mb-2">Project Brief & System Scope</h3>
+            <h3 className="text-xs font-black uppercase tracking-wider text-emerald-600 mb-2">Project Brief &amp; System Scope</h3>
             <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
               This application is an enterprise-ready, high-converting pharmaceutical and wellness e-commerce platform built for <strong>SD GHT Health Care Nig Ltd</strong>. It features a full-stack architecture combining a reactive TypeScript client, a secure server-side proxy layer, PostgreSQL/Supabase database integration, multi-channel transactional alerts (Telegram &amp; Gmail), and an administrative back-office.
             </p>
@@ -193,14 +349,28 @@ export const DeveloperCaseStudyModal: React.FC<DeveloperCaseStudyModalProps> = (
 
           {/* Author Card Footer */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 rounded-2xl bg-slate-900 text-white">
-            <div>
-              <p className="text-[11px] uppercase tracking-widest text-slate-400 font-bold">Author &amp; Lead Engineer</p>
-              <h4 className="text-base sm:text-lg font-black text-white">Jesufemi Temitope Solomon</h4>
-              <p className="text-xs text-slate-300">Software Engineer &bull; Full-Stack TypeScript / Node.js Specialist</p>
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-xl overflow-hidden bg-slate-800 border border-emerald-500/40 shrink-0 flex items-center justify-center">
+                {photoUrl && !imgError ? (
+                  <img 
+                    src={photoUrl} 
+                    alt={CONFIG.developer.name} 
+                    className="w-full h-full object-cover object-top"
+                    referrerPolicy="no-referrer"
+                  />
+                ) : (
+                  <span className="text-emerald-400 font-black text-base">JS</span>
+                )}
+              </div>
+              <div>
+                <p className="text-[11px] uppercase tracking-widest text-slate-400 font-bold">Author &amp; Lead Engineer</p>
+                <h4 className="text-base sm:text-lg font-black text-white">{CONFIG.developer.name}</h4>
+                <p className="text-xs text-slate-300">{CONFIG.developer.role}</p>
+              </div>
             </div>
             <div className="flex items-center gap-2 w-full sm:w-auto">
               <a 
-                href="https://www.linkedin.com/in/temitope-solomon-jesufemi-2620ab275/" 
+                href={CONFIG.developer.linkedin} 
                 target="_blank" 
                 rel="noreferrer noopener"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition-colors cursor-pointer"
