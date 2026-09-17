@@ -1131,6 +1131,42 @@ export async function createServer() {
     }
   });
 
+  // Developer Profile Photo Endpoint: Allows direct upload and permanent disk storage of developer-photo.jpg
+  app.post("/api/developer-photo", async (req, res) => {
+    try {
+      const { image } = req.body;
+      if (!image || typeof image !== 'string') {
+        return res.status(400).json({ error: "No image provided" });
+      }
+
+      const matches = image.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+      const buffer = matches ? Buffer.from(matches[2], 'base64') : Buffer.from(image, 'base64');
+
+      const publicDir = path.join(process.cwd(), 'public');
+      const distDir = path.join(process.cwd(), 'dist');
+
+      if (!fs.existsSync(publicDir)) {
+        fs.mkdirSync(publicDir, { recursive: true });
+      }
+      fs.writeFileSync(path.join(publicDir, 'developer-photo.jpg'), buffer);
+
+      if (fs.existsSync(distDir)) {
+        fs.writeFileSync(path.join(distDir, 'developer-photo.jpg'), buffer);
+      }
+
+      res.json({ success: true, url: `/developer-photo.jpg?v=${Date.now()}` });
+    } catch (err: any) {
+      console.error("Developer photo upload error:", err);
+      res.status(500).json({ error: err.message || "Failed to save photo" });
+    }
+  });
+
+  app.get("/api/developer-photo-status", (req, res) => {
+    const publicPhoto = path.join(process.cwd(), 'public', 'developer-photo.jpg');
+    const exists = fs.existsSync(publicPhoto);
+    res.json({ exists, url: exists ? `/developer-photo.jpg?v=${fs.statSync(publicPhoto).mtimeMs}` : null });
+  });
+
   app.post("/api/orders", async (req, res) => {
     if (!supabase) return res.status(503).json({ error: "Database not configured" });
     const access_token = getAccessToken(req);

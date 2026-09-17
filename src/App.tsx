@@ -33,7 +33,8 @@ import {
   Sparkles,
   Home as HomeIcon,
   Linkedin,
-  Code2
+  Code2,
+  ExternalLink
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { CONFIG } from "./config";
@@ -144,8 +145,20 @@ export default function App() {
   const [isDevCaseStudyOpen, setIsDevCaseStudyOpen] = useState(false);
   const [developerPhoto, setDeveloperPhoto] = useState<string>(() => {
     const saved = typeof window !== 'undefined' ? localStorage.getItem('developer_photo_url') : null;
-    return (saved && saved.length > 5) ? saved : (CONFIG.developer.avatarUrl || '');
+    return (saved && saved.length > 5 && !saved.includes('placeholder')) ? saved : '';
   });
+
+  useEffect(() => {
+    fetch('/api/developer-photo-status')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.exists && data.url) {
+          setDeveloperPhoto(data.url);
+          localStorage.setItem('developer_photo_url', data.url);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -823,9 +836,35 @@ export default function App() {
                 </AnimatePresence>
               </div>
               <div className="hidden sm:block h-8 w-[1px] bg-slate-200 mx-1 md:mx-2"></div>
-              <div className="hidden xs:flex items-center gap-1.5 md:gap-2 px-2 md:px-3 py-1 md:py-1.5 bg-emerald-50 text-emerald-700 rounded-full text-[10px] md:text-xs font-bold border border-emerald-100">
-                <ShieldCheck size={12} className="md:hidden" />
-                <ShieldCheck size={14} className="hidden md:block" />
+              
+              {/* Lead Developer Spotlight Pill */}
+              <button
+                type="button"
+                onClick={() => setIsDevCaseStudyOpen(true)}
+                className="inline-flex items-center gap-2 pl-1.5 pr-2.5 sm:pr-3.5 py-1 bg-slate-900 hover:bg-slate-800 text-white rounded-full text-xs font-semibold shadow-sm transition-all border border-slate-700 hover:border-emerald-400 group cursor-pointer"
+                title="View Technical & Architecture Showcase by Lead Engineer Jesufemi Temitope Solomon"
+              >
+                <div className="w-6 h-6 rounded-full overflow-hidden border border-emerald-400 bg-slate-800 shrink-0 flex items-center justify-center">
+                  {developerPhoto ? (
+                    <img 
+                      src={developerPhoto} 
+                      alt={CONFIG.developer.name} 
+                      className="w-full h-full object-cover object-top" 
+                      onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
+                    />
+                  ) : (
+                    <span className="text-[9px] font-black text-emerald-400">JS</span>
+                  )}
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="hidden sm:inline text-slate-300 text-[11px]">Engineer:</span>
+                  <span className="text-emerald-400 font-bold text-xs group-hover:text-emerald-300 transition-colors">Jesufemi</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                </div>
+              </button>
+
+              <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-full text-[10px] font-bold border border-emerald-100">
+                <ShieldCheck size={13} />
                 <span className="whitespace-nowrap">RLS SECURE</span>
               </div>
               
@@ -896,6 +935,38 @@ export default function App() {
                       </button>
                     );
                   })}
+
+                  {/* Mobile Lead Engineer Spotlight Card */}
+                  <div className="pt-2 border-t border-slate-100">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsDevCaseStudyOpen(true);
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="w-full flex items-center gap-3.5 p-3 rounded-2xl bg-gradient-to-r from-slate-950 via-slate-900 to-slate-850 text-white border border-slate-800 shadow-md text-left group"
+                    >
+                      <div className="w-12 h-12 rounded-xl overflow-hidden border-2 border-emerald-400 bg-slate-800 shrink-0 flex items-center justify-center">
+                        {developerPhoto ? (
+                          <img 
+                            src={developerPhoto} 
+                            alt={CONFIG.developer.name} 
+                            className="w-full h-full object-cover object-top" 
+                          />
+                        ) : (
+                          <span className="text-xs font-black text-emerald-400">JS</span>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[10px] uppercase tracking-wider text-emerald-400 font-bold">Lead Engineer</span>
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        </div>
+                        <div className="text-sm font-bold text-white truncate">{CONFIG.developer.name}</div>
+                        <div className="text-[11px] text-slate-300 font-normal">View Architecture Case Study &rarr;</div>
+                      </div>
+                    </button>
+                  </div>
                 </div>
               </motion.div>
             )}
@@ -1994,49 +2065,52 @@ export default function App() {
         </div>
         
         {/* Developer Attribution & Bottom Bar */}
-        <div className="max-w-7xl mx-auto px-4 mt-12 md:mt-20 pt-8 border-t border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-slate-500 text-[10px] md:text-xs text-center md:text-left">
+        <div className="max-w-7xl mx-auto px-4 mt-12 md:mt-20 pt-8 border-t border-slate-800 flex flex-col lg:flex-row items-center justify-between gap-6">
+          <p className="text-slate-500 text-[10px] md:text-xs text-center lg:text-left">
             © {new Date().getFullYear()} {CONFIG.company.name} {CONFIG.company.subtitle}. All Rights Reserved.
           </p>
 
-          <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3 text-xs">
+          <div className="flex flex-wrap items-center justify-center gap-3 text-xs">
             <button
               type="button"
               onClick={() => setIsDevCaseStudyOpen(true)}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/90 hover:bg-slate-800 border border-slate-700/80 text-slate-300 shadow-sm transition-all cursor-pointer group"
+              className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-gradient-to-r from-slate-900 via-slate-850 to-slate-800 hover:from-slate-800 hover:to-slate-700 border border-slate-700/80 hover:border-emerald-400 text-slate-200 shadow-lg transition-all cursor-pointer group"
               title="Click to view Developer Technical Case Study"
             >
-              <div className="w-5 h-5 rounded-full overflow-hidden bg-slate-700 border border-emerald-400 shrink-0 flex items-center justify-center text-[9px] font-black text-emerald-400">
+              <div className="w-8 h-8 rounded-full overflow-hidden bg-slate-800 border-2 border-emerald-400 shrink-0 flex items-center justify-center text-[10px] font-black text-emerald-400">
                 {developerPhoto ? (
                   <img 
                     src={developerPhoto} 
                     alt={CONFIG.developer.name} 
-                    className="w-full h-full object-cover" 
+                    className="w-full h-full object-cover object-top" 
                     onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
                   />
                 ) : (
                   <span>JS</span>
                 )}
               </div>
-              <span className="text-[11px]">Architected &amp; Built by <strong className="text-white font-bold group-hover:text-emerald-400 transition-colors">Jesufemi Temitope Solomon</strong></span>
+              <div className="text-left">
+                <span className="text-[10px] uppercase tracking-wider text-emerald-400 font-bold block leading-tight">Lead Software Architect</span>
+                <span className="text-xs font-bold text-white group-hover:text-emerald-300 transition-colors">Jesufemi Temitope Solomon</span>
+              </div>
             </button>
 
             <a 
               href={CONFIG.developer.linkedin}
               target="_blank"
               rel="noreferrer noopener"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 hover:text-blue-300 border border-blue-500/30 transition-all text-[11px] font-semibold cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-500 text-white font-semibold shadow-md transition-all text-xs cursor-pointer"
               title="Connect with Jesufemi Temitope Solomon on LinkedIn"
             >
-              <Linkedin size={13} />
+              <Linkedin size={14} />
               <span>LinkedIn</span>
             </a>
 
             <button
               onClick={() => setIsDevCaseStudyOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 hover:bg-emerald-500/25 text-emerald-400 hover:text-emerald-300 border border-emerald-500/30 transition-all text-[11px] font-semibold cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-400 hover:text-emerald-300 border border-emerald-500/30 transition-all text-xs font-semibold cursor-pointer"
             >
-              <Code2 size={13} />
+              <Code2 size={14} />
               <span>Technical Case Study</span>
             </button>
           </div>
@@ -2572,6 +2646,43 @@ export default function App() {
           }
         }}
       />
+
+      {/* Floating Lead Developer Showcase Badge for Employers & Visitors */}
+      <div className="fixed bottom-6 left-6 z-[80] hidden md:block">
+        <button
+          type="button"
+          onClick={() => setIsDevCaseStudyOpen(true)}
+          className="flex items-center gap-3 pl-2 pr-4 py-2 bg-slate-950/95 hover:bg-slate-900 text-white rounded-full shadow-2xl border border-slate-700/80 hover:border-emerald-400 backdrop-blur-md transition-all hover:scale-105 group cursor-pointer"
+          title="Click to view Architecture & Case Study by Jesufemi Temitope Solomon"
+        >
+          <div className="relative">
+            <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-emerald-400 bg-slate-800 shrink-0 shadow-md">
+              {developerPhoto ? (
+                <img 
+                  src={developerPhoto} 
+                  alt={CONFIG.developer.name} 
+                  className="w-full h-full object-cover object-top" 
+                  onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-xs font-black text-emerald-400">JS</div>
+              )}
+            </div>
+            <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-slate-950 rounded-full animate-ping" />
+            <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-slate-950 rounded-full" />
+          </div>
+          <div className="text-left">
+            <div className="text-[9px] uppercase font-bold tracking-wider text-emerald-400 flex items-center gap-1.5">
+              <span>Lead Architect</span>
+              <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 text-[8px] text-emerald-300 font-extrabold">HIRE / EXPLORE</span>
+            </div>
+            <div className="text-xs font-black text-slate-100 group-hover:text-white flex items-center gap-1">
+              <span>Jesufemi T. Solomon</span>
+              <ExternalLink size={12} className="text-slate-400 group-hover:text-emerald-400 transition-colors" />
+            </div>
+          </div>
+        </button>
+      </div>
 
       {/* Developer Case Study & Portfolio Modal */}
       <DeveloperCaseStudyModal 
