@@ -31,7 +31,9 @@ import {
   Check,
   FileText,
   Sparkles,
-  Home as HomeIcon
+  Home as HomeIcon,
+  Linkedin,
+  Code2
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { CONFIG } from "./config";
@@ -54,6 +56,7 @@ import { TestimonialsPage } from "./components/TestimonialsPage";
 import { ThankYouPage } from "./components/ThankYouPage";
 import { ReturnPolicy } from "./components/ReturnPolicy";
 import { AdLandingPage } from "./components/AdLandingPage";
+import { DeveloperCaseStudyModal } from "./components/DeveloperCaseStudyModal";
 import { Product, PackageData } from "./types";
 import { trackPageView, trackConsultation, trackWhatsAppClick, trackBlogView } from "./lib/analytics";
 
@@ -138,6 +141,7 @@ export default function App() {
   const [selectedProdOptIdx, setSelectedProdOptIdx] = useState<number>(0);
   const [selectedDetailProdOptIdx, setSelectedDetailProdOptIdx] = useState<number>(0);
   const [openedFromQuickView, setOpenedFromQuickView] = useState<'product' | 'package' | null>(null);
+  const [isDevCaseStudyOpen, setIsDevCaseStudyOpen] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -1958,6 +1962,15 @@ export default function App() {
                   Return Policy
                 </button>
               </li>
+              <li>
+                <button 
+                  onClick={() => setIsDevCaseStudyOpen(true)} 
+                  className="hover:text-emerald-300 transition-colors font-semibold text-emerald-400 flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Code2 size={13} />
+                  Developer Case Study
+                </button>
+              </li>
             </ul>
           </div>
 
@@ -1975,8 +1988,38 @@ export default function App() {
             </ul>
           </div>
         </div>
-        <div className="max-w-7xl mx-auto px-4 mt-12 md:mt-20 pt-8 border-t border-slate-800 text-center text-slate-500 text-[10px] md:text-xs">
-          © {new Date().getFullYear()} {CONFIG.company.name} {CONFIG.company.subtitle}. All Rights Reserved.
+        
+        {/* Developer Attribution & Bottom Bar */}
+        <div className="max-w-7xl mx-auto px-4 mt-12 md:mt-20 pt-8 border-t border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-slate-500 text-[10px] md:text-xs text-center md:text-left">
+            © {new Date().getFullYear()} {CONFIG.company.name} {CONFIG.company.subtitle}. All Rights Reserved.
+          </p>
+
+          <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3 text-xs">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/90 border border-slate-700/80 text-slate-300 shadow-sm">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span className="text-[11px]">Architected &amp; Built by <strong className="text-white font-bold">Jesufemi Temitope Solomon</strong></span>
+            </div>
+
+            <a 
+              href="https://www.linkedin.com/in/temitope-solomon-jesufemi-2620ab275/"
+              target="_blank"
+              rel="noreferrer noopener"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 hover:text-blue-300 border border-blue-500/30 transition-all text-[11px] font-semibold cursor-pointer"
+              title="Connect with Jesufemi Temitope Solomon on LinkedIn"
+            >
+              <Linkedin size={13} />
+              <span>LinkedIn</span>
+            </a>
+
+            <button
+              onClick={() => setIsDevCaseStudyOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 hover:bg-emerald-500/25 text-emerald-400 hover:text-emerald-300 border border-emerald-500/30 transition-all text-[11px] font-semibold cursor-pointer"
+            >
+              <Code2 size={13} />
+              <span>Technical Case Study</span>
+            </button>
+          </div>
         </div>
       </footer>
       )}
@@ -2508,6 +2551,12 @@ export default function App() {
             alert("Sorry, we couldn't open that specific item automatically. Please find it in our catalog.");
           }
         }}
+      />
+
+      {/* Developer Case Study & Portfolio Modal */}
+      <DeveloperCaseStudyModal 
+        isOpen={isDevCaseStudyOpen} 
+        onClose={() => setIsDevCaseStudyOpen(false)} 
       />
     </div>
   );

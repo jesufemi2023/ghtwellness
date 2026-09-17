@@ -30,13 +30,16 @@ import {
   ChevronRight,
   Link as LinkIcon,
   Check,
-  Settings
+  Settings,
+  Database,
+  Copy
 } from "lucide-react";
 import OrdersAdminView from "./OrdersAdminView";
 import ConsultationsAdminView from "./ConsultationsAdminView";
 import { Order, Consultation, BlogPost } from "../types";
 import { BlogAdmin } from "./blog/BlogAdmin";
 import { getOptimizedImageUrl } from "../utils/cloudinary";
+import { formatProductNameWithBottles, formatOptionProductList } from "../utils/bottleFormatter";
 
 interface AdminDashboardProps {
   adminPassword: string;
@@ -571,8 +574,8 @@ export default function AdminDashboard({ adminPassword, onLogout }: AdminDashboa
                       {!isProduct && (
                         <div className="space-y-1 lg:col-span-1 md:col-span-2">
                           <div className="flex justify-between items-center">
-                            <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Included Products</label>
-                            <span className="text-[8px] text-emerald-500 font-bold">Comma separated</span>
+                            <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Included Products (e.g. 1x Reodoe(3))</label>
+                            <span className="text-[8px] text-emerald-500 font-bold">Auto-formats with bottles</span>
                           </div>
                           <input 
                             className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold focus:ring-2 focus:ring-emerald-500 outline-none"
@@ -582,8 +585,17 @@ export default function AdminDashboard({ adminPassword, onLogout }: AdminDashboa
                               newOptions[index].products = e.target.value.split(",").map((s: string) => s.trim()).filter((s: string) => s !== "");
                               setEditForm({ ...editForm, options: newOptions });
                             }}
-                            placeholder="Product1, Product2..."
+                            placeholder="e.g. 1x Reodoe(3), 1x Prostbeta(3)"
                           />
+                          {opt.products && opt.products.length > 0 && (
+                            <div className="flex flex-wrap gap-1 pt-1">
+                              {formatOptionProductList(opt.products, opt.bottles).map((formattedP: string, pIdx: number) => (
+                                <span key={pIdx} className="text-[9px] font-extrabold bg-emerald-50 text-emerald-800 border border-emerald-200 px-1.5 py-0.5 rounded">
+                                  {formattedP}
+                                </span>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
@@ -1383,6 +1395,45 @@ const SettingsAdminView = ({ adminPassword }: { adminPassword: string }) => {
             {saving ? <RefreshCw className="animate-spin" size={16} /> : <Save size={16} />}
             Save Settings
           </button>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-3xl border border-slate-200 p-8 shadow-sm space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl">
+              <Database size={22} />
+            </div>
+            <div>
+              <h3 className="text-lg font-black text-slate-900 tracking-tight">Database Schema & Bottle Options</h3>
+              <p className="text-xs text-slate-400 font-medium">Automatic cloud synchronization and persistence status</p>
+            </div>
+          </div>
+          <span className="text-[10px] bg-emerald-100 text-emerald-700 font-black px-2.5 py-1 rounded-full uppercase tracking-wider">
+            Auto-Sync Active
+          </span>
+        </div>
+
+        <p className="text-xs text-slate-600 font-medium leading-relaxed">
+          Bottle options, variations, prices, and discounts are automatically saved to persistent storage and cloud backup. If you wish to also update your remote Supabase PostgreSQL tables directly, you can run this SQL in your Supabase SQL Editor:
+        </p>
+
+        <div className="bg-slate-900 text-emerald-400 p-4 rounded-2xl font-mono text-xs relative group">
+          <button 
+            type="button"
+            onClick={() => {
+              const sql = `-- Add JSONB options column to products and recommended_packages\nALTER TABLE products ADD COLUMN IF NOT EXISTS options JSONB DEFAULT '[]'::jsonb;\nALTER TABLE recommended_packages ADD COLUMN IF NOT EXISTS options JSONB DEFAULT '[]'::jsonb;`;
+              navigator.clipboard.writeText(sql);
+              alert("SQL snippet copied to clipboard!");
+            }}
+            className="absolute top-3 right-3 bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 transition-all"
+          >
+            <Copy size={12} /> Copy SQL
+          </button>
+          <pre className="overflow-x-auto whitespace-pre-wrap pr-20 text-[11px] leading-relaxed">
+{`ALTER TABLE products ADD COLUMN IF NOT EXISTS options JSONB DEFAULT '[]'::jsonb;
+ALTER TABLE recommended_packages ADD COLUMN IF NOT EXISTS options JSONB DEFAULT '[]'::jsonb;`}
+          </pre>
         </div>
       </div>
 

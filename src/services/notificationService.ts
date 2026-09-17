@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer';
 import { Telegraf } from 'telegraf';
+import { formatProductNameWithBottles, extractBottleCount } from '../utils/bottleFormatter';
 
 // --- Gmail Configuration ---
 // We use a singleton pattern to reuse the transporter connection
@@ -71,17 +72,29 @@ export const NotificationService = {
     });
 
     packages.forEach((pkgItems, pkgName) => {
-      const pkgQuantity = pkgItems[0].quantity || 1;
-      const pkgPrice = pkgItems[0].package_price || pkgItems.reduce((sum, p) => sum + (p.price_at_time || 0), 0);
-      itemsList += `- ${pkgQuantity}x ${pkgName} (₦${(pkgPrice * pkgQuantity).toLocaleString()})\n`;
-      pkgItems.forEach(p => {
-        itemsList += `    ↳ ${p.name || 'Product'}\n`;
-      });
+      const firstItem = pkgItems[0];
+      const pkgQuantity = firstItem.quantity || 1;
+      const pkgPrice = firstItem.package_price || pkgItems.reduce((sum, p) => sum + (p.price_at_time || 0), 0);
+      const pkgFormattedName = formatProductNameWithBottles(pkgName, firstItem.bottles, pkgQuantity);
+      itemsList += `- ${pkgFormattedName} (₦${(pkgPrice * pkgQuantity).toLocaleString()})\n`;
+      
+      // If included_products list exists on package item
+      if (firstItem.included_products && Array.isArray(firstItem.included_products) && firstItem.included_products.length > 0) {
+        firstItem.included_products.forEach((inc: string) => {
+          itemsList += `    ↳ ${formatProductNameWithBottles(inc, firstItem.bottles, 1)}\n`;
+        });
+      } else {
+        pkgItems.forEach(p => {
+          itemsList += `    ↳ ${formatProductNameWithBottles(p.name || 'Product', p.bottles, 1)}\n`;
+        });
+      }
     });
 
     singleProducts.forEach(item => {
       const price = item.price_at_time || item.price_naira || 0;
-      itemsList += `- ${item.quantity || 1}x ${item.name || 'Product'} (₦${(price * (item.quantity || 1)).toLocaleString()})\n`;
+      const qty = item.quantity || 1;
+      const formattedName = formatProductNameWithBottles(item.name || 'Product', item.bottles, qty);
+      itemsList += `- ${formattedName} (₦${(price * qty).toLocaleString()})\n`;
     });
 
     itemsList = itemsList.trim();

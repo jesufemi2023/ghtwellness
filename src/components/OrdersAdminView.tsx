@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { Order, OrderStatus } from "../types";
 import { openWhatsAppLink } from "../utils/whatsapp";
+import { formatProductNameWithBottles } from "../utils/bottleFormatter";
 
 interface OrdersAdminViewProps {
   data: Order[];
@@ -324,8 +325,19 @@ export default function OrdersAdminView({ data, adminPassword, fetchData }: Orde
                                 <Box size={20} />
                               </div>
                               <div>
-                                <p className="text-sm font-black text-slate-900 tracking-tight">{item.products?.name || 'Unknown Product'}</p>
+                                <p className="text-sm font-black text-slate-900 tracking-tight">
+                                  {formatProductNameWithBottles(item.products?.name || item.name || 'Product', item.bottles, item.quantity || 1)}
+                                </p>
                                 <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Qty: {item.quantity} × ₦{item.price_at_time?.toLocaleString()}</p>
+                                {item.included_products && Array.isArray(item.included_products) && item.included_products.length > 0 && (
+                                  <div className="flex flex-wrap gap-1 mt-1.5">
+                                    {item.included_products.map((inc: string, incIdx: number) => (
+                                      <span key={incIdx} className="text-[9px] font-bold bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded border border-slate-200">
+                                        {formatProductNameWithBottles(inc, item.bottles, 1)}
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
                               </div>
                             </div>
                             <p className="text-sm font-black text-slate-900">

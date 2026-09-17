@@ -26,6 +26,11 @@ import {
 import { CONFIG } from '../config';
 import { PackageData, Product } from '../types';
 import { openWhatsAppLink } from '../utils/whatsapp';
+import { 
+  formatProductNameWithBottles, 
+  formatOrderDisplayName, 
+  formatOptionProductList 
+} from '../utils/bottleFormatter';
 
 interface PackageQuickViewProps {
   isOpen: boolean;
@@ -521,6 +526,22 @@ export const PackageQuickView: React.FC<PackageQuickViewProps> = ({
                                     </span>
                                   )}
                                 </div>
+                                {opt.products && opt.products.length > 0 && (
+                                  <div className="flex flex-wrap gap-1 mt-2">
+                                    {formatOptionProductList(opt.products, opt.bottles).map((pStr: string, pI: number) => (
+                                      <span 
+                                        key={pI}
+                                        className={`text-[9px] font-bold px-1.5 py-0.5 rounded border ${
+                                          isSelected 
+                                            ? 'bg-emerald-50 border-emerald-200 text-emerald-800 font-black' 
+                                            : 'bg-slate-100 border-slate-200 text-slate-600'
+                                        }`}
+                                      >
+                                        {pStr}
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
                               </div>
                               <div className="mt-3">
                                 {optDiscount > 0 ? (
@@ -657,7 +678,9 @@ export const PackageQuickView: React.FC<PackageQuickViewProps> = ({
                     <div className="space-y-2">
                       <div className="flex justify-between">
                         <span className="text-slate-600 font-bold">Selected Treatment:</span>
-                        <span className="font-black text-slate-950 truncate max-w-[220px]">{data.name}</span>
+                        <span className="font-black text-slate-950 truncate max-w-[220px]">
+                          {formatOrderDisplayName(data.name, quantity, selectedOption?.bottles)}
+                        </span>
                       </div>
                       {selectedOption && (
                         <div className="flex justify-between">

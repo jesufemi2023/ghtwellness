@@ -25,6 +25,12 @@ import { CONFIG } from '../config';
 import { supabase } from '../lib/supabase';
 import { trackOrderStart, trackOrderComplete, trackWhatsAppClick } from '../lib/analytics';
 import { openWhatsAppLink } from '../utils/whatsapp';
+import { 
+  formatProductNameWithBottles, 
+  formatOptionProductList, 
+  formatOrderDisplayName, 
+  extractBottleCount 
+} from '../utils/bottleFormatter';
 
 interface OrderDrawerProps {
   isOpen: boolean;
@@ -186,27 +192,33 @@ export const OrderDrawer: React.FC<OrderDrawerProps> = ({
     setLoading(true);
     console.log("Submitting order...", formData);
     try {
+      const bottleNum = selectedOption ? extractBottleCount(selectedOption.bottles) : null;
+      const formattedItemName = formatProductNameWithBottles(item.name, bottleNum, quantity);
+
       // Prepare items for the new order_items table
       let orderItems: any[] = [];
       if (type === 'package') {
         const pkg = item as PackageData;
         // If an option is selected, use its details
         if (selectedOption) {
+          const includedFormatted = selectedOption.products 
+            ? formatOptionProductList(selectedOption.products, selectedOption.bottles)
+            : [];
           orderItems = [{
             id: pkg.id,
-            name: `${pkg.name} (${selectedOption.bottles})`,
+            name: formatProductNameWithBottles(pkg.name, bottleNum, 1),
             quantity: quantity,
             price_at_time: basePrice,
             is_package: true,
             package_name: pkg.name,
             package_price: basePrice,
-            included_products: selectedOption.products
+            included_products: includedFormatted
           }];
         } else {
           // If it's a package, we send all its products
           orderItems = (pkg.products || []).map(p => ({
             id: p.id,
-            name: p.name,
+            name: formatProductNameWithBottles(p.name, null, 1),
             quantity: quantity,
             price_at_time: p.price_naira * (1 - (p.discount_percent || 0) / 100),
             is_package: true,
@@ -218,7 +230,7 @@ export const OrderDrawer: React.FC<OrderDrawerProps> = ({
         const prod = item as Product;
         orderItems = [{
           id: prod.id,
-          name: selectedOption ? `${prod.name} (${selectedOption.bottles})` : prod.name,
+          name: formatProductNameWithBottles(prod.name, bottleNum, 1),
           quantity: quantity,
           price_at_time: basePrice,
           is_package: false
@@ -269,7 +281,7 @@ export const OrderDrawer: React.FC<OrderDrawerProps> = ({
         if (onOrderSuccess) {
           onOrderSuccess(
             formData.full_name,
-            item.name,
+            formattedItemName,
             quantity,
             totalPrice,
             formData.delivery_date,
@@ -291,7 +303,8 @@ export const OrderDrawer: React.FC<OrderDrawerProps> = ({
 
   const openWhatsApp = () => {
     trackWhatsAppClick("Order Confirmation");
-    const message = `Hello SD GHT Health Care, I just placed an order for ${item.name}. 
+    const itemDisplay = formatOrderDisplayName(item.name, quantity, selectedOption?.bottles);
+    const message = `Hello SD GHT Health Care, I just placed an order for ${itemDisplay}. 
 Name: ${formData.full_name}
 Delivery Date: ${formData.delivery_date}
 Payment: ${formData.payment_method === 'pod' ? 'Pay on Delivery' : 'Bank Transfer'}`;
@@ -330,7 +343,7 @@ Payment: ${formData.payment_method === 'pod' ? 'Pay on Delivery' : 'Bank Transfe
                     <h2 className="text-3xl font-black text-slate-900">Order Received!</h2>
                     <p className="text-slate-600 font-medium text-lg">
                       Thank you, <span className="text-slate-900 font-bold">{formData.full_name}</span>. 
-                      We have received your request for <span className="text-emerald-600 font-bold">{quantity}x {item.name}</span>.
+                      We have received your request for <span className="text-emerald-600 font-bold">{formatOrderDisplayName(item.name, quantity, selectedOption?.bottles)}</span>.
                     </p>
                   </div>
                   
@@ -504,18 +517,21 @@ Payment: ${formData.payment_method === 'pod' ? 'Pay on Delivery' : 'Bank Transfe
                                           <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Package Includes:</span>
                                         </div>
                                         <div className="flex flex-wrap gap-1.5">
-                                          {(opt as any).products.map((p: string, j: number) => (
-                                            <span 
-                                              key={j} 
-                                              className={`text-[10px] font-bold px-2 py-1 rounded-lg border transition-colors ${
-                                                selectedOption === opt 
-                                                  ? 'bg-white border-emerald-200 text-emerald-700' 
-                                                  : 'bg-slate-50 border-slate-100 text-slate-500'
-                                              }`}
-                                            >
-                                              {p}
-                                            </span>
-                                          ))}
+                                          {(opt as any).products.map((p: string, j: number) => {
+                                            const formattedP = formatProductNameWithBottles(p, (opt as any).bottles, 1);
+                                            return (
+                                              <span 
+                                                key={j} 
+                                                className={`text-[10px] font-bold px-2 py-1 rounded-lg border transition-colors ${
+                                                  selectedOption === opt 
+                                                    ? 'bg-white border-emerald-200 text-emerald-700 font-black' 
+                                                    : 'bg-slate-50 border-slate-100 text-slate-600'
+                                                }`}
+                                              >
+                                                {formattedP}
+                                              </span>
+                                            );
+                                          })}
                                         </div>
                                       </div>
                                     )}
@@ -659,7 +675,7 @@ Payment: ${formData.payment_method === 'pod' ? 'Pay on Delivery' : 'Bank Transfe
                           <div className="flex justify-between items-center">
                             <div className="space-y-1">
                               <p className="text-slate-400 text-xs font-bold uppercase">Item</p>
-                              <p className="text-lg font-black">{item.name} x{quantity}</p>
+                              <p className="text-lg font-black">{formatOrderDisplayName(item.name, quantity, selectedOption?.bottles)}</p>
                             </div>
                             <div className="text-right space-y-1">
                               <p className="text-slate-400 text-xs font-bold uppercase">Total Amount</p>

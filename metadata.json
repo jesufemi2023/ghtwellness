@@ -1,5 +1,6 @@
 {
   "name": "Copy of GHT Wellness",
   "description": "Professional health e-commerce database schema and management system for SD GHT HEALTH CARE NIG LTD.",
-  "requestFramePermissions": []
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

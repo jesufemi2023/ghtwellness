@@ -6,6 +6,7 @@ import { getSupabaseAdmin } from "./src/services/supabaseAdmin.js";
 import { NotificationService } from "./src/services/notificationService.js";
 import { getAIService } from "./src/services/ai/AIService.js";
 import { getCloudinaryService } from "./src/services/cloudinary/CloudinaryService.js";
+import { OptionsStorage } from "./src/services/optionsStorage.js";
 import { CONFIG } from "./src/config.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -61,14 +62,30 @@ export async function createServer() {
             }
           }
 
-          // Check settings table
-          const { error: settingsError } = await supabase
+          // Check settings table and load any cloud-backed options
+          const { data: settingsData, error: settingsError } = await supabase
             .from('settings')
-            .select('key')
-            .limit(1);
+            .select('key, value');
           
           if (settingsError && settingsError.message.includes('relation "settings" does not exist')) {
             console.warn("MIGRATION WARNING: 'settings' table is missing. Please run the SQL migration in Supabase to enable dynamic bank details.");
+          } else if (settingsData && Array.isArray(settingsData)) {
+            // Restore any stored options into memory
+            for (const s of settingsData) {
+              if (s.key && s.key.startsWith('options_') && s.value) {
+                try {
+                  const parts = s.key.split('_');
+                  const tableType = parts[1] === 'products' ? 'products' : 'recommended_packages';
+                  const itemId = parts.slice(2).join('_');
+                  const parsedOptions = JSON.parse(s.value);
+                  if (itemId && Array.isArray(parsedOptions)) {
+                    OptionsStorage.saveOptions(tableType, itemId, parsedOptions);
+                  }
+                } catch (pe) {
+                  // ignore JSON parse errors
+                }
+              }
+            }
           }
         } catch (migErr) {
           console.error("Migration Logic Error:", migErr);
@@ -347,7 +364,15 @@ export async function createServer() {
       console.error(`Database Error fetching ${table}:`, error);
       return res.status(500).json({ error: error.message, details: error.hint });
     }
-    res.json(data);
+
+    let finalData = data;
+    if (table === 'products') {
+      finalData = OptionsStorage.attachOptionsToItems('products', data || []);
+    } else if (table === 'recommended_packages') {
+      finalData = OptionsStorage.attachOptionsToItems('recommended_packages', data || []);
+    }
+
+    res.json(finalData);
   });
 
   // Specific route for product images base64 (MUST be before generic /api/admin/:table)
@@ -462,6 +487,7 @@ export async function createServer() {
     if (!supabase) return res.status(503).json({ error: "Database not configured" });
     const { table } = req.params;
     const { product_ids, ...body } = req.body;
+    const requestedOptions = body.options;
     
     const { data, error } = await supabase.from(table).insert([body]).select().single();
     
@@ -479,8 +505,18 @@ export async function createServer() {
           const junctionData = product_ids.map(pid => ({ package_id: retryData.id, product_id: pid }));
           await supabase.from('package_products').insert(junctionData);
         }
+
+        if (table === 'products' || table === 'recommended_packages') {
+          if (requestedOptions && Array.isArray(requestedOptions)) {
+            OptionsStorage.saveOptions(table as any, retryData.id, requestedOptions, retryData.product_code || retryData.package_code, retryData.name, supabase);
+          }
+        }
+
         updateSyncTimestamp();
-        return res.json(retryData);
+        const finalResult = (table === 'products' || table === 'recommended_packages')
+          ? OptionsStorage.attachOptionsToItem(table as any, retryData)
+          : retryData;
+        return res.json(finalResult);
       }
       return res.status(500).json({ error: error.message });
     }
@@ -499,8 +535,17 @@ export async function createServer() {
       }
     }
 
+    if (table === 'products' || table === 'recommended_packages') {
+      if (requestedOptions && Array.isArray(requestedOptions)) {
+        OptionsStorage.saveOptions(table as any, data.id, requestedOptions, data.product_code || data.package_code, data.name, supabase);
+      }
+    }
+
     updateSyncTimestamp();
-    res.json(data);
+    const finalResult = (table === 'products' || table === 'recommended_packages')
+      ? OptionsStorage.attachOptionsToItem(table as any, data)
+      : data;
+    res.json(finalResult);
   });
 
   // Generic Admin PUT
@@ -508,6 +553,7 @@ export async function createServer() {
     if (!supabase) return res.status(503).json({ error: "Database not configured" });
     const { table, id } = req.params;
     const { product_ids, ...body } = req.body;
+    const requestedOptions = body.options;
     
     // Remove fields that shouldn't be in the update body (like joined data)
     const cleanBody = { ...body };
@@ -519,6 +565,20 @@ export async function createServer() {
     // Auto-generate slug for blog posts if title is present but slug is missing
     if (table === 'blog_posts' && cleanBody.title && !cleanBody.slug) {
       cleanBody.slug = slugify(cleanBody.title);
+    }
+
+    // Save options to persistent storage
+    if (table === 'products' || table === 'recommended_packages') {
+      if (requestedOptions !== undefined) {
+        OptionsStorage.saveOptions(
+          table as any,
+          id,
+          Array.isArray(requestedOptions) ? requestedOptions : [],
+          cleanBody.product_code || cleanBody.package_code,
+          cleanBody.name,
+          supabase
+        );
+      }
     }
 
     const { data, error } = await supabase.from(table).update(cleanBody).eq('id', id).select().single();
@@ -541,7 +601,10 @@ export async function createServer() {
           }
         }
         updateSyncTimestamp();
-        return res.json(retryData);
+        const finalResult = (table === 'products' || table === 'recommended_packages')
+          ? OptionsStorage.attachOptionsToItem(table as any, retryData)
+          : retryData;
+        return res.json(finalResult);
       }
       return res.status(500).json({ error: error.message });
     }
@@ -564,7 +627,10 @@ export async function createServer() {
     }
 
     updateSyncTimestamp();
-    res.json(data);
+    const finalResult = (table === 'products' || table === 'recommended_packages')
+      ? OptionsStorage.attachOptionsToItem(table as any, data)
+      : data;
+    res.json(finalResult);
   });
 
   // Generic Admin DELETE
@@ -573,6 +639,11 @@ export async function createServer() {
     const { table, id } = req.params;
     const { error } = await supabase.from(table).delete().eq('id', id);
     if (error) return res.status(500).json({ error: error.message });
+    
+    if (table === 'products' || table === 'recommended_packages') {
+      OptionsStorage.deleteOptions(table as any, id);
+    }
+    
     updateSyncTimestamp();
     res.json({ success: true });
   });
@@ -726,7 +797,8 @@ export async function createServer() {
       console.error("Products error:", error);
       return res.status(500).json({ error: error.message, hint: "Ensure the 'products' table exists in Supabase by running the SQL migration." });
     }
-    res.json(data || []);
+    const productsWithOptions = OptionsStorage.attachOptionsToItems('products', data || []);
+    res.json(productsWithOptions);
   });
 
   app.get("/api/products/:id", async (req, res) => {
@@ -751,12 +823,12 @@ export async function createServer() {
         .ilike('product_code', id)
         .maybeSingle();
       if (fallbackData) {
-        return res.json(fallbackData);
+        return res.json(OptionsStorage.attachOptionsToItem('products', fallbackData));
       }
       return res.status(404).json({ error: "Product not found" });
     }
 
-    res.json(data);
+    res.json(OptionsStorage.attachOptionsToItem('products', data));
   });
 
   app.get("/api/recommended-packages", async (req, res) => {
@@ -774,8 +846,8 @@ export async function createServer() {
       if (error) {
         console.error("Packages error:", error);
         // If the error is specifically about is_combo missing, try fetching without it
-        if (error.message?.includes("is_combo")) {
-          console.warn("is_combo column missing in DB, falling back...");
+        if (error.message?.includes("is_combo") || error.message?.includes("options")) {
+          console.warn("is_combo or options column missing in DB, falling back...");
           const { data: fallbackData, error: fallbackError } = await supabase
             .from('recommended_packages')
             .select(`
@@ -791,7 +863,8 @@ export async function createServer() {
             is_combo: false, // Default if column missing
             products: pkg.package_products?.map((pp: any) => pp.products).filter(Boolean) || []
           })) || [];
-          return res.json(formatted);
+          const formattedWithOptions = OptionsStorage.attachOptionsToItems('recommended_packages', formatted);
+          return res.json(formattedWithOptions);
         }
         return res.status(500).json({ error: error.message, hint: "Ensure the 'recommended_packages' and 'package_products' tables exist in Supabase by running the SQL migration." });
       }
@@ -803,7 +876,8 @@ export async function createServer() {
         products: pkg.package_products?.map((pp: any) => pp.products).filter(Boolean) || []
       })) || [];
       
-      res.json(formatted);
+      const formattedWithOptions = OptionsStorage.attachOptionsToItems('recommended_packages', formatted);
+      res.json(formattedWithOptions);
     } catch (e: any) {
       res.status(500).json({ error: e.message });
     }
@@ -843,20 +917,22 @@ export async function createServer() {
         .ilike('package_code', id)
         .maybeSingle();
       if (fallbackData) {
-        return res.json({
+        const item = {
           ...fallbackData,
           is_combo: fallbackData.is_combo || false,
           products: fallbackData.package_products?.map((pp: any) => pp.products).filter(Boolean) || []
-        });
+        };
+        return res.json(OptionsStorage.attachOptionsToItem('recommended_packages', item));
       }
       return res.status(404).json({ error: "Package not found" });
     }
 
-    res.json({
+    const item = {
       ...data,
       is_combo: data.is_combo || false,
       products: data.package_products?.map((pp: any) => pp.products).filter(Boolean) || []
-    });
+    };
+    res.json(OptionsStorage.attachOptionsToItem('recommended_packages', item));
   });
 
   app.post("/api/consultations", async (req, res) => {

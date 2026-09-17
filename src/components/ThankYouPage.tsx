@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { CONFIG } from "../config";
 import { openWhatsAppLink } from "../utils/whatsapp";
+import { formatOrderDisplayName } from "../utils/bottleFormatter";
 
 interface ThankYouPageProps {
   onNavigate: (tab: "home" | "products" | "recommended" | "combo") => void;
@@ -34,9 +35,10 @@ export const ThankYouPage: React.FC<ThankYouPageProps> = ({ onNavigate }) => {
   const isDirectAccess = !fullName && !itemName;
 
   const handleWhatsAppConfirm = () => {
+    const itemDisplay = formatOrderDisplayName(itemName, parseInt(quantity) || 1);
     const textMessage = `Hello SD GHT Health Care, I just completed my purchase on your website!
 ${fullName ? `Name: ${fullName}` : ""}
-${itemName ? `Item: ${quantity ? `${quantity}x ` : ""}${itemName}` : ""}
+${itemName ? `Item: ${itemDisplay}` : ""}
 ${totalPrice ? `Total Price: ₦${parseInt(totalPrice).toLocaleString()}` : ""}
 ${deliveryDate ? `Expected Delivery: ${deliveryDate}` : ""}
 ${paymentMethod ? `Payment Method: ${paymentMethod === "pod" ? "Pay on Delivery (POD)" : "Bank Transfer"}` : ""}
@@ -96,7 +98,7 @@ Please confirm my order and expedite fast delivery! Thank you.`;
               <div className="flex items-center justify-between border-b border-slate-200/60 pb-3">
                 <span className="text-slate-400 font-bold uppercase tracking-wider text-xs">Product Order</span>
                 <span className="text-slate-900 font-extrabold text-sm text-right max-w-[70%] truncate">
-                  {quantity ? `${quantity}x ` : ""}{itemName}
+                  {formatOrderDisplayName(itemName, parseInt(quantity) || 1)}
                 </span>
               </div>
               {totalPrice && (
