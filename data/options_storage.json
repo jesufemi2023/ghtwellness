@@ -1,0 +1,298 @@
+{
+  "products": {
+    "a3a6eb5a-71cc-4bef-ad6c-a72dbf70058a": {
+      "id": "a3a6eb5a-71cc-4bef-ad6c-a72dbf70058a",
+      "code": "A12",
+      "name": "Vigor Max",
+      "options": [
+        {
+          "price": 29500,
+          "bottles": "",
+          "discount": 10
+        }
+      ],
+      "updated_at": "2026-10-28T16:10:24.918Z"
+    },
+    "code_a12": {
+      "id": "a3a6eb5a-71cc-4bef-ad6c-a72dbf70058a",
+      "code": "A12",
+      "name": "Vigor Max",
+      "options": [
+        {
+          "price": 29500,
+          "bottles": "",
+          "discount": 10
+        }
+      ],
+      "updated_at": "2026-10-28T16:10:24.918Z"
+    }
+  },
+  "recommended_packages": {
+    "97f0cc17-fa5e-4189-8f39-7c142407f69c": {
+      "id": "97f0cc17-fa5e-4189-8f39-7c142407f69c",
+      "code": "P001",
+      "name": "Prostate Enlargement",
+      "options": [
+        {
+          "price": 49500,
+          "bottles": "2 Bottles",
+          "products": [
+            "Prostbeta",
+            "Longzit"
+          ]
+        },
+        {
+          "price": 59500,
+          "bottles": "3 Bottles",
+          "products": [
+            "Prostbeta",
+            "Longzit",
+            "Ganoderma"
+          ]
+        },
+        {
+          "price": 78500,
+          "bottles": "4 Bottles",
+          "products": [
+            "Prostbeta",
+            "Mycobalance",
+            "Ganoderma",
+            "B-clear"
+          ]
+        },
+        {
+          "price": 98500,
+          "bottles": "5 Bottles",
+          "products": [
+            "Prostbeta",
+            "Mycobalance",
+            "Ganoderma",
+            "B-clear",
+            "Garlic oil"
+          ]
+        }
+      ],
+      "updated_at": "2026-10-28T16:09:06.800Z"
+    },
+    "code_p001": {
+      "id": "97f0cc17-fa5e-4189-8f39-7c142407f69c",
+      "code": "P001",
+      "name": "Prostate Enlargement",
+      "options": [
+        {
+          "price": 49500,
+          "bottles": "2 Bottles",
+          "products": [
+            "Prostbeta",
+            "Longzit"
+          ]
+        },
+        {
+          "price": 59500,
+          "bottles": "3 Bottles",
+          "products": [
+            "Prostbeta",
+            "Longzit",
+            "Ganoderma"
+          ]
+        },
+        {
+          "price": 78500,
+          "bottles": "4 Bottles",
+          "products": [
+            "Prostbeta",
+            "Mycobalance",
+            "Ganoderma",
+            "B-clear"
+          ]
+        },
+        {
+          "price": 98500,
+          "bottles": "5 Bottles",
+          "products": [
+            "Prostbeta",
+            "Mycobalance",
+            "Ganoderma",
+            "B-clear",
+            "Garlic oil"
+          ]
+        }
+      ],
+      "updated_at": "2026-10-28T16:09:06.800Z"
+    },
+    "c66d3473-d480-4e6a-bf89-cf8f0d8c8547": {
+      "id": "c66d3473-d480-4e6a-bf89-cf8f0d8c8547",
+      "code": "P002",
+      "name": "Weak Erection/Premature Ejaculation",
+      "options": [
+        {
+          "price": 45500,
+          "bottles": "2 Bootles",
+          "products": [
+            "1-Reodoe",
+            "1-Zinc"
+          ]
+        },
+        {
+          "price": 63000,
+          "bottles": "3 Bottles",
+          "products": [
+            "1-Reodoe",
+            "1-Zinc",
+            "1-vigormax"
+          ]
+        },
+        {
+          "price": 77500,
+          "bottles": "4 Bottles",
+          "products": [
+            "2-Reodoe",
+            "1-Zinc",
+            "1-vigormax"
+          ]
+        },
+        {
+          "price": 89500,
+          "bottles": "5 Bottles",
+          "products": [
+            "3-Reodoe",
+            "1-Zinc",
+            "1-vigormax"
+          ]
+        },
+        {
+          "price": 99650,
+          "bottles": "6 Bottles",
+          "products": [
+            "4-Reodoe",
+            "1-Zinc",
+            "1-vigormax"
+          ]
+        }
+      ],
+      "updated_at": "2026-10-28T16:09:06.801Z"
+    },
+    "code_p002": {
+      "id": "c66d3473-d480-4e6a-bf89-cf8f0d8c8547",
+      "code": "P002",
+      "name": "Weak Erection/Premature Ejaculation",
+      "options": [
+        {
+          "price": 45500,
+          "bottles": "2 Bootles",
+          "products": [
+            "1-Reodoe",
+            "1-Zinc"
+          ]
+        },
+        {
+          "price": 63000,
+          "bottles": "3 Bottles",
+          "products": [
+            "1-Reodoe",
+            "1-Zinc",
+            "1-vigormax"
+          ]
+        },
+        {
+          "price": 77500,
+          "bottles": "4 Bottles",
+          "products": [
+            "2-Reodoe",
+            "1-Zinc",
+            "1-vigormax"
+          ]
+        },
+        {
+          "price": 89500,
+          "bottles": "5 Bottles",
+          "products": [
+            "3-Reodoe",
+            "1-Zinc",
+            "1-vigormax"
+          ]
+        },
+        {
+          "price": 99650,
+          "bottles": "6 Bottles",
+          "products": [
+            "4-Reodoe",
+            "1-Zinc",
+            "1-vigormax"
+          ]
+        }
+      ],
+      "updated_at": "2026-10-28T16:09:06.801Z"
+    },
+    "b527274b-68c4-4167-a4ce-983202c2fd0b": {
+      "id": "b527274b-68c4-4167-a4ce-983202c2fd0b",
+      "code": "P004",
+      "name": "Arthritis",
+      "options": [
+        {
+          "price": 65700,
+          "bottles": "4 Bottles",
+          "products": [
+            "Calcium",
+            "Longzit",
+            "Spabucta spray",
+            "Panicept"
+          ]
+        },
+        {
+          "price": 58500,
+          "bottles": "3 Bottles",
+          "products": [
+            "Calcium",
+            "Spabucta spray",
+            "Panicept"
+          ]
+        },
+        {
+          "price": 48500,
+          "bottles": "2 Bottles",
+          "products": [
+            "Calcium",
+            "Panicept"
+          ]
+        }
+      ],
+      "updated_at": "2026-10-28T16:09:06.802Z"
+    },
+    "code_p004": {
+      "id": "b527274b-68c4-4167-a4ce-983202c2fd0b",
+      "code": "P004",
+      "name": "Arthritis",
+      "options": [
+        {
+          "price": 65700,
+          "bottles": "4 Bottles",
+          "products": [
+            "Calcium",
+            "Longzit",
+            "Spabucta spray",
+            "Panicept"
+          ]
+        },
+        {
+          "price": 58500,
+          "bottles": "3 Bottles",
+          "products": [
+            "Calcium",
+            "Spabucta spray",
+            "Panicept"
+          ]
+        },
+        {
+          "price": 48500,
+          "bottles": "2 Bottles",
+          "products": [
+            "Calcium",
+            "Panicept"
+          ]
+        }
+      ],
+      "updated_at": "2026-10-28T16:09:06.802Z"
+    }
+  }
+}

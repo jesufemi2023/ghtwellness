@@ -202,11 +202,12 @@ export const OrderDrawer: React.FC<OrderDrawerProps> = ({
         // If an option is selected, use its details
         if (selectedOption) {
           const includedFormatted = selectedOption.products 
-            ? formatOptionProductList(selectedOption.products, selectedOption.bottles)
+            ? formatOptionProductList(selectedOption.products)
             : [];
           orderItems = [{
             id: pkg.id,
             name: formatProductNameWithBottles(pkg.name, bottleNum, 1),
+            bottles: selectedOption.bottles,
             quantity: quantity,
             price_at_time: basePrice,
             is_package: true,
@@ -218,7 +219,7 @@ export const OrderDrawer: React.FC<OrderDrawerProps> = ({
           // If it's a package, we send all its products
           orderItems = (pkg.products || []).map(p => ({
             id: p.id,
-            name: formatProductNameWithBottles(p.name, null, 1),
+            name: p.name,
             quantity: quantity,
             price_at_time: p.price_naira * (1 - (p.discount_percent || 0) / 100),
             is_package: true,
@@ -517,21 +518,18 @@ Payment: ${formData.payment_method === 'pod' ? 'Pay on Delivery' : 'Bank Transfe
                                           <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Package Includes:</span>
                                         </div>
                                         <div className="flex flex-wrap gap-1.5">
-                                          {(opt as any).products.map((p: string, j: number) => {
-                                            const formattedP = formatProductNameWithBottles(p, (opt as any).bottles, 1);
-                                            return (
-                                              <span 
-                                                key={j} 
-                                                className={`text-[10px] font-bold px-2 py-1 rounded-lg border transition-colors ${
-                                                  selectedOption === opt 
-                                                    ? 'bg-white border-emerald-200 text-emerald-700 font-black' 
-                                                    : 'bg-slate-50 border-slate-100 text-slate-600'
-                                                }`}
-                                              >
-                                                {formattedP}
-                                              </span>
-                                            );
-                                          })}
+                                          {formatOptionProductList((opt as any).products).map((formattedP: string, j: number) => (
+                                            <span 
+                                              key={j} 
+                                              className={`text-[10px] font-bold px-2 py-1 rounded-lg border transition-colors ${
+                                                selectedOption === opt 
+                                                  ? 'bg-white border-emerald-200 text-emerald-700 font-black' 
+                                                  : 'bg-slate-50 border-slate-100 text-slate-600'
+                                              }`}
+                                            >
+                                              {formattedP}
+                                            </span>
+                                          ))}
                                         </div>
                                       </div>
                                     )}

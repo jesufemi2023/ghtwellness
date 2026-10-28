@@ -113,7 +113,7 @@ export const PackageCard: React.FC<PackageCardProps> = ({ data, allPackages, onO
         <div className="p-4 md:p-5 flex flex-col flex-grow space-y-2 md:space-y-3">
           <div className="min-h-[80px] md:min-h-[90px]">
             <h3 className="text-lg md:text-xl font-black text-slate-900 leading-tight line-clamp-2 hover:text-emerald-700 cursor-pointer mb-1">
-              <span className="text-emerald-600">Natural Cure For: </span>
+              <span className="text-emerald-600">Wellness Pack: </span>
               {data.name}
             </h3>
             <p 

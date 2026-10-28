@@ -333,7 +333,7 @@ export default function OrdersAdminView({ data, adminPassword, fetchData }: Orde
                                   <div className="flex flex-wrap gap-1 mt-1.5">
                                     {item.included_products.map((inc: string, incIdx: number) => (
                                       <span key={incIdx} className="text-[9px] font-bold bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded border border-slate-200">
-                                        {formatProductNameWithBottles(inc, item.bottles, 1)}
+                                        {inc}
                                       </span>
                                     ))}
                                   </div>

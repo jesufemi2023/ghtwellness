@@ -706,35 +706,49 @@ export async function createServer() {
     const blogIdOrSlug = url.searchParams.get('blog');
     const activeTab = url.searchParams.get('activeTab') || url.searchParams.get('tab');
 
-    // Default Homepage Metadata (from user request)
+    // Default Google-Ads-compliant nutritional supplement metadata
     let metadata = {
-      title: "GHT wellness supplement | 100% herbal supplement",
-      description: "the best natural supplement that works for prostate enlargement, female/male infertility, erectile dysfunction, premature ejaculation, diabetes, stroke and so on. Order Now.",
+      title: "GHT Wellness – NAFDAC Registered Herbal & Nutritional Supplements",
+      description: "Shop authentic NAFDAC-registered herbal dietary supplements and daily wellness bundles by SD GHT Health Care Nigeria Ltd. Nationwide delivery & Pay on Delivery available.",
       image: "https://res.cloudinary.com/drizgfofw/image/upload/v1773906809/compressed_70kb_ox1i8j.jpg",
       url: `https://ghtwellness.vercel.app${req.url}`
     };
 
+    if (url.pathname.startsWith('/ad')) {
+      metadata.title = "GHT Herbal Wellness Bundles – Nationwide Pay on Delivery | GHT Wellness";
+      metadata.description = "Explore authentic NAFDAC-registered herbal supplement bundles for daily vitality, mobility, and wellness support. Free nationwide delivery & Pay on Delivery across Nigeria.";
+    } else if (url.pathname.startsWith('/privacy-policy')) {
+      metadata.title = "Privacy Policy | GHT Wellness – SD GHT Health Care Nigeria Ltd";
+      metadata.description = "Read our Privacy Policy and data protection guidelines for customers of GHT Wellness (SD GHT Health Care Nigeria Ltd).";
+    } else if (url.pathname.startsWith('/terms-of-service')) {
+      metadata.title = "Terms of Service & Shipping Policy | GHT Wellness";
+      metadata.description = "Review our Terms of Service, nationwide shipping timelines, Pay on Delivery terms, and dietary supplement disclosures.";
+    } else if (url.pathname.startsWith('/return-policy')) {
+      metadata.title = "Return & Exchange Policy | GHT Wellness";
+      metadata.description = "Official Return, Replacement, and Exchange Policy for SD GHT Health Care Nigeria Ltd customers.";
+    }
+
     if (!supabase) return metadata;
 
     try {
-      const makeAbsolute = (url: string) => {
-        if (!url) return metadata.image;
-        if (url.startsWith('http')) return url;
-        return `https://ghtwellness.vercel.app${url.startsWith('/') ? '' : '/'}${url}`;
+      const makeAbsolute = (imgUrl: string) => {
+        if (!imgUrl) return metadata.image;
+        if (imgUrl.startsWith('http')) return imgUrl;
+        return `https://ghtwellness.vercel.app${imgUrl.startsWith('/') ? '' : '/'}${imgUrl}`;
       };
 
       if (productId) {
         const { data } = await supabase.from('products').select('name, short_desc, image_url').or(`id.eq.${productId},product_code.eq.${productId}`).maybeSingle();
         if (data) {
-          metadata.title = `${data.name} | Order Now`;
-          metadata.description = `${data.short_desc || metadata.description} Order Now.`;
+          metadata.title = `${data.name} – Herbal Dietary Supplement | GHT Wellness`;
+          metadata.description = `${data.short_desc || metadata.description}`;
           metadata.image = makeAbsolute(data.image_url);
         }
       } else if (packageId) {
         const { data } = await supabase.from('recommended_packages').select('name, description, package_image_url').or(`id.eq.${packageId},package_code.eq.${packageId}`).maybeSingle();
         if (data) {
-          metadata.title = `${data.name} | Order Now`;
-          metadata.description = `${data.description || metadata.description} Order Now.`;
+          metadata.title = `${data.name} – Herbal Wellness Bundle | GHT Wellness`;
+          metadata.description = `${data.description || metadata.description}`;
           metadata.image = makeAbsolute(data.package_image_url);
         }
       } else if (blogIdOrSlug) {
@@ -747,24 +761,25 @@ export async function createServer() {
         }
         const { data } = await query.maybeSingle();
         if (data) {
-          metadata.title = `${data.title} | Order Now`;
-          metadata.description = `${data.meta_description || metadata.description} Order Now.`;
+          metadata.title = `${data.title} | GHT Wellness`;
+          metadata.description = `${data.meta_description || metadata.description}`;
           metadata.image = makeAbsolute(data.image_url);
         }
       } else if (activeTab) {
         const tabTitles: Record<string, string> = {
+          ad: "Herbal Wellness Bundles",
           about: "About Us",
-          consultation: "Free AI Health Consultation",
-          products: "Our Health Products",
-          recommended: "Expert Health Solutions",
-          combo: "Combo Savings Packs",
-          blog: "Health & Wellness Blog",
-          history: "Your Health Records",
-          testimonials: "Customer Success Stories"
+          consultation: "Wellness Consultation",
+          products: "Herbal Nutritional Supplements",
+          recommended: "Wellness Packages",
+          combo: "Value Supplement Bundles",
+          blog: "Health & Wellness Journal",
+          history: "Order Status",
+          testimonials: "Customer Reviews"
         };
         if (tabTitles[activeTab]) {
-          metadata.title = `${tabTitles[activeTab]} | Order Now`;
-          metadata.description = `Explore our ${tabTitles[activeTab].toLowerCase()} at GHT Wellness. Premium herbal supplements and professional health consultations. Order Now.`;
+          metadata.title = `${tabTitles[activeTab]} | GHT Wellness`;
+          metadata.description = `Explore ${tabTitles[activeTab].toLowerCase()} at GHT Wellness. Authentic NAFDAC-registered herbal dietary supplements with nationwide delivery.`;
         }
       }
     } catch (e) {
@@ -1292,14 +1307,17 @@ export async function createServer() {
       const metadata = await getMetadataForRequest(req);
       
       // Fallback paths for index.html depending on environment
-      const possibleIndexPaths = [
-        path.resolve(process.cwd(), "dist/index.html"),
-        path.resolve(process.cwd(), "index.html"),
-        // Vercel output structure fallback
-        path.join(__dirname, "../dist/index.html"),
-        path.join(__dirname, "dist/index.html"),
-        path.join(__dirname, "../index.html")
-      ];
+      // Never serve unbuilt root index.html in production (its /src/main.tsx module does not exist in dist)
+      const possibleIndexPaths = isProduction
+        ? [
+            path.resolve(process.cwd(), "dist/index.html"),
+            path.join(__dirname, "../dist/index.html"),
+            path.join(__dirname, "dist/index.html")
+          ]
+        : [
+            path.resolve(process.cwd(), "index.html"),
+            path.join(__dirname, "../index.html")
+          ];
 
       let indexPath = possibleIndexPaths[0];
       for (const p of possibleIndexPaths) {

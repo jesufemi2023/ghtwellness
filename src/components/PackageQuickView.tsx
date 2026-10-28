@@ -544,16 +544,12 @@ export const PackageQuickView: React.FC<PackageQuickViewProps> = ({
                                 )}
                               </div>
                               <div className="mt-3">
-                                {optDiscount > 0 ? (
+                                {optDiscount > 0 && (
                                   <span className="text-xs text-slate-400 block font-bold line-through">
                                     ₦{optPrice.toLocaleString()}
                                   </span>
-                                ) : (
-                                  <span className="text-xs text-slate-500 block font-bold line-through">
-                                    ₦{Math.round(optPrice * 1.2).toLocaleString()}
-                                  </span>
                                 )}
-                                <span className="text-lg md:text-xl font-black text-slate-950 block mt-0.5">
+                                <span className="text-lg md:text-xl font-black text-slate-950 block mt-0.5 tabular-nums">
                                   ₦{effectiveOptPrice.toLocaleString()}
                                 </span>
                               </div>
@@ -564,41 +560,34 @@ export const PackageQuickView: React.FC<PackageQuickViewProps> = ({
                     </div>
                   )}
 
-                  {/* Pricing and Scarcity Box */}
+                  {/* Transparent Pricing and Availability Box */}
                   <div className="bg-slate-950 text-white rounded-3xl p-6 md:p-8 border-2 border-slate-800 relative overflow-hidden shadow-2xl">
-                    <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
-                    
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                       <div className="space-y-2">
-                        <span className="text-xs font-black uppercase text-emerald-400 tracking-wider">Subsidized Direct Clinical Price</span>
+                        <span className="text-xs font-black uppercase text-emerald-400 tracking-wider">Direct Store Price</span>
                         <div className="flex items-baseline gap-3">
-                          <span className="text-4xl md:text-5xl font-black text-emerald-400">₦{discountedPrice.toLocaleString()}</span>
+                          <span className="text-4xl md:text-5xl font-black text-emerald-400 tabular-nums">₦{discountedPrice.toLocaleString()}</span>
                           {(() => {
                             const optDiscount = selectedOption ? (Number(selectedOption.discount) || 0) : 0;
                             const hasDiscount = selectedOption ? optDiscount > 0 : data.discount > 0;
-                            const originalVal = selectedOption 
-                              ? (optDiscount > 0 ? selectedOption.price : selectedOption.price * 1.2) 
-                              : data.price;
+                            const originalVal = selectedOption ? selectedOption.price : data.price;
                             
                             return hasDiscount ? (
-                              <span className="text-sm md:text-base text-slate-400 line-through font-extrabold">
+                              <span className="text-sm md:text-base text-slate-400 line-through font-extrabold tabular-nums">
                                 ₦{Math.round(originalVal).toLocaleString()}
                               </span>
                             ) : null;
                           })()}
                         </div>
-                        <p className="text-xs md:text-sm text-slate-300 font-bold">Includes FREE Nationwide Delivery & Cash / Transfer on Delivery (POD)</p>
+                        <p className="text-xs md:text-sm text-slate-300 font-bold">Includes FREE Nationwide Delivery &amp; Cash / Transfer on Delivery (POD)</p>
                       </div>
 
-                      <div className="bg-black/50 border border-white/10 p-4 rounded-2xl sm:text-right shrink-0">
-                        <div className="flex items-center gap-2 text-red-400 font-black text-xs uppercase tracking-wider justify-start sm:justify-end">
-                          <div className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse" />
-                          <span>High Demand Alert</span>
+                      <div className="bg-black/40 border border-white/10 p-4 rounded-2xl sm:text-right shrink-0">
+                        <div className="flex items-center gap-2 text-emerald-400 font-black text-xs uppercase tracking-wider justify-start sm:justify-end">
+                          <CheckCircle2 size={15} />
+                          <span>In Stock · Ready to Ship</span>
                         </div>
-                        <p className="text-sm text-slate-200 font-extrabold mt-1">Only <span className="text-white text-base font-black">{stockLeft} packages</span> left in regional stock</p>
-                        <div className="w-full sm:w-36 h-2 bg-slate-800 rounded-full overflow-hidden mt-2 ml-auto">
-                          <div className="h-full bg-red-500 rounded-full transition-all duration-1000" style={{ width: `${(stockLeft / 10) * 100}%` }} />
-                        </div>
+                        <p className="text-xs text-slate-300 font-semibold mt-1">Dispatched in 24–48 hrs nationwide</p>
                       </div>
                     </div>
                   </div>
@@ -662,8 +651,8 @@ export const PackageQuickView: React.FC<PackageQuickViewProps> = ({
                         <p className="text-xs text-slate-700 font-semibold mt-1 leading-relaxed">No! We operate strict Pay on Delivery (POD). You only inspect your package and pay cash or transfer when our dispatch agent delivers it to you.</p>
                       </div>
                       <div className="bg-white p-4 rounded-2xl border border-slate-200">
-                        <h5 className="text-sm font-black text-slate-950">Q: Are there any side effects?</h5>
-                        <p className="text-xs text-slate-700 font-semibold mt-1 leading-relaxed">All GHT formulas are 100% natural, herbal, and NAFDAC registered with zero chemical additives or side effects.</p>
+                        <h5 className="text-sm font-black text-slate-950">Q: How should I use these herbal supplements?</h5>
+                        <p className="text-xs text-slate-700 font-semibold mt-1 leading-relaxed">All GHT formulas are plant-based herbal dietary supplements registered with NAFDAC to support general wellness. Consult your physician if pregnant, nursing, or taking prescription medication.</p>
                       </div>
                     </div>
                   </div>
@@ -729,17 +718,17 @@ export const PackageQuickView: React.FC<PackageQuickViewProps> = ({
 
                 {/* PINNED FIXED FOOTER (Always Visible Whether Scrolling or Not) */}
                 <div className={`${isPage ? 'fixed bottom-0 left-0 right-0 z-50 max-w-7xl mx-auto px-6 sm:px-8' : 'sticky bottom-0 z-50'} p-4 sm:p-6 bg-slate-950/95 backdrop-blur-md text-white border-t-4 border-emerald-500 shadow-[0_-15px_40px_rgba(0,0,0,0.3)] space-y-3`}>
-                  {/* Immediate Refund & Guarantee Note */}
+                  {/* Doorstep Inspection & Privacy Note */}
                   <div className="hidden sm:flex text-xs text-emerald-400 font-black items-center gap-2 justify-center leading-tight">
                     <ShieldCheck size={16} className="text-emerald-400 shrink-0" />
-                    <span>🔒 Secure Medical Privacy Protocol | Pay on Delivery (POD) Guaranteed</span>
+                    <span>Confidential Packaging · Inspect Seals Upon Delivery Before Payment (POD)</span>
                   </div>
 
                   {/* Actions Row */}
                   <div className="grid grid-cols-2 gap-3 max-w-4xl mx-auto">
                     <button 
                       onClick={() => {
-                        const message = `Hello SD GHT Health Care, I am interested in the ${data.name} package ${selectedOption ? `(${selectedOption.bottles})` : ""}. I would like to chat with a health consultant first.`;
+                        const message = `Hello SD GHT Health Care, I am interested in the ${data.name} bundle ${selectedOption ? `(${selectedOption.bottles})` : ""}. I would like to speak with a wellness advisor first.`;
                         openWhatsAppLink(CONFIG.whatsapp.number, message);
                       }}
                       className="h-14 sm:h-16 bg-white border-2 border-slate-300 text-slate-950 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider hover:bg-slate-100 transition-all flex items-center justify-center gap-2 shadow-xl cursor-pointer active:scale-95"
@@ -749,15 +738,15 @@ export const PackageQuickView: React.FC<PackageQuickViewProps> = ({
                     </button>
                     <button 
                       onClick={() => onOrder?.(quantity, selectedOptionIdx)}
-                      className="h-14 sm:h-16 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all shadow-2xl active:scale-[0.98] flex items-center justify-center gap-2 border-b-4 border-emerald-900 ring-4 ring-emerald-500/30 cursor-pointer animate-pulse"
+                      className="h-14 sm:h-16 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all shadow-2xl active:scale-[0.98] flex items-center justify-center gap-2 border-b-4 border-emerald-900 cursor-pointer"
                     >
                       <ShoppingBag size={18} className="shrink-0 stroke-[3]" />
                       <span className="font-black text-xs sm:text-sm text-white">ORDER NOW (POD)</span>
                     </button>
                   </div>
 
-                  <p className="block text-center text-xs text-slate-300 font-black uppercase tracking-widest">
-                    📦 Nationwide Express Delivery Within 24-48 Hours | Pay Only Upon Delivery
+                  <p className="block text-center text-xs text-slate-300 font-semibold">
+                    Nationwide Express Delivery Within 24–48 Hours · Dietary Supplement Disclaimer Applies
                   </p>
                 </div>
 

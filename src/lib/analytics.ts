@@ -9,18 +9,16 @@ import {
 } from "./metaPixel";
 import {
   initGoogleTag,
-  trackGoogleTagEvent
+  trackGoogleTagEvent,
+  trackGoogleAdsConversion
 } from "./googleTag";
 
 const MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
 
 export const initGA = () => {
   // Initialize Google Analytics
-  if (MEASUREMENT_ID) {
+  if (MEASUREMENT_ID && MEASUREMENT_ID !== "G-XXXXXXXXXX") {
     ReactGA.initialize(MEASUREMENT_ID);
-    console.log("GA Initialized with ID:", MEASUREMENT_ID);
-  } else {
-    console.warn("GA Measurement ID not found. Analytics disabled.");
   }
 
   // Initialize Meta Pixel
@@ -31,7 +29,7 @@ export const initGA = () => {
 };
 
 export const trackPageView = (path: string, title?: string) => {
-  if (MEASUREMENT_ID) {
+  if (MEASUREMENT_ID && MEASUREMENT_ID !== "G-XXXXXXXXXX") {
     ReactGA.send({ hitType: "pageview", page: path, title: title || path });
   }
   trackPixelPageView();
@@ -40,7 +38,7 @@ export const trackPageView = (path: string, title?: string) => {
 };
 
 export const trackEvent = (category: string, action: string, label?: string, value?: number) => {
-  if (MEASUREMENT_ID) {
+  if (MEASUREMENT_ID && MEASUREMENT_ID !== "G-XXXXXXXXXX") {
     ReactGA.event({
       category,
       action,
@@ -64,14 +62,16 @@ export const trackOrderStart = (itemName: string, type: string) => {
 };
 
 export const trackOrderComplete = (itemName: string, amount: number) => {
+  const txId = `T_${Date.now()}`;
   trackEvent("Ecommerce", "Order Complete", itemName, amount);
   trackPixelPurchase(itemName, amount);
   trackGoogleTagEvent("purchase", {
-    transaction_id: `T_${Date.now()}`,
+    transaction_id: txId,
     value: amount,
     currency: "NGN",
     items: [{ item_name: itemName, price: amount }]
   });
+  trackGoogleAdsConversion(amount, txId);
 };
 
 export const trackConsultation = (illness: string) => {

@@ -65,19 +65,19 @@ export function formatProductNameWithBottles(
 
 /**
  * Formats an array of included products for a package or package option.
- * E.g., ['1x Reodoe', '1x Prostbeta'] with '3 Bottles' -> ['1x Reodoe(3)', '1x Prostbeta(3)']
+ * In a multi-product package (e.g., '3 Bottles' containing Calcium, Prostbeta, Panicept),
+ * each entry in `products` is already the specific included product name (or explicit count like '2-Reodoe'),
+ * so we display the product name cleanly without appending the total package bottle count or '1x '.
  */
 export function formatOptionProductList(
   products: string[],
-  optionBottles?: string | number | null
+  _optionBottles?: string | number | null
 ): string[] {
   if (!Array.isArray(products)) return [];
-  const bottleCount = extractBottleCount(optionBottles);
 
-  return products.map((p) => {
-    if (!p) return '';
-    return formatProductNameWithBottles(p, bottleCount, 1);
-  });
+  return products
+    .map((p) => (p ? String(p).trim() : ''))
+    .filter(Boolean);
 }
 
 /**

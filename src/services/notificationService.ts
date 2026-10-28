@@ -81,11 +81,11 @@ export const NotificationService = {
       // If included_products list exists on package item
       if (firstItem.included_products && Array.isArray(firstItem.included_products) && firstItem.included_products.length > 0) {
         firstItem.included_products.forEach((inc: string) => {
-          itemsList += `    ↳ ${formatProductNameWithBottles(inc, firstItem.bottles, 1)}\n`;
+          itemsList += `    ↳ ${inc}\n`;
         });
       } else {
         pkgItems.forEach(p => {
-          itemsList += `    ↳ ${formatProductNameWithBottles(p.name || 'Product', p.bottles, 1)}\n`;
+          itemsList += `    ↳ ${p.name || 'Product'}\n`;
         });
       }
     });
