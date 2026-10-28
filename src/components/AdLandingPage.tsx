@@ -14,11 +14,11 @@ import {
   FileText,
   ZoomIn,
   ArrowRight,
+  Loader2,
 } from 'lucide-react';
 import { Product, PackageData } from '../types';
 import { CONFIG } from '../config';
 import { openWhatsAppLink } from '../utils/whatsapp';
-import { formatOptionProductList } from '../utils/bottleFormatter';
 import { sanitizeAdTitle, sanitizeAdText } from '../utils/adCompliance';
 import {
   SymptomCategory,
@@ -26,6 +26,11 @@ import {
   matchesSymptomCategory,
   resolveAdIntent,
 } from '../utils/adAttribution';
+import {
+  computePackagePricing,
+  computeProductPricing,
+  resolveSingleOptionPricing,
+} from '../utils/optionPricing';
 import { trackWhatsAppClick, trackAdBundleSelect } from '../lib/analytics';
 import { getOptimizedImageUrl } from '../utils/cloudinary';
 import { ExpressPodCheckout } from './ExpressPodCheckout';
@@ -36,6 +41,7 @@ export interface AdLandingPageProps {
   products: Product[];
   packages: PackageData[];
   combos: PackageData[];
+  isLoading?: boolean;
   distributorId?: string;
   onOrderProduct?: (product: Product, quantity?: number) => void;
   onOrderPackage?: (pkg: PackageData, type: 'package', quantity?: number, optionIdx?: number) => void;
@@ -55,7 +61,7 @@ export interface AdLandingPageProps {
 type FilterTabId = SymptomCategory | 'singles';
 
 const SYMPTOM_TABS: Array<{ id: FilterTabId; label: string }> = [
-  { id: 'all', label: 'All Courses' },
+  { id: 'all', label: 'All Wellness Packs' },
   { id: 'prostate', label: 'Prostate Care' },
   { id: 'joints', label: 'Joints & Mobility' },
   { id: 'vitality', label: "Men's Vitality" },
@@ -70,7 +76,7 @@ const CUSTOMER_STORIES = [
     name: 'Chief Adebayo O.',
     role: 'Retired Civil Engineer, 64',
     location: 'Bodija, Ibadan',
-    course: '3-Bottle Prostate & Male Comfort Course',
+    packName: '3-Bottle Prostate & Male Comfort Pack',
     quote:
       'The dispatch rider delivered to my residence in Bodija within 36 hours. Every bottle carried its intact factory seal and NAFDAC registration number, and I paid via transfer only after inspecting the package. Consistent daily use has noticeably supported my nighttime comfort.',
   },
@@ -78,7 +84,7 @@ const CUSTOMER_STORIES = [
     name: 'Mrs. Evelyn N.',
     role: 'School Principal, 56',
     location: 'GRA, Benin City',
-    course: 'Joint Comfort & Calcium Course',
+    packName: 'Joint Comfort & Calcium Combo Pack',
     quote:
       'What gave my family confidence was the zero-risk Pay on Delivery service. Their specialist explained the morning and evening mealtime schedule clearly on WhatsApp, and my mother moves around the compound with much steadier comfort.',
   },
@@ -86,7 +92,7 @@ const CUSTOMER_STORIES = [
     name: 'Engr. Musa K.',
     role: 'Project Director, 51',
     location: 'Wuse II, Abuja',
-    course: "Men's Stamina & Vitality Course",
+    packName: "Men's Stamina & Vitality Pack",
     quote:
       'Discreetly packaged and delivered straight to my office in Wuse the next afternoon. Authentic GHT herbal bottles with clear printed expiry dates and dependable customer follow-up.',
   },
@@ -109,9 +115,9 @@ const BUYER_FAQS = [
       'All supplements supplied by SD GHT Health Care Nigeria Ltd are sourced directly from authorized GHT corporate distribution, featuring tamper-evident foil seals, batch numbers, manufacturing/expiry dates, and NAFDAC registration details.',
   },
   {
-    question: 'Which bottle course duration is recommended for adults?',
+    question: 'Which multi-bottle pack size is recommended for adults?',
     answer:
-      'A 2-Bottle Starter Pack covers initial nutritional support, while our 3-Bottle and 4-Bottle Recommended Courses are structured for a complete 30 to 60-day herbal wellness regimen with higher multi-bottle savings.',
+      'A 2-Bottle Starter Pack covers initial nutritional support, while our 3-Bottle and 4-Bottle Value Packs are structured for a complete 30 to 60-day herbal wellness regimen with higher multi-bottle discount savings.',
   },
 ];
 
@@ -182,32 +188,37 @@ function getPackageGalleryEntries(pkg: PackageData): GalleryImageEntry[] {
   const seen = new Set<string>();
 
   if (pkg.package_image_url && pkg.package_image_url.trim().length > 0) {
-    seen.add(pkg.package_image_url.trim());
+    const cleanPkgUrl = pkg.package_image_url.trim();
+    seen.add(cleanPkgUrl);
     entries.push({
-      url: pkg.package_image_url.trim(),
-      label: 'Complete Course',
+      url: cleanPkgUrl,
+      label: 'Full Pack',
     });
   }
 
   for (const prod of pkg.products || []) {
-    if (prod?.image_url && prod.image_url.trim().length > 0 && !seen.has(prod.image_url.trim())) {
-      seen.add(prod.image_url.trim());
-      entries.push({
-        url: prod.image_url.trim(),
-        label: prod.name,
-      });
+    if (prod?.image_url && prod.image_url.trim().length > 0) {
+      const cleanProdUrl = prod.image_url.trim();
+      if (!seen.has(cleanProdUrl)) {
+        seen.add(cleanProdUrl);
+        entries.push({
+          url: cleanProdUrl,
+          label: prod.name,
+        });
+      }
     }
   }
 
   return entries;
 }
 
+type ImageAttemptState = 'optimized' | 'raw' | 'failed';
+
 interface StudioProductStageProps {
   entries: GalleryImageEntry[];
   alt: string;
   heightClassName: string;
   optimizeWidth?: number;
-  priority?: boolean;
   onInspect?: () => void;
 }
 
@@ -216,28 +227,57 @@ const StudioProductStage: React.FC<StudioProductStageProps> = ({
   alt,
   heightClassName,
   optimizeWidth = 1200,
-  priority = false,
   onInspect,
 }) => {
   const [activeIdx, setActiveIdx] = useState(0);
-  const [failedMap, setFailedMap] = useState<Record<number, boolean>>({});
+  const [attemptMap, setAttemptMap] = useState<Record<number, ImageAttemptState>>({});
+
+  const entriesSignature = entries.map((e) => e.url).join('|');
 
   useEffect(() => {
     setActiveIdx(0);
-    setFailedMap({});
-  }, [entries[0]?.url]);
+    setAttemptMap({});
+  }, [entriesSignature]);
 
-  const currentEntry = entries[activeIdx] || entries[0];
-  const resolvedUrl = currentEntry?.url
-    ? getOptimizedImageUrl(currentEntry.url, optimizeWidth)
-    : '';
-  const hasFailed = !resolvedUrl || Boolean(failedMap[activeIdx]);
+  const safeIdx = entries[activeIdx] ? activeIdx : 0;
+  const currentEntry = entries[safeIdx];
+  const rawUrl = currentEntry?.url?.trim() || '';
+  const optimizedUrl = rawUrl ? getOptimizedImageUrl(rawUrl, optimizeWidth) : '';
+
+  const currentStage: ImageAttemptState = attemptMap[safeIdx] || 'optimized';
+  const activeSrc =
+    currentStage === 'optimized'
+      ? optimizedUrl || rawUrl
+      : currentStage === 'raw'
+        ? rawUrl
+        : '';
+
+  const hasFailed = !activeSrc || currentStage === 'failed';
+  const hasMultipleEntries = entries.length > 1;
+
+  const handleImageError = () => {
+    if (currentStage === 'optimized' && rawUrl && optimizedUrl !== rawUrl) {
+      // Retry directly with the raw un-transformed Supabase / Cloudinary URL
+      setAttemptMap((prev) => ({ ...prev, [safeIdx]: 'raw' }));
+      return;
+    }
+
+    // Mark current entry as failed and automatically fall forward to next available bottle image if present
+    setAttemptMap((prev) => {
+      const nextMap: Record<number, ImageAttemptState> = { ...prev, [safeIdx]: 'failed' };
+      const fallbackIdx = entries.findIndex((_, i) => i !== safeIdx && nextMap[i] !== 'failed');
+      if (fallbackIdx >= 0) {
+        setActiveIdx(fallbackIdx);
+      }
+      return nextMap;
+    });
+  };
 
   return (
     <div
-      className={`relative w-full ${heightClassName} bg-[radial-gradient(circle_at_50%_42%,#ffffff_0%,#f1f6f3_62%,#e4ede8_100%)] flex flex-col justify-between overflow-hidden select-none group`}
+      className={`relative w-full ${heightClassName} bg-[radial-gradient(circle_at_50%_46%,#ffffff_0%,#ffffff_58%,#eef4f1_100%)] overflow-hidden select-none group`}
     >
-      {/* Main Monumental Bottle Canvas */}
+      {/* Explicit Absolute Geometry Canvas — Prevents Flex Percentage Height Collapse Across Safari & Chrome */}
       <div
         onClick={onInspect}
         role={onInspect ? 'button' : undefined}
@@ -253,9 +293,9 @@ const StudioProductStage: React.FC<StudioProductStageProps> = ({
             : undefined
         }
         aria-label={onInspect ? `Inspect ${alt} bottles up close` : undefined}
-        className={`flex-1 w-full min-h-0 flex items-center justify-center p-3 sm:p-6 ${
-          onInspect ? 'cursor-zoom-in' : ''
-        }`}
+        className={`absolute inset-x-0 top-0 ${
+          hasMultipleEntries ? 'bottom-14' : 'bottom-0'
+        } flex items-center justify-center p-3 sm:p-5 ${onInspect ? 'cursor-zoom-in' : ''}`}
       >
         {hasFailed ? (
           <div className="flex flex-col items-center justify-center text-center p-6 max-w-xs">
@@ -271,12 +311,13 @@ const StudioProductStage: React.FC<StudioProductStageProps> = ({
           </div>
         ) : (
           <img
-            src={resolvedUrl}
+            key={`${safeIdx}-${currentStage}`}
+            src={activeSrc}
             alt={`${alt} — ${currentEntry.label}`}
-            loading={priority ? 'eager' : 'lazy'}
-            referrerPolicy="no-referrer"
-            onError={() => setFailedMap((prev) => ({ ...prev, [activeIdx]: true }))}
-            className="w-full h-full object-contain mix-blend-multiply scale-[1.06] group-hover:scale-[1.11] transition-transform duration-200"
+            loading="eager"
+            decoding="async"
+            onError={handleImageError}
+            className="max-w-full max-h-full w-full h-full object-contain transition-transform duration-300 group-hover:scale-[1.04]"
           />
         )}
       </div>
@@ -289,7 +330,7 @@ const StudioProductStage: React.FC<StudioProductStageProps> = ({
             e.stopPropagation();
             onInspect();
           }}
-          className="absolute top-3.5 right-3.5 z-10 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/90 hover:bg-white text-[#0F1F18] border border-[#D5DFDA] text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap"
+          className="absolute top-3.5 right-3.5 z-10 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/95 hover:bg-white text-[#0F1F18] border border-[#D5DFDA] text-xs font-semibold shadow-2xs transition-colors cursor-pointer whitespace-nowrap"
         >
           <ZoomIn className="w-3.5 h-3.5 text-[#047857]" />
           <span>Enlarge</span>
@@ -297,33 +338,40 @@ const StudioProductStage: React.FC<StudioProductStageProps> = ({
       )}
 
       {/* Multi-Bottle Interactive Gallery Strip */}
-      {entries.length > 1 && (
+      {hasMultipleEntries && (
         <div
-          className="relative z-10 px-3 sm:px-5 pb-3.5 pt-1 flex items-center justify-center gap-2 overflow-x-auto no-scrollbar"
+          className="absolute inset-x-0 bottom-0 h-14 z-10 px-3 sm:px-5 bg-white/85 backdrop-blur-xs border-t border-[#E6ECE8] flex items-center justify-center gap-2 overflow-x-auto no-scrollbar"
           onClick={(e) => e.stopPropagation()}
         >
           {entries.slice(0, 5).map((entry, idx) => {
-            const isSelected = idx === activeIdx;
-            const thumbUrl = getOptimizedImageUrl(entry.url, 220);
+            const isSelected = idx === safeIdx;
+            const thumbSrc = getOptimizedImageUrl(entry.url, 180) || entry.url;
             return (
               <button
                 key={idx}
                 type="button"
                 onClick={() => setActiveIdx(idx)}
                 title={entry.label}
-                className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg border text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
+                className={`flex items-center gap-2 px-2.5 py-1 rounded-lg border text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
                   isSelected
-                    ? 'bg-white border-[#047857] text-[#0F1F18] ring-1 ring-[#047857]'
-                    : 'bg-white/75 hover:bg-white border-[#D5DFDA] text-slate-600'
+                    ? 'bg-[#F2F7F4] border-[#047857] text-[#0F1F18] ring-1 ring-[#047857]'
+                    : 'bg-white hover:bg-slate-50 border-[#D5DFDA] text-slate-600'
                 }`}
               >
                 <img
-                  src={thumbUrl}
+                  src={thumbSrc}
                   alt={entry.label}
-                  referrerPolicy="no-referrer"
-                  className="w-7 h-7 object-contain mix-blend-multiply shrink-0"
+                  loading="eager"
+                  decoding="async"
+                  onError={(e) => {
+                    const imgEl = e.currentTarget;
+                    if (imgEl.src !== entry.url) {
+                      imgEl.src = entry.url;
+                    }
+                  }}
+                  className="w-6 h-6 object-contain shrink-0"
                 />
-                <span className="max-w-[110px] truncate">{entry.label}</span>
+                <span className="max-w-[105px] truncate">{entry.label}</span>
               </button>
             );
           })}
@@ -339,61 +387,11 @@ function getDefaultOptionIdx(options?: Array<{ bottles: string }>): number {
   return idx3 >= 0 ? idx3 : 0;
 }
 
-function computePackagePricing(pkg: PackageData, optIdx: number) {
-  const activeOption =
-    pkg.options && pkg.options.length > 0
-      ? pkg.options[Math.min(optIdx, pkg.options.length - 1)] || pkg.options[0]
-      : null;
-
-  const discount = activeOption ? Number(activeOption.discount) || 0 : Number(pkg.discount) || 0;
-  const retailPrice = activeOption ? Number(activeOption.price) || 0 : Number(pkg.price) || 0;
-  const currentPrice =
-    discount > 0 ? Math.round(retailPrice * (1 - discount / 100)) : retailPrice;
-  const savings = Math.max(0, retailPrice - currentPrice);
-
-  const includedList =
-    activeOption && Array.isArray(activeOption.products) && activeOption.products.length > 0
-      ? formatOptionProductList(activeOption.products)
-      : (pkg.products || []).map((p) => p.name);
-
-  return {
-    activeOption,
-    discount,
-    retailPrice,
-    currentPrice,
-    savings,
-    includedList,
-  };
-}
-
-function computeProductPricing(prod: Product, optIdx: number) {
-  const activeOption =
-    prod.options && prod.options.length > 0
-      ? prod.options[Math.min(optIdx, prod.options.length - 1)] || prod.options[0]
-      : null;
-
-  const discount = activeOption
-    ? Number(activeOption.discount) || 0
-    : Number(prod.discount_percent) || 0;
-  const retailPrice = activeOption
-    ? Number(activeOption.price) || 0
-    : Number(prod.price_naira) || 0;
-  const currentPrice =
-    discount > 0 ? Math.round(retailPrice * (1 - discount / 100)) : retailPrice;
-
-  return {
-    activeOption,
-    discount,
-    retailPrice,
-    currentPrice,
-    savings: Math.max(0, retailPrice - currentPrice),
-  };
-}
-
 export const AdLandingPage: React.FC<AdLandingPageProps> = ({
   products,
   packages,
   combos,
+  isLoading = false,
   distributorId,
   onOrderSuccess,
 }) => {
@@ -551,8 +549,8 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
   const handleAdvisorWhatsApp = (contextLabel: string, customSubject?: string) => {
     trackWhatsAppClick(contextLabel);
     const message = customSubject
-      ? `Hello ${CONFIG.company.name}, I am visiting your Wellness Course page and would like guidance on ${customSubject}.`
-      : `Hello ${CONFIG.company.name}, I would like guidance on choosing the right GHT herbal wellness course with Pay on Delivery.`;
+      ? `Hello ${CONFIG.company.name}, I am visiting your Wellness Packs page and would like guidance on ${customSubject}.`
+      : `Hello ${CONFIG.company.name}, I would like guidance on choosing the right GHT herbal wellness pack with Pay on Delivery.`;
     openWhatsAppLink(CONFIG.whatsapp.number, message);
   };
 
@@ -584,17 +582,17 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
   }, [inlineTarget]);
 
   const mobileBarItem = inlineTarget.item || spotlightBundle;
-  const mobileBarPrice = useMemo(() => {
-    if (!mobileBarItem) return 0;
+  const mobileBarPricing = useMemo(() => {
+    if (!mobileBarItem) return null;
     if (inlineTarget.item) {
       return inlineTarget.type === 'package'
         ? computePackagePricing(inlineTarget.item as PackageData, inlineTarget.optionIdx)
-            .currentPrice
-        : computeProductPricing(inlineTarget.item as Product, inlineTarget.optionIdx)
-            .currentPrice;
+        : computeProductPricing(inlineTarget.item as Product, inlineTarget.optionIdx);
     }
-    return spotlightPricing?.currentPrice || 0;
+    return spotlightPricing;
   }, [mobileBarItem, inlineTarget, spotlightPricing]);
+
+  const showSkeletonState = isLoading && allBundles.length === 0 && products.length === 0;
 
   return (
     <div className="min-h-screen bg-white text-[#0F1F18] font-[family-name:var(--font-clinical-body)] pb-16 md:pb-0">
@@ -620,7 +618,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
               onClick={() => scrollToSection('ad-bundles')}
               className="hover:text-[#0F1F18] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
             >
-              Wellness Courses
+              Wellness Packs
             </button>
             <button
               type="button"
@@ -660,7 +658,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
       <section className="bg-white border-b border-[#E4EBE7]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-10 sm:py-12 lg:py-16">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch">
-            {/* Editorial Headline & Purchase Controls (Left on Desktop, split around Giant Visual on Mobile) */}
+            {/* Editorial Headline & Purchase Controls */}
             <div className="lg:col-span-5 flex flex-col justify-center space-y-6 order-2 lg:order-1">
               <div className="hidden lg:block space-y-4">
                 <p className="text-xs sm:text-sm font-semibold text-[#047857]">
@@ -681,13 +679,13 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                 {adIntent.subheadline}
               </p>
 
-              {/* Contiguous Featured Course Purchase Module */}
+              {/* Contiguous Featured Wellness Pack Purchase Module */}
               {spotlightBundle && spotlightPricing && (
                 <div className="pt-2 lg:pt-4 border-t border-[#E4EBE7] space-y-5">
                   <div className="flex flex-wrap items-baseline justify-between gap-2">
                     <div>
                       <span className="text-xs font-medium text-slate-500">
-                        Featured Herbal Course
+                        Featured Wellness Pack
                         {spotlightBundle.package_code ? ` · ${spotlightBundle.package_code}` : ''}
                       </span>
                       <h2 className="text-xl sm:text-2xl font-bold text-[#0F1F18] font-[family-name:var(--font-editorial)] mt-0.5">
@@ -700,24 +698,30 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                         ₦{spotlightPricing.currentPrice.toLocaleString()}
                       </div>
                       {spotlightPricing.savings > 0 && (
-                        <div className="text-xs text-slate-400 line-through">
+                        <div className="text-xs sm:text-sm text-slate-400 line-through">
                           ₦{spotlightPricing.retailPrice.toLocaleString()}
+                        </div>
+                      )}
+                      {spotlightPricing.discount > 0 && (
+                        <div className="text-xs font-semibold text-[#047857]">
+                          Save ₦{spotlightPricing.savings.toLocaleString()} ({spotlightPricing.discount}% Off)
                         </div>
                       )}
                     </div>
                   </div>
 
                   {spotlightBundle.options && spotlightBundle.options.length > 0 && (
-                    <div className="space-y-2">
+                    <div className="space-y-2.5">
                       <div className="text-xs sm:text-sm font-semibold text-slate-700">
-                        Select Course Duration:
+                        Select Bottle Pack &amp; Discounted Price:
                       </div>
                       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-2.5">
                         {spotlightBundle.options.map((opt, idx) => {
                           const isSelected = idx === spotlightOptIdx;
-                          const d = Number(opt.discount) || 0;
-                          const eff =
-                            d > 0 ? Math.round(opt.price * (1 - d / 100)) : opt.price;
+                          const optPriceInfo = resolveSingleOptionPricing(
+                            opt,
+                            Number(spotlightBundle.discount) || 0
+                          );
                           return (
                             <button
                               key={idx}
@@ -734,8 +738,8 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                                 });
                                 trackAdBundleSelect(
                                   sanitizeAdTitle(spotlightBundle.name),
-                                  opt.bottles,
-                                  eff
+                                  optPriceInfo.label,
+                                  optPriceInfo.sellingPrice
                                 );
                               }}
                               className={`p-3 rounded-xl border text-left transition-colors cursor-pointer tabular-nums ${
@@ -746,16 +750,23 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                             >
                               <div className="flex items-center justify-between gap-1">
                                 <span className="text-sm font-bold text-[#0F1F18] whitespace-nowrap">
-                                  {opt.bottles}
+                                  {optPriceInfo.label}
                                 </span>
-                                {d > 0 && (
-                                  <span className="text-xs font-semibold text-[#047857]">
-                                    -{d}%
+                                {optPriceInfo.discountPercent > 0 && (
+                                  <span className="text-xs font-bold text-[#047857]">
+                                    -{optPriceInfo.discountPercent}%
                                   </span>
                                 )}
                               </div>
-                              <div className="text-sm font-bold text-[#047857] mt-0.5">
-                                ₦{eff.toLocaleString()}
+                              <div className="flex items-baseline gap-2 mt-1 flex-wrap">
+                                <span className="text-sm sm:text-base font-extrabold text-[#047857]">
+                                  ₦{optPriceInfo.sellingPrice.toLocaleString()}
+                                </span>
+                                {optPriceInfo.savings > 0 && (
+                                  <span className="text-xs text-slate-400 line-through">
+                                    ₦{optPriceInfo.originalPrice.toLocaleString()}
+                                  </span>
+                                )}
                               </div>
                             </button>
                           );
@@ -789,7 +800,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                         onClick={() => scrollToSection('ad-bundles')}
                         className="hover:text-[#047857] inline-flex items-center gap-1 cursor-pointer"
                       >
-                        <span>Browse All {allBundles.length || ''} Wellness Courses</span>
+                        <span>Browse All {allBundles.length || ''} Wellness Packs</span>
                         <ArrowRight className="w-3.5 h-3.5" />
                       </button>
 
@@ -809,7 +820,6 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
 
             {/* Centerpiece Giant Product Visual Stage (7 Columns on Desktop, Top-of-Screen on Mobile) */}
             <div className="lg:col-span-7 flex flex-col space-y-4 order-1 lg:order-2">
-              {/* Mobile Headline Above Giant Image so Mobile Visitors Immediately See Context + Huge Bottles */}
               <div className="lg:hidden space-y-2">
                 <p className="text-xs font-semibold text-[#047857]">{adIntent.kicker}</p>
                 <h1 className="text-3xl sm:text-4xl font-bold text-[#0F1F18] tracking-tight leading-[1.12] [text-wrap:balance] font-[family-name:var(--font-editorial)]">
@@ -818,13 +828,12 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
               </div>
 
               {spotlightBundle ? (
-                <div className="flex-1 rounded-3xl border border-[#DCE5E0] overflow-hidden flex flex-col">
+                <div className="flex-1 rounded-3xl border border-[#DCE5E0] overflow-hidden flex flex-col bg-white">
                   <StudioProductStage
                     entries={spotlightGallery}
                     alt={sanitizeAdTitle(spotlightBundle.name)}
-                    heightClassName="h-[370px] sm:h-[490px] lg:h-[580px]"
+                    heightClassName="h-[380px] sm:h-[500px] lg:h-[580px]"
                     optimizeWidth={1400}
-                    priority={true}
                     onInspect={() =>
                       setDetailModalItem({ item: spotlightBundle, type: 'package' })
                     }
@@ -846,9 +855,9 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                 </div>
               ) : (
                 <div className="h-[380px] sm:h-[520px] rounded-3xl bg-[#F6F8F7] border border-[#DCE5E0] flex flex-col items-center justify-center p-8 text-center space-y-3">
-                  <ShieldCheck className="w-10 h-10 text-[#047857]" />
+                  <Loader2 className="w-9 h-9 text-[#047857] animate-spin" />
                   <p className="text-base font-semibold text-slate-700">
-                    Loading Authentic NAFDAC-Registered Herbal Wellness Courses...
+                    Loading Authentic NAFDAC-Registered Herbal Wellness Packs...
                   </p>
                 </div>
               )}
@@ -904,11 +913,11 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                 Curated Adult Wellness Formulations
               </p>
               <h2 className="text-3xl sm:text-4xl font-bold text-[#0F1F18] font-[family-name:var(--font-editorial)] tracking-tight [text-wrap:balance]">
-                Select Your Targeted Herbal Wellness Course
+                Select Your Targeted Herbal Wellness Pack
               </h2>
               <p className="text-base sm:text-lg text-slate-600 leading-relaxed">
-                Tap any bottle image to inspect up close, choose your preferred course duration,
-                and request doorstep Pay-on-Delivery dispatch.
+                Tap any bottle image to inspect up close, choose your preferred bottle pack with
+                discounted bundle pricing, and request doorstep Pay-on-Delivery dispatch.
               </p>
             </div>
           </div>
@@ -940,10 +949,10 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
             })}
           </div>
 
-          {!hasExactCategoryMatch && (
+          {!hasExactCategoryMatch && !showSkeletonState && (
             <div className="py-4 px-5 rounded-xl bg-white border border-[#DCE5E0] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <p className="text-sm sm:text-base text-slate-700">
-                Showing all complete multi-bottle herbal courses below. Need personal guidance for
+                Showing all complete multi-bottle wellness packs below. Need personal guidance for
                 your specific wellness goal? Speak directly with our specialist.
               </p>
               <button
@@ -961,8 +970,25 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
             </div>
           )}
 
-          {activeFilter !== 'singles' ? (
-            /* 2-Column Flagship Gallery Layout so Every Package Image Is Huge (400px–460px tall) */
+          {showSkeletonState ? (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10">
+              {[0, 1].map((skeletonKey) => (
+                <div
+                  key={skeletonKey}
+                  className="bg-white rounded-3xl border border-[#DCE5E0] overflow-hidden animate-pulse"
+                >
+                  <div className="h-[360px] sm:h-[430px] bg-[#EEF4F1]" />
+                  <div className="p-6 sm:p-8 space-y-4">
+                    <div className="h-4 w-40 bg-slate-200 rounded" />
+                    <div className="h-8 w-3/4 bg-slate-200 rounded" />
+                    <div className="h-16 w-full bg-slate-100 rounded-xl" />
+                    <div className="h-14 w-full bg-emerald-100 rounded-xl" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : activeFilter !== 'singles' ? (
+            /* 2-Column Flagship Gallery Layout so Every Package Image Is Huge */
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10">
               {bundlesToDisplay.map((pkg) => {
                 const selectedIdx = getPkgOptionIdx(pkg);
@@ -979,12 +1005,12 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                     key={pkg.id}
                     className="bg-white rounded-3xl border border-[#DCE5E0] hover:border-[#047857]/50 transition-all duration-200 hover:-translate-y-0.5 flex flex-col overflow-hidden"
                   >
-                    {/* Oversized Studio Product Stage — 65%+ Visual Presence */}
+                    {/* Oversized Studio Product Stage */}
                     <div className="border-b border-[#E6ECE8]">
                       <StudioProductStage
                         entries={galleryEntries}
                         alt={cleanTitle}
-                        heightClassName="h-[340px] sm:h-[420px] lg:h-[450px]"
+                        heightClassName="h-[350px] sm:h-[430px] lg:h-[460px]"
                         optimizeWidth={1200}
                         onInspect={() => setDetailModalItem({ item: pkg, type: 'package' })}
                       />
@@ -996,7 +1022,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                         {/* Unboxed Metadata with Middot Separators */}
                         <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-slate-500">
                           <span className="font-semibold text-[#047857]">
-                            {pkg.is_combo ? 'Complete Value Course' : 'Targeted Herbal Course'}
+                            {pkg.is_combo ? 'Complete Combo Pack' : 'Targeted Wellness Pack'}
                           </span>
                           <span aria-hidden="true">·</span>
                           <span>NAFDAC Registered</span>
@@ -1034,14 +1060,15 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                         {pkg.options && pkg.options.length > 0 && (
                           <div className="space-y-2.5 pt-2 border-t border-[#EBF0ED]">
                             <span className="block text-sm font-semibold text-[#0F1F18]">
-                              Choose Course Duration:
+                              Select Bottle Pack &amp; Discounted Price:
                             </span>
                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                               {pkg.options.map((opt, oIdx) => {
                                 const isSel = oIdx === selectedIdx;
-                                const d = Number(opt.discount) || 0;
-                                const eff =
-                                  d > 0 ? Math.round(opt.price * (1 - d / 100)) : opt.price;
+                                const optPriceInfo = resolveSingleOptionPricing(
+                                  opt,
+                                  Number(pkg.discount) || 0
+                                );
                                 return (
                                   <button
                                     key={oIdx}
@@ -1056,7 +1083,11 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                                         type: 'package',
                                         optionIdx: oIdx,
                                       });
-                                      trackAdBundleSelect(cleanTitle, opt.bottles, eff);
+                                      trackAdBundleSelect(
+                                        cleanTitle,
+                                        optPriceInfo.label,
+                                        optPriceInfo.sellingPrice
+                                      );
                                     }}
                                     className={`p-3 rounded-xl border text-left transition-colors cursor-pointer tabular-nums ${
                                       isSel
@@ -1066,16 +1097,23 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                                   >
                                     <div className="flex items-center justify-between gap-1">
                                       <span className="text-xs sm:text-sm font-bold text-[#0F1F18] whitespace-nowrap">
-                                        {opt.bottles}
+                                        {optPriceInfo.label}
                                       </span>
-                                      {d > 0 && (
-                                        <span className="text-[11px] font-semibold text-[#047857]">
-                                          -{d}%
+                                      {optPriceInfo.discountPercent > 0 && (
+                                        <span className="text-[11px] font-bold text-[#047857]">
+                                          -{optPriceInfo.discountPercent}%
                                         </span>
                                       )}
                                     </div>
-                                    <div className="text-sm font-bold text-[#047857] mt-1">
-                                      ₦{eff.toLocaleString()}
+                                    <div className="mt-1 space-y-0.5">
+                                      <div className="text-sm font-extrabold text-[#047857]">
+                                        ₦{optPriceInfo.sellingPrice.toLocaleString()}
+                                      </div>
+                                      {optPriceInfo.savings > 0 && (
+                                        <div className="text-[11px] text-slate-400 line-through">
+                                          ₦{optPriceInfo.originalPrice.toLocaleString()}
+                                        </div>
+                                      )}
                                     </div>
                                   </button>
                                 );
@@ -1096,19 +1134,19 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                       <div className="pt-5 border-t border-[#E4EBE7] space-y-4">
                         <div className="flex flex-wrap items-baseline justify-between gap-3 tabular-nums">
                           <div>
-                            <div className="flex items-baseline gap-2.5">
+                            <div className="flex items-baseline gap-2.5 flex-wrap">
                               <span className="text-3xl font-extrabold text-[#0F1F18]">
                                 ₦{pricing.currentPrice.toLocaleString()}
                               </span>
                               {pricing.savings > 0 && (
-                                <span className="text-sm text-slate-400 line-through">
+                                <span className="text-sm sm:text-base text-slate-400 line-through">
                                   ₦{pricing.retailPrice.toLocaleString()}
                                 </span>
                               )}
                             </div>
-                            <div className="text-xs sm:text-sm text-[#047857] font-medium mt-0.5">
+                            <div className="text-xs sm:text-sm text-[#047857] font-semibold mt-0.5">
                               {pricing.savings > 0
-                                ? `Save ₦${pricing.savings.toLocaleString()} · Free Doorstep Delivery`
+                                ? `Save ₦${pricing.savings.toLocaleString()} (${pricing.discount}% Off) · Free Doorstep Delivery`
                                 : 'Free Nationwide Delivery · Pay on Delivery'}
                             </div>
                           </div>
@@ -1155,7 +1193,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                       <StudioProductStage
                         entries={prodEntries}
                         alt={prod.name}
-                        heightClassName="h-[320px] sm:h-[360px]"
+                        heightClassName="h-[330px] sm:h-[370px]"
                         optimizeWidth={900}
                         onInspect={() => setDetailModalItem({ item: prod, type: 'product' })}
                       />
@@ -1178,9 +1216,10 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                           <div className="grid grid-cols-2 gap-2 pt-2">
                             {prod.options.map((opt, oIdx) => {
                               const isSel = oIdx === selectedIdx;
-                              const d = Number(opt.discount) || 0;
-                              const eff =
-                                d > 0 ? Math.round(opt.price * (1 - d / 100)) : opt.price;
+                              const optPriceInfo = resolveSingleOptionPricing(
+                                opt,
+                                Number(prod.discount_percent) || 0
+                              );
                               return (
                                 <button
                                   key={oIdx}
@@ -1193,13 +1232,29 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                                   }
                                   className={`p-2.5 rounded-xl border text-left text-xs sm:text-sm cursor-pointer tabular-nums ${
                                     isSel
-                                      ? 'border-[#047857] bg-[#F2F7F4] font-bold text-[#0F1F18]'
+                                      ? 'border-[#047857] bg-[#F2F7F4] ring-1 ring-[#047857] text-[#0F1F18]'
                                       : 'border-[#DCE5E0] bg-white text-slate-700'
                                   }`}
                                 >
-                                  <div className="whitespace-nowrap">{opt.bottles}</div>
-                                  <div className="font-bold text-[#047857]">
-                                    ₦{eff.toLocaleString()}
+                                  <div className="flex items-center justify-between gap-1">
+                                    <span className="font-bold whitespace-nowrap">
+                                      {optPriceInfo.label}
+                                    </span>
+                                    {optPriceInfo.discountPercent > 0 && (
+                                      <span className="text-[11px] font-bold text-[#047857]">
+                                        -{optPriceInfo.discountPercent}%
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div className="flex items-baseline gap-1.5 mt-0.5 flex-wrap">
+                                    <span className="font-extrabold text-[#047857]">
+                                      ₦{optPriceInfo.sellingPrice.toLocaleString()}
+                                    </span>
+                                    {optPriceInfo.savings > 0 && (
+                                      <span className="text-[11px] text-slate-400 line-through">
+                                        ₦{optPriceInfo.originalPrice.toLocaleString()}
+                                      </span>
+                                    )}
                                   </div>
                                 </button>
                               );
@@ -1209,13 +1264,29 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                       </div>
 
                       <div className="pt-4 border-t border-[#E4EBE7] space-y-3.5">
-                        <div className="flex items-baseline justify-between tabular-nums">
-                          <span className="text-2xl font-extrabold text-[#0F1F18]">
-                            ₦{pricing.currentPrice.toLocaleString()}
-                          </span>
-                          <span className="text-xs sm:text-sm text-[#047857] font-medium">
-                            Free Delivery · POD
-                          </span>
+                        <div className="flex items-baseline justify-between gap-2 tabular-nums">
+                          <div>
+                            <div className="flex items-baseline gap-2">
+                              <span className="text-2xl font-extrabold text-[#0F1F18]">
+                                ₦{pricing.currentPrice.toLocaleString()}
+                              </span>
+                              {pricing.savings > 0 && (
+                                <span className="text-sm text-slate-400 line-through">
+                                  ₦{pricing.retailPrice.toLocaleString()}
+                                </span>
+                              )}
+                            </div>
+                            {pricing.discount > 0 && (
+                              <div className="text-xs font-semibold text-[#047857] mt-0.5">
+                                Save {pricing.discount}% · Free POD Delivery
+                              </div>
+                            )}
+                          </div>
+                          {pricing.discount === 0 && (
+                            <span className="text-xs sm:text-sm text-[#047857] font-medium">
+                              Free Delivery · POD
+                            </span>
+                          )}
                         </div>
 
                         <button
@@ -1262,7 +1333,6 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
         className="py-16 sm:py-20 bg-white border-t border-[#E4EBE7] scroll-mt-16"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
-          {/* 3-Step Clean Editorial Numbering */}
           <div className="space-y-10">
             <div className="max-w-2xl space-y-2">
               <p className="text-xs sm:text-sm font-semibold text-[#047857]">
@@ -1283,11 +1353,11 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                   01. Request Dispatch
                 </span>
                 <h3 className="text-xl font-bold text-[#0F1F18] font-[family-name:var(--font-editorial)]">
-                  Select Your Wellness Course
+                  Select Your Wellness Pack
                 </h3>
                 <p className="text-base text-slate-600 leading-relaxed">
-                  Choose your multi-bottle duration and enter your phone number, state, and street
-                  address. No card or online payment is required.
+                  Choose your discounted multi-bottle pack and enter your phone number, state, and
+                  street address. No card or online payment is required.
                 </p>
               </div>
 
@@ -1355,7 +1425,9 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                     <div className="text-xs sm:text-sm text-slate-500 mt-0.5">
                       {story.role} · {story.location}
                     </div>
-                    <div className="text-xs font-semibold text-[#047857] mt-1">{story.course}</div>
+                    <div className="text-xs font-semibold text-[#047857] mt-1">
+                      {story.packName}
+                    </div>
                   </footer>
                 </blockquote>
               ))}
@@ -1420,7 +1492,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
-            {/* Sticky Visual Showcase of the Selected Course on Desktop */}
+            {/* Sticky Visual Showcase of the Selected Pack on Desktop */}
             <div className="hidden lg:block lg:col-span-5 lg:sticky lg:top-24 space-y-5">
               {inlineTarget.item && inlineSummaryPricing && (
                 <div className="bg-white rounded-3xl border border-[#DCE5E0] overflow-hidden">
@@ -1580,7 +1652,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
               formulated to support general daily wellness. These statements have not been evaluated
               to diagnose, treat, cure, or prevent any disease. Individual results vary depending on
               consistency, diet, and baseline health. Always consult a qualified physician or
-              healthcare professional before starting any supplement course, especially if you are
+              healthcare professional before starting any supplement regimen, especially if you are
               pregnant, nursing, taking prescription medication, or under medical supervision.
             </p>
             <p className="text-slate-500">
@@ -1596,14 +1668,22 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
         !expressModalState.isOpen &&
         !detailModalItem &&
         !activePolicyModal &&
-        mobileBarItem && (
+        mobileBarItem &&
+        mobileBarPricing && (
           <div className="md:hidden fixed bottom-0 inset-x-0 z-40 h-14 bg-white/95 backdrop-blur-xs border-t border-[#DCE5E0] shadow-lg px-4 flex items-center justify-between gap-3">
             <div className="min-w-0">
               <div className="text-[11px] font-medium text-slate-500 truncate">
                 Pay on Delivery · Free Shipping
               </div>
-              <div className="text-base font-extrabold text-[#0F1F18] tabular-nums">
-                ₦{mobileBarPrice.toLocaleString()}
+              <div className="flex items-baseline gap-1.5 tabular-nums">
+                <span className="text-base font-extrabold text-[#0F1F18]">
+                  ₦{mobileBarPricing.currentPrice.toLocaleString()}
+                </span>
+                {mobileBarPricing.savings > 0 && (
+                  <span className="text-xs text-slate-400 line-through">
+                    ₦{mobileBarPricing.retailPrice.toLocaleString()}
+                  </span>
+                )}
               </div>
             </div>
             <button
@@ -1679,7 +1759,6 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
             </div>
 
             <div className="overflow-y-auto grid grid-cols-1 md:grid-cols-12">
-              {/* Left 7 Cols: Huge Studio Bottle Gallery */}
               <div className="md:col-span-7 border-b md:border-b-0 md:border-r border-[#E4EBE7]">
                 <StudioProductStage
                   entries={
@@ -1695,12 +1774,11 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                         : []
                   }
                   alt={detailModalItem.item.name}
-                  heightClassName="h-[340px] sm:h-[440px] md:h-full md:min-h-[460px]"
+                  heightClassName="h-[340px] sm:h-[440px] md:h-[480px]"
                   optimizeWidth={1400}
                 />
               </div>
 
-              {/* Right 5 Cols: Supplement Facts & Immediate Action */}
               <div className="md:col-span-5 p-6 sm:p-7 flex flex-col justify-between space-y-6 text-base text-slate-700">
                 <div className="space-y-4">
                   <p className="leading-relaxed">
@@ -1814,7 +1892,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                 onClick={() => setActivePolicyModal(null)}
                 className="px-5 py-2.5 rounded-xl bg-[#0F1F18] hover:bg-slate-800 text-white text-sm font-semibold cursor-pointer"
               >
-                Back to Wellness Courses
+                Back to Wellness Packs
               </button>
             </div>
           </div>

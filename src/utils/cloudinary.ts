@@ -1,33 +1,46 @@
 /**
- * Utility for Cloudinary image transformations to optimize performance and bandwidth.
+ * Utility for Cloudinary & remote image URL handling.
+ * Safely preserves Supabase Storage URLs, data URIs, and already-transformed Cloudinary URLs.
  */
 
 export const getOptimizedImageUrl = (url: string, width: number = 800): string => {
-  if (!url) return "";
+  if (!url || typeof url !== "string") return "";
 
-  // If it's already a Cloudinary URL, inject transformations
-  if (url.includes("cloudinary.com")) {
-    // Cloudinary URLs usually look like: https://res.cloudinary.com/cloud_name/image/upload/v12345/path/to/image.jpg
-    // We want to insert transformations after /upload/
-    const parts = url.split("/upload/");
+  const trimmed = url.trim();
+  if (!trimmed) return "";
+
+  // Pass data URIs and Supabase Storage URLs directly without mutation
+  if (trimmed.startsWith("data:") || trimmed.includes("supabase.co")) {
+    return trimmed;
+  }
+
+  // Safely optimize standard Cloudinary upload URLs without double-injecting transformations
+  if (trimmed.includes("cloudinary.com") && trimmed.includes("/upload/")) {
+    const parts = trimmed.split("/upload/");
     if (parts.length === 2) {
-      return `${parts[0]}/upload/f_auto,q_auto,w_${width}/${parts[1]}`;
+      const rest = parts[1];
+      // Only inject if the segment after /upload/ doesn't already contain transformations (e.g. f_auto, w_, c_)
+      const firstSegment = rest.split("/")[0] || "";
+      const alreadyTransformed =
+        firstSegment.includes(",") ||
+        /^(f_|q_|w_|h_|c_|ar_|g_|e_)/.test(firstSegment);
+
+      if (!alreadyTransformed) {
+        return `${parts[0]}/upload/f_auto,q_auto,w_${width}/${rest}`;
+      }
+      return trimmed;
     }
   }
 
-  // If it's a Picsum URL, we can also optimize it by requesting specific dimensions
-  if (url.includes("picsum.photos")) {
-    // Picsum URLs look like: https://picsum.photos/seed/xxx/width/height
-    // We can replace the width/height at the end
-    const parts = url.split("/");
+  // Optimize Picsum placeholder URLs if ever used
+  if (trimmed.includes("picsum.photos")) {
+    const parts = trimmed.split("/");
     if (parts.length >= 6) {
-      // Replace width and height
       parts[parts.length - 2] = width.toString();
-      parts[parts.length - 1] = Math.round(width * 0.75).toString(); // Maintain 4:3 or similar
+      parts[parts.length - 1] = Math.round(width * 0.75).toString();
       return parts.join("/");
     }
   }
 
-  // Fallback for other URLs (no optimization possible without a proxy)
-  return url;
+  return trimmed;
 };

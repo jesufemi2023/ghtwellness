@@ -32,6 +32,7 @@ import {
   extractBottleCount 
 } from '../utils/bottleFormatter';
 import { getStoredAdAttribution } from '../utils/adAttribution';
+import { resolveSingleOptionPricing } from '../utils/optionPricing';
 
 interface OrderDrawerProps {
   isOpen: boolean;
@@ -117,12 +118,15 @@ export const OrderDrawer: React.FC<OrderDrawerProps> = ({
     payment_receipt_url: ''
   });
 
-  const selectedOptDiscount = selectedOption ? (Number(selectedOption.discount) || 0) : 0;
+  const parentDiscount = type === 'package'
+    ? (Number((item as PackageData).discount) || 0)
+    : (Number((item as Product).discount_percent) || 0);
+
   const basePrice = selectedOption 
-    ? (selectedOptDiscount > 0 ? Math.round(selectedOption.price * (1 - selectedOptDiscount / 100)) : selectedOption.price)
+    ? resolveSingleOptionPricing(selectedOption, parentDiscount).sellingPrice
     : (type === 'package' 
-        ? (item as PackageData).price * (1 - ((item as PackageData).discount || 0) / 100)
-        : (item as Product).price_naira * (1 - ((item as Product).discount_percent || 0) / 100));
+        ? Math.round((item as PackageData).price * (1 - parentDiscount / 100))
+        : Math.round((item as Product).price_naira * (1 - parentDiscount / 100)));
 
   const totalPrice = basePrice * quantity;
 
@@ -465,9 +469,7 @@ Payment: ${formData.payment_method === 'pod' ? 'Pay on Delivery' : 'Bank Transfe
                             </div>
                             <div className="grid grid-cols-1 gap-3">
                               {(item as PackageData | Product).options!.map((opt, i) => {
-                                const optDiscount = Number(opt.discount) || 0;
-                                const optPrice = Number(opt.price) || 0;
-                                const effectiveOptPrice = optDiscount > 0 ? Math.round(optPrice * (1 - optDiscount / 100)) : optPrice;
+                                const resolvedOpt = resolveSingleOptionPricing(opt, parentDiscount);
 
                                 return (
                                   <button
@@ -489,26 +491,26 @@ Payment: ${formData.payment_method === 'pod' ? 'Pay on Delivery' : 'Bank Transfe
                                       <div className="flex flex-col">
                                         <div className="flex items-center gap-2 flex-wrap">
                                           <span className={`text-lg font-black leading-none ${selectedOption === opt ? 'text-emerald-700' : 'text-slate-900'}`}>
-                                            {opt.bottles}
+                                            {resolvedOpt.label}
                                           </span>
-                                          {optDiscount > 0 && (
+                                          {resolvedOpt.discountPercent > 0 && (
                                             <span className="text-[10px] bg-red-100 text-red-700 font-black px-2 py-0.5 rounded-full border border-red-200">
-                                              SAVE {optDiscount}%
+                                              SAVE {resolvedOpt.discountPercent}%
                                             </span>
                                           )}
                                         </div>
                                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
-                                          {type === 'package' ? 'Full Treatment' : 'Direct Supply'}
+                                          {type === 'package' ? 'Combo Wellness Pack' : 'Direct Supply'}
                                         </span>
                                       </div>
                                       <div className="text-right">
-                                        {optDiscount > 0 && (
+                                        {resolvedOpt.discountPercent > 0 && resolvedOpt.originalPrice > resolvedOpt.sellingPrice && (
                                           <div className="text-xs text-slate-400 line-through font-bold">
-                                            ₦{optPrice.toLocaleString()}
+                                            ₦{resolvedOpt.originalPrice.toLocaleString()}
                                           </div>
                                         )}
                                         <div className={`text-2xl font-black ${selectedOption === opt ? 'text-emerald-700' : 'text-slate-900'}`}>
-                                          ₦{effectiveOptPrice.toLocaleString()}
+                                          ₦{resolvedOpt.sellingPrice.toLocaleString()}
                                         </div>
                                       </div>
                                     </div>

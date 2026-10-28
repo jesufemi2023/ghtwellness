@@ -33,6 +33,12 @@ import {
 import { sanitizeAdTitle } from '../utils/adCompliance';
 import { getStoredAdAttribution } from '../utils/adAttribution';
 import { getOptimizedImageUrl } from '../utils/cloudinary';
+import {
+  computePackagePricing,
+  computeProductPricing,
+  resolveSingleOptionPricing,
+  cleanBottleLabel,
+} from '../utils/optionPricing';
 
 const NIGERIAN_STATES = [
   'Lagos State',
@@ -118,7 +124,7 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
   const [activeType, setActiveType] = useState<'package' | 'product'>(itemType);
   const [activeOptIdx, setActiveOptIdx] = useState<number>(selectedOptionIdx);
   const [quantity, setQuantity] = useState<number>(initialQuantity);
-  const [imgError, setImgError] = useState(false);
+  const [imgStage, setImgStage] = useState<'optimized' | 'raw' | 'failed'>('optimized');
 
   const [fullName, setFullName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -169,53 +175,49 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
     setActiveType(itemType);
     setActiveOptIdx(selectedOptionIdx);
     setQuantity(initialQuantity);
-    setImgError(false);
+    setImgStage('optimized');
     setSubmitError(null);
     setIsSuccess(false);
   }, [selectedItem, itemType, selectedOptionIdx, initialQuantity]);
 
   const itemOptions = activeItem.options || [];
-  const activeOption =
-    itemOptions.length > 0
-      ? itemOptions[Math.min(activeOptIdx, itemOptions.length - 1)] || itemOptions[0]
-      : null;
-
-  const optDiscount = activeOption
-    ? Number(activeOption.discount) || 0
-    : activeType === 'package'
+  const parentDiscountPercent =
+    activeType === 'package'
       ? Number((activeItem as PackageData).discount) || 0
       : Number((activeItem as Product).discount_percent) || 0;
 
-  const optRetailPrice = activeOption
-    ? Number(activeOption.price) || 0
-    : activeType === 'package'
-      ? Number((activeItem as PackageData).price) || 0
-      : Number((activeItem as Product).price_naira) || 0;
+  const computedPricing =
+    activeType === 'package'
+      ? computePackagePricing(activeItem as PackageData, activeOptIdx)
+      : {
+          ...computeProductPricing(activeItem as Product, activeOptIdx),
+          includedList: [] as string[],
+        };
 
-  const unitPrice =
-    optDiscount > 0 ? Math.round(optRetailPrice * (1 - optDiscount / 100)) : optRetailPrice;
+  const activeOption = computedPricing.activeOption;
+  const activeOptionLabel = activeOption ? cleanBottleLabel(activeOption.bottles) : '';
+  const unitPrice = computedPricing.currentPrice;
+  const unitRetailPrice = computedPricing.retailPrice;
   const totalPrice = unitPrice * quantity;
-  const totalRetail = optRetailPrice * quantity;
+  const totalRetail = unitRetailPrice * quantity;
   const totalSavings = Math.max(0, totalRetail - totalPrice);
 
-  const includedProducts =
-    activeType === 'package'
-      ? activeOption &&
-        'products' in activeOption &&
-        Array.isArray(activeOption.products) &&
-        activeOption.products.length > 0
-        ? formatOptionProductList(activeOption.products)
-        : ((activeItem as PackageData).products || []).map((p) => p.name)
-      : [];
+  const includedProducts = computedPricing.includedList;
 
   const rawImageUrl =
     activeType === 'package'
-      ? (activeItem as PackageData).package_image_url ||
-        (activeItem as PackageData).products?.[0]?.image_url ||
+      ? (activeItem as PackageData).package_image_url?.trim() ||
+        (activeItem as PackageData).products?.[0]?.image_url?.trim() ||
         ''
-      : (activeItem as Product).image_url || '';
+      : (activeItem as Product).image_url?.trim() || '';
 
-  const previewImageUrl = rawImageUrl ? getOptimizedImageUrl(rawImageUrl, 700) : '';
+  const optimizedImageUrl = rawImageUrl ? getOptimizedImageUrl(rawImageUrl, 700) : '';
+  const previewImageUrl =
+    imgStage === 'optimized'
+      ? optimizedImageUrl || rawImageUrl
+      : imgStage === 'raw'
+        ? rawImageUrl
+        : '';
 
   useEffect(() => {
     if (mode === 'modal' && isOpen) {
@@ -345,7 +347,7 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
             {
               id: pkg.id,
               name: formatProductNameWithBottles(pkg.name, bottleNum, 1),
-              bottles: activeOption.bottles,
+              bottles: activeOptionLabel,
               quantity,
               price_at_time: unitPrice,
               is_package: true,
@@ -456,7 +458,7 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
     const itemDisplay = formatOrderDisplayName(
       displayTitle,
       quantity,
-      activeOption ? activeOption.bottles : undefined
+      activeOption ? activeOptionLabel : undefined
     );
     const msg = `Hello ${CONFIG.company.name}, I would like to confirm my Pay-on-Delivery order for ${itemDisplay} (₦${totalPrice.toLocaleString()}).${
       fullName ? `\nName: ${fullName}` : ''
@@ -481,9 +483,9 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
       </div>
       <div className="bg-[#F6F8F7] border border-[#DDE5E0] rounded-xl p-5 max-w-md mx-auto text-left text-sm sm:text-base space-y-2 tabular-nums">
         <div className="flex justify-between gap-3">
-          <span className="text-slate-600">Selected Course</span>
+          <span className="text-slate-600">Selected Pack</span>
           <span className="font-semibold text-[#0F1F18] text-right">
-            {displayTitle} {activeOption ? `(${activeOption.bottles})` : ''}
+            {displayTitle} {activeOptionLabel ? `(${activeOptionLabel})` : ''}
           </span>
         </div>
         <div className="flex justify-between gap-3">
@@ -525,7 +527,7 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
               htmlFor="inline-bundle-select"
               className="block text-sm font-semibold text-[#0F1F18] mb-2"
             >
-              Select Wellness Course to Dispatch
+              Select Wellness Pack to Dispatch
             </label>
             <select
               id="inline-bundle-select"
@@ -545,7 +547,7 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
                   setActiveItem(chosen);
                   setActiveType('package');
                   setActiveOptIdx(defaultIdx);
-                  setImgError(false);
+                  setImgStage('optimized');
                   onSelectBundle?.(chosen, defaultIdx);
                 }
               }}
@@ -569,18 +571,27 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
             mode === 'inline' ? 'lg:hidden' : ''
           }`}
         >
-          <div className="w-full sm:w-44 h-44 rounded-xl bg-[radial-gradient(circle_at_center,#ffffff_0%,#eef3f0_100%)] border border-[#DDE5E0] flex items-center justify-center p-3 shrink-0 overflow-hidden">
-            {previewImageUrl && !imgError ? (
-              <img
-                src={previewImageUrl}
-                alt={displayTitle}
-                referrerPolicy="no-referrer"
-                onError={() => setImgError(true)}
-                className="w-full h-full object-contain mix-blend-multiply scale-105"
-              />
+          <div className="relative w-full sm:w-44 h-44 rounded-xl bg-white border border-[#DDE5E0] shrink-0 overflow-hidden">
+            {previewImageUrl && imgStage !== 'failed' ? (
+              <div className="absolute inset-2 flex items-center justify-center">
+                <img
+                  src={previewImageUrl}
+                  alt={displayTitle}
+                  loading="eager"
+                  decoding="async"
+                  onError={() => {
+                    if (imgStage === 'optimized' && rawImageUrl && optimizedImageUrl !== rawImageUrl) {
+                      setImgStage('raw');
+                    } else {
+                      setImgStage('failed');
+                    }
+                  }}
+                  className="max-w-full max-h-full w-full h-full object-contain"
+                />
+              </div>
             ) : (
-              <div className="text-center p-2">
-                <ShieldCheck className="w-8 h-8 text-[#047857] mx-auto mb-1" />
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-2">
+                <ShieldCheck className="w-8 h-8 text-[#047857] mb-1" />
                 <span className="text-xs font-semibold text-slate-700">{displayTitle}</span>
               </div>
             )}
@@ -601,6 +612,11 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
                 </span>
               )}
             </div>
+            {totalSavings > 0 && (
+              <div className="text-xs font-semibold text-[#047857]">
+                You Save ₦{totalSavings.toLocaleString()} ({computedPricing.discount}% Off)
+              </div>
+            )}
           </div>
         </div>
 
@@ -616,7 +632,7 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
           </div>
 
           <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
-            <span className="text-sm font-medium text-slate-700">Number of Courses:</span>
+            <span className="text-sm font-medium text-slate-700">Quantity (Packs):</span>
             <div className="inline-flex items-center gap-2">
               <button
                 type="button"
@@ -644,21 +660,23 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
         {itemOptions.length > 0 && (
           <div className="space-y-2.5">
             <div className="text-sm font-semibold text-[#0F1F18]">
-              Select Bottle Course Duration:
+              Select Bottle Pack &amp; Discounted Price:
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
               {itemOptions.map((opt, idx) => {
                 const isSelected = idx === activeOptIdx;
-                const d = Number(opt.discount) || 0;
-                const p = Number(opt.price) || 0;
-                const eff = d > 0 ? Math.round(p * (1 - d / 100)) : p;
+                const optPriceInfo = resolveSingleOptionPricing(opt, parentDiscountPercent);
                 return (
                   <button
                     key={idx}
                     type="button"
                     onClick={() => {
                       setActiveOptIdx(idx);
-                      trackAdBundleSelect(displayTitle, opt.bottles, eff);
+                      trackAdBundleSelect(
+                        displayTitle,
+                        optPriceInfo.label,
+                        optPriceInfo.sellingPrice
+                      );
                       if (activeType === 'package') {
                         onSelectBundle?.(activeItem as PackageData, idx);
                       }
@@ -666,7 +684,7 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
                     className={`p-3 rounded-xl border text-left transition-colors cursor-pointer tabular-nums ${
                       isSelected
                         ? 'border-[#047857] bg-white ring-2 ring-[#047857]'
-                        : 'border-[#D5DFDA] bg-white/80 hover:bg-white hover:border-slate-400'
+                        : 'border-[#D5DFDA] bg-white/85 hover:bg-white hover:border-slate-400'
                     }`}
                   >
                     <div className="flex items-center justify-between gap-1">
@@ -675,14 +693,23 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
                           isSelected ? 'text-[#047857]' : 'text-[#0F1F18]'
                         }`}
                       >
-                        {opt.bottles}
+                        {optPriceInfo.label}
                       </span>
-                      {d > 0 && (
-                        <span className="text-xs font-semibold text-[#047857]">-{d}%</span>
+                      {optPriceInfo.discountPercent > 0 && (
+                        <span className="text-xs font-bold text-[#047857]">
+                          -{optPriceInfo.discountPercent}%
+                        </span>
                       )}
                     </div>
-                    <div className="text-sm font-extrabold text-[#0F1F18] mt-1">
-                      ₦{eff.toLocaleString()}
+                    <div className="mt-1 space-y-0.5">
+                      <div className="text-sm font-extrabold text-[#0F1F18]">
+                        ₦{optPriceInfo.sellingPrice.toLocaleString()}
+                      </div>
+                      {optPriceInfo.savings > 0 && (
+                        <div className="text-[11px] text-slate-400 line-through">
+                          ₦{optPriceInfo.originalPrice.toLocaleString()}
+                        </div>
+                      )}
                     </div>
                   </button>
                 );
@@ -980,15 +1007,21 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
 
         {/* Clean Unboxed Hairline Order Total Summary */}
         <div className="pt-4 border-t border-[#E4EBE7] space-y-2 tabular-nums">
+          {totalSavings > 0 && (
+            <div className="flex justify-between text-sm text-slate-500">
+              <span>Regular Retail Value</span>
+              <span className="line-through">₦{totalRetail.toLocaleString()}</span>
+            </div>
+          )}
           <div className="flex justify-between text-sm sm:text-base text-slate-600">
             <span>
-              {displayTitle} {activeOption ? `(${activeOption.bottles})` : ''} × {quantity}
+              {displayTitle} {activeOptionLabel ? `(${activeOptionLabel})` : ''} × {quantity}
             </span>
             <span className="font-semibold text-[#0F1F18]">₦{totalPrice.toLocaleString()}</span>
           </div>
           {totalSavings > 0 && (
-            <div className="flex justify-between text-sm text-[#047857] font-medium">
-              <span>Multi-Bottle Course Savings</span>
+            <div className="flex justify-between text-sm text-[#047857] font-semibold">
+              <span>Multi-Bottle Pack Savings ({computedPricing.discount}% Off)</span>
               <span>-₦{totalSavings.toLocaleString()}</span>
             </div>
           )}

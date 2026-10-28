@@ -21,27 +21,45 @@ interface StorageSchema {
   recommended_packages: Record<string, StoredItem>;
 }
 
-const DATA_DIR = path.resolve(process.cwd(), "data");
-const STORAGE_FILE = path.join(DATA_DIR, "options_storage.json");
+const IS_VERCEL = Boolean(process.env.VERCEL);
+const SEED_STORAGE_FILE = path.resolve(process.cwd(), "data", "options_storage.json");
+const WRITABLE_DATA_DIR = IS_VERCEL ? "/tmp" : path.resolve(process.cwd(), "data");
+const WRITABLE_STORAGE_FILE = path.join(WRITABLE_DATA_DIR, "options_storage.json");
 
 let memoryStore: StorageSchema = {
   products: {},
   recommended_packages: {}
 };
 
+let initialized = false;
+
 function ensureInitialized() {
+  if (initialized) return;
+  initialized = true;
+
   try {
-    if (!fs.existsSync(DATA_DIR)) {
-      fs.mkdirSync(DATA_DIR, { recursive: true });
-    }
-    if (fs.existsSync(STORAGE_FILE)) {
-      const raw = fs.readFileSync(STORAGE_FILE, "utf-8");
+    // 1. Load bundled seed file first (works on both local dev and Vercel read-only /var/task/data)
+    if (fs.existsSync(SEED_STORAGE_FILE)) {
+      const raw = fs.readFileSync(SEED_STORAGE_FILE, "utf-8");
       const parsed = JSON.parse(raw);
       memoryStore = {
-        products: parsed.products || {},
-        recommended_packages: parsed.recommended_packages || {}
+        products: { ...(parsed.products || {}) },
+        recommended_packages: { ...(parsed.recommended_packages || {}) }
       };
-    } else {
+    }
+
+    // 2. Overlay any runtime writes stored in /tmp on Vercel (or local data dir)
+    if (WRITABLE_STORAGE_FILE !== SEED_STORAGE_FILE && fs.existsSync(WRITABLE_STORAGE_FILE)) {
+      const runtimeRaw = fs.readFileSync(WRITABLE_STORAGE_FILE, "utf-8");
+      const runtimeParsed = JSON.parse(runtimeRaw);
+      memoryStore = {
+        products: { ...memoryStore.products, ...(runtimeParsed.products || {}) },
+        recommended_packages: {
+          ...memoryStore.recommended_packages,
+          ...(runtimeParsed.recommended_packages || {})
+        }
+      };
+    } else if (!IS_VERCEL && !fs.existsSync(SEED_STORAGE_FILE)) {
       saveToDisk();
     }
   } catch (err) {
@@ -51,12 +69,33 @@ function ensureInitialized() {
 
 function saveToDisk() {
   try {
-    if (!fs.existsSync(DATA_DIR)) {
-      fs.mkdirSync(DATA_DIR, { recursive: true });
+    if (!fs.existsSync(WRITABLE_DATA_DIR)) {
+      fs.mkdirSync(WRITABLE_DATA_DIR, { recursive: true });
     }
-    fs.writeFileSync(STORAGE_FILE, JSON.stringify(memoryStore, null, 2), "utf-8");
+    fs.writeFileSync(WRITABLE_STORAGE_FILE, JSON.stringify(memoryStore, null, 2), "utf-8");
   } catch (err) {
     console.error("[OptionsStorage] Error saving storage file:", err);
+  }
+}
+
+function cacheInMemoryOnly(
+  table: "products" | "recommended_packages",
+  id: string,
+  options: BottleOption[],
+  code?: string,
+  name?: string
+) {
+  if (!id) return;
+  const storedItem: StoredItem = {
+    id: String(id),
+    code: code ? String(code).trim() : undefined,
+    name: name ? String(name).trim() : undefined,
+    options,
+    updated_at: new Date().toISOString()
+  };
+  memoryStore[table][String(id)] = storedItem;
+  if (code) {
+    memoryStore[table][`code_${String(code).trim().toLowerCase()}`] = storedItem;
   }
 }
 
@@ -65,7 +104,7 @@ ensureInitialized();
 
 export class OptionsStorage {
   /**
-   * Save options for a product or recommended package to persistent disk and memory.
+   * Save options for a product or recommended package to writable disk, memory, and Supabase settings backup.
    */
   static saveOptions(
     table: "products" | "recommended_packages",
@@ -81,22 +120,10 @@ export class OptionsStorage {
     const normalizedTable = table === "products" ? "products" : "recommended_packages";
     const cleanedOptions: BottleOption[] = Array.isArray(options) ? options : [];
 
-    const storedItem: StoredItem = {
-      id: String(id),
-      code: code ? String(code).trim() : undefined,
-      name: name ? String(name).trim() : undefined,
-      options: cleanedOptions,
-      updated_at: new Date().toISOString()
-    };
-
-    memoryStore[normalizedTable][String(id)] = storedItem;
-    if (code) {
-      memoryStore[normalizedTable][`code_${String(code).trim().toLowerCase()}`] = storedItem;
-    }
-
+    cacheInMemoryOnly(normalizedTable, id, cleanedOptions, code, name);
     saveToDisk();
 
-    // Also persist as a fallback to Supabase 'settings' table if available
+    // Persist as a cloud backup to Supabase 'settings' table if available
     if (supabaseClient) {
       (async () => {
         try {
@@ -107,7 +134,7 @@ export class OptionsStorage {
               value: JSON.stringify(cleanedOptions)
             }
           ]);
-        } catch (e) {
+        } catch {
           // Silently ignore settings fallback write errors
         }
       })();
@@ -115,7 +142,7 @@ export class OptionsStorage {
   }
 
   /**
-   * Get options for a given product or package by ID or code.
+   * Get options for a given product or package by ID, code, or name.
    */
   static getOptions(
     table: "products" | "recommended_packages",
@@ -136,7 +163,6 @@ export class OptionsStorage {
       if (tableData[codeKey] && tableData[codeKey].options) {
         return tableData[codeKey].options;
       }
-      // Also search by code property
       for (const key in tableData) {
         const item = tableData[key];
         if (item.code && item.code.toLowerCase() === String(code).trim().toLowerCase()) {
@@ -184,20 +210,20 @@ export class OptionsStorage {
   }
 
   /**
-   * Seamlessly attach persistent options to a single item if missing from DB.
+   * Seamlessly attach persistent options to a single item without writing to disk on read requests.
    */
   static attachOptionsToItem<T extends Record<string, any>>(
     table: "products" | "recommended_packages",
     item: T
   ): T {
     if (!item || typeof item !== "object") return item;
+    ensureInitialized();
 
-    // Check if the item already has populated options
+    const normalizedTable = table === "products" ? "products" : "recommended_packages";
     const existingOptions = item.options;
     if (Array.isArray(existingOptions) && existingOptions.length > 0) {
-      // Sync into memoryStore so disk has the latest copy
-      OptionsStorage.saveOptions(
-        table,
+      cacheInMemoryOnly(
+        normalizedTable,
         item.id,
         existingOptions,
         item.product_code || item.package_code,
@@ -206,9 +232,8 @@ export class OptionsStorage {
       return item;
     }
 
-    // Otherwise, retrieve from storage
     const storedOptions = OptionsStorage.getOptions(
-      table,
+      normalizedTable,
       item.id,
       item.product_code || item.package_code,
       item.name

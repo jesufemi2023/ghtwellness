@@ -41,6 +41,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { CONFIG } from "./config";
 import { CacheService } from "./utils/cache";
 import { openWhatsAppLink } from "./utils/whatsapp";
+import { supabase } from "./lib/supabase";
 
 import { Home } from "./components/Home";
 import { About } from "./components/About";
@@ -358,26 +359,44 @@ export default function App() {
     setFormData(prev => ({ ...prev, distributor_id: distributorId }));
   }, [distributorId]);
 
+  const [isCatalogLoading, setIsCatalogLoading] = useState(true);
+
   useEffect(() => {
     const initApp = async () => {
-      // 1. Try to load from cache first for instant UI
+      // 1. Load non-empty cached catalog immediately if present
       const cachedProducts = CacheService.get(CacheService.KEYS.PRODUCTS);
       const cachedPackages = CacheService.get(CacheService.KEYS.PACKAGES);
 
-      if (cachedProducts) setProducts(cachedProducts);
-      if (cachedPackages) {
+      const hasCachedProducts = Array.isArray(cachedProducts) && cachedProducts.length > 0;
+      const hasCachedPackages = Array.isArray(cachedPackages) && cachedPackages.length > 0;
+
+      if (hasCachedProducts) {
+        setProducts(cachedProducts);
+      }
+      if (hasCachedPackages) {
         setRecommendedPackages(cachedPackages.filter((p: any) => !p.is_combo));
         setComboPackages(cachedPackages.filter((p: any) => p.is_combo));
+        setIsCatalogLoading(false);
       }
 
-      // 2. Check if cache is valid in background
-      const isValid = await CacheService.isCacheValid();
-      
-      if (!isValid || !cachedProducts || !cachedPackages) {
-        // Cache is stale or missing, fetch fresh data
-        fetchProducts();
-        fetchRecommendedPackages();
+      // 2. On cold visit (no cache), fetch fresh Supabase data IMMEDIATELY without waiting on sync-check
+      if (!hasCachedProducts || !hasCachedPackages) {
+        setIsCatalogLoading(true);
+        await Promise.allSettled([
+          fetchProducts(),
+          fetchRecommendedPackages(),
+          CacheService.isCacheValid(),
+        ]);
+        setIsCatalogLoading(false);
+        return;
       }
+
+      // 3. When warm cache exists, validate in background and refresh if stale or updated
+      const isValid = await CacheService.isCacheValid();
+      if (!isValid) {
+        await Promise.allSettled([fetchProducts(), fetchRecommendedPackages()]);
+      }
+      setIsCatalogLoading(false);
     };
 
     initApp();
@@ -461,7 +480,17 @@ export default function App() {
         console.warn("Network error: Server might be starting or unreachable. Retrying in 3s...");
         setTimeout(fetchProducts, 3000);
       }
-      setProducts([]);
+      // Direct Supabase read fallback if serverless API is temporarily unreachable
+      try {
+        const { data: sbProducts } = await supabase.from("products").select("*");
+        if (Array.isArray(sbProducts) && sbProducts.length > 0) {
+          setProducts(sbProducts as Product[]);
+          CacheService.save(CacheService.KEYS.PRODUCTS, sbProducts);
+          return;
+        }
+      } catch {
+        // Ignore fallback error
+      }
     }
   };
 
@@ -506,8 +535,26 @@ export default function App() {
         console.warn("Network error: Server might be starting or unreachable. Retrying in 3s...");
         setTimeout(fetchRecommendedPackages, 3000);
       }
-      setRecommendedPackages([]);
-      setComboPackages([]);
+      // Direct Supabase read fallback if serverless API is temporarily unreachable
+      try {
+        const { data: sbPkgs } = await supabase
+          .from("recommended_packages")
+          .select("*, package_products(products(*))");
+        if (Array.isArray(sbPkgs) && sbPkgs.length > 0) {
+          const formatted: PackageData[] = sbPkgs.map((pkg: any) => ({
+            ...pkg,
+            is_combo: pkg.is_combo || false,
+            options: Array.isArray(pkg.options) ? pkg.options : [],
+            products: pkg.package_products?.map((pp: any) => pp.products).filter(Boolean) || []
+          }));
+          setRecommendedPackages(formatted.filter(p => !p.is_combo));
+          setComboPackages(formatted.filter(p => p.is_combo));
+          CacheService.save(CacheService.KEYS.PACKAGES, formatted);
+          return;
+        }
+      } catch {
+        // Ignore fallback error
+      }
     }
   };
 
@@ -1000,6 +1047,7 @@ export default function App() {
                 products={products}
                 packages={recommendedPackages}
                 combos={comboPackages}
+                isLoading={isCatalogLoading}
                 distributorId={distributorId}
                 onOrderProduct={(p, qty) => openOrderDrawer(p, 'product', qty || 1)}
                 onOrderPackage={(pkg, type, qty, optIdx) => openOrderDrawer(pkg, type, qty || 1, optIdx || 0, true)}
