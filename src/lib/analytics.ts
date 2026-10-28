@@ -9,18 +9,16 @@ import {
 } from "./metaPixel";
 import {
   initGoogleTag,
-  trackGoogleTagEvent
+  trackGoogleTagEvent,
+  trackGoogleAdsConversion
 } from "./googleTag";
 
 const MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
 
 export const initGA = () => {
   // Initialize Google Analytics
-  if (MEASUREMENT_ID) {
+  if (MEASUREMENT_ID && MEASUREMENT_ID !== "G-XXXXXXXXXX") {
     ReactGA.initialize(MEASUREMENT_ID);
-    console.log("GA Initialized with ID:", MEASUREMENT_ID);
-  } else {
-    console.warn("GA Measurement ID not found. Analytics disabled.");
   }
 
   // Initialize Meta Pixel
@@ -31,7 +29,7 @@ export const initGA = () => {
 };
 
 export const trackPageView = (path: string, title?: string) => {
-  if (MEASUREMENT_ID) {
+  if (MEASUREMENT_ID && MEASUREMENT_ID !== "G-XXXXXXXXXX") {
     ReactGA.send({ hitType: "pageview", page: path, title: title || path });
   }
   trackPixelPageView();
@@ -40,7 +38,7 @@ export const trackPageView = (path: string, title?: string) => {
 };
 
 export const trackEvent = (category: string, action: string, label?: string, value?: number) => {
-  if (MEASUREMENT_ID) {
+  if (MEASUREMENT_ID && MEASUREMENT_ID !== "G-XXXXXXXXXX") {
     ReactGA.event({
       category,
       action,
@@ -53,25 +51,37 @@ export const trackEvent = (category: string, action: string, label?: string, val
 };
 
 // Specific events for the app
-export const trackOrderStart = (itemName: string, type: string) => {
-  trackEvent("Ecommerce", "Order Start", `${type}: ${itemName}`);
+export const trackOrderStart = (itemName: string, type: string, amount: number = 0) => {
+  trackEvent("Ecommerce", "Order Start", `${type}: ${itemName}`, amount);
   trackPixelInitiateCheckout(itemName, type);
   trackGoogleTagEvent("begin_checkout", {
-    items: [{ item_name: itemName, item_category: type }],
-    value: 0,
+    items: [{ item_name: itemName, item_category: type, price: amount }],
+    value: amount,
+    currency: "NGN"
+  });
+};
+
+export const trackAdBundleSelect = (bundleName: string, optionLabel: string, price: number) => {
+  trackEvent("Ad_Funnel", "Select Bundle Course", `${bundleName} - ${optionLabel}`, price);
+  trackGoogleTagEvent("select_item", {
+    item_list_name: "Ad Landing Bundles",
+    items: [{ item_name: bundleName, item_variant: optionLabel, price }],
+    value: price,
     currency: "NGN"
   });
 };
 
 export const trackOrderComplete = (itemName: string, amount: number) => {
+  const txId = `T_${Date.now()}`;
   trackEvent("Ecommerce", "Order Complete", itemName, amount);
   trackPixelPurchase(itemName, amount);
   trackGoogleTagEvent("purchase", {
-    transaction_id: `T_${Date.now()}`,
+    transaction_id: txId,
     value: amount,
     currency: "NGN",
     items: [{ item_name: itemName, price: amount }]
   });
+  trackGoogleAdsConversion(amount, txId);
 };
 
 export const trackConsultation = (illness: string) => {

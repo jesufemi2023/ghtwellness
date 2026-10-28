@@ -34,7 +34,8 @@ import {
   Home as HomeIcon,
   Linkedin,
   Code2,
-  ExternalLink
+  ExternalLink,
+  Mail
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { CONFIG } from "./config";
@@ -56,10 +57,13 @@ import AdminDashboard from "./components/AdminDashboard";
 import { TestimonialsPage } from "./components/TestimonialsPage";
 import { ThankYouPage } from "./components/ThankYouPage";
 import { ReturnPolicy } from "./components/ReturnPolicy";
+import { PrivacyPolicy } from "./components/PrivacyPolicy";
+import { TermsOfService } from "./components/TermsOfService";
 import { AdLandingPage } from "./components/AdLandingPage";
 import { DeveloperCaseStudyModal } from "./components/DeveloperCaseStudyModal";
 import { Product, PackageData } from "./types";
 import { trackPageView, trackConsultation, trackWhatsAppClick, trackBlogView } from "./lib/analytics";
+import { captureAndPersistAdAttribution, getStoredAdAttribution } from "./utils/adAttribution";
 
 interface Consultation {
   id: string;
@@ -73,51 +77,93 @@ interface Consultation {
 }
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<"home" | "ad" | "about" | "products" | "recommended" | "combo" | "consultation" | "history" | "product-detail" | "package-detail" | "admin" | "blog" | "blog-post" | "search" | "testimonials" | "thank-you" | "return-policy">((() => {
+  const resolveTabFromLocation = () => {
     const path = window.location.pathname;
     if (path === "/thank-you" || path.startsWith("/thank-you")) {
-      return "thank-you";
+      return "thank-you" as const;
     }
     if (path === "/return-policy" || path.startsWith("/return-policy")) {
-      return "return-policy";
+      return "return-policy" as const;
+    }
+    if (path === "/privacy-policy" || path.startsWith("/privacy-policy")) {
+      return "privacy-policy" as const;
+    }
+    if (path === "/terms-of-service" || path.startsWith("/terms-of-service") || path === "/terms") {
+      return "terms-of-service" as const;
+    }
+    if (path === "/about" || path.startsWith("/about")) {
+      return "about" as const;
     }
     if (path === "/ad" || path.startsWith("/ad")) {
-      return "ad";
+      return "ad" as const;
     }
     const params = new URLSearchParams(window.location.search);
     if (params.get("page") === "thank-you" || params.get("page") === "thankyou" || params.has("thank-you")) {
-      return "thank-you";
+      return "thank-you" as const;
     }
     if (params.get("page") === "return-policy" || params.get("page") === "returnpolicy" || params.has("return-policy")) {
-      return "return-policy";
+      return "return-policy" as const;
+    }
+    if (params.get("page") === "privacy-policy" || params.has("privacy-policy")) {
+      return "privacy-policy" as const;
+    }
+    if (params.get("page") === "terms-of-service" || params.has("terms-of-service")) {
+      return "terms-of-service" as const;
     }
     if (params.get("page") === "ad" || params.has("ad")) {
-      return "ad";
+      return "ad" as const;
     }
     if (params.has("package") || params.has("buy_package") || params.has("combo") || params.has("buy_combo")) {
-      return "package-detail";
+      return "package-detail" as const;
     }
     if (params.has("product") || params.has("buy_product")) {
-      return "product-detail";
+      return "product-detail" as const;
     }
     if (params.has("blog")) {
-      return "blog-post";
+      return "blog-post" as const;
     }
-    return "home";
-  })());
+    return "home" as const;
+  };
+
+  const [activeTab, setActiveTab] = useState<"home" | "ad" | "about" | "products" | "recommended" | "combo" | "consultation" | "history" | "product-detail" | "package-detail" | "admin" | "blog" | "blog-post" | "search" | "testimonials" | "thank-you" | "return-policy" | "privacy-policy" | "terms-of-service">(resolveTabFromLocation);
   const [previousTab, setPreviousTab] = useState<typeof activeTab>("home");
+
+  useEffect(() => {
+    captureAndPersistAdAttribution();
+    const onPopState = () => {
+      setActiveTab(resolveTabFromLocation());
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
 
   const navigateTo = (tab: typeof activeTab) => {
     setPreviousTab(activeTab);
     setActiveTab(tab);
+
+    // Preserve Google Ads auto-tagging / UTM params during in-session navigation
+    const currentParams = new URLSearchParams(window.location.search);
+    const preserved = new URLSearchParams();
+    ["gclid", "gbraid", "wbraid", "gad_source", "utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content", "ref", "distributor_id"].forEach((key) => {
+      const val = currentParams.get(key);
+      if (val) preserved.set(key, val);
+    });
+    const suffix = preserved.toString() ? `?${preserved.toString()}` : "";
+
     if (tab === "return-policy") {
-      window.history.pushState(null, '', '/return-policy');
+      window.history.pushState(null, "", `/return-policy${suffix}`);
+    } else if (tab === "privacy-policy") {
+      window.history.pushState(null, "", `/privacy-policy${suffix}`);
+    } else if (tab === "terms-of-service") {
+      window.history.pushState(null, "", `/terms-of-service${suffix}`);
+    } else if (tab === "about") {
+      window.history.pushState(null, "", `/about${suffix}`);
     } else if (tab === "ad") {
-      window.history.pushState(null, '', '/ad');
+      window.history.pushState(null, "", `/ad${suffix}`);
     } else if (tab === "home") {
-      window.history.pushState(null, '', '/');
+      window.history.pushState(null, "", `/${suffix}`);
     }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
   const [adminPassword, setAdminPassword] = useState("");
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
@@ -340,26 +386,40 @@ export default function App() {
   useEffect(() => {
     if (activeTab === "history") fetchHistory();
     
-    // Track Page View
+    // Sync document title, canonical URL, and analytics page_view
     const titles: Record<string, string> = {
-      home: "Home",
-      about: "About Us",
-      products: "All Products",
-      recommended: "Expert Solutions",
-      combo: "Combo Packs",
-      consultation: "AI Consultation",
-      history: "Consultation History",
-      "product-detail": `Product: ${viewingProduct?.name || "Detail"}`,
-      admin: "Admin Dashboard",
-      blog: "Health Blog",
-      "blog-post": "Blog Article",
-      search: `Search: ${searchQuery}`,
-      testimonials: "Success Stories",
-      "thank-you": "Thank You",
-      "return-policy": "Return & Exchange Policy"
+      home: "GHT Wellness – NAFDAC Registered Herbal & Nutritional Supplements",
+      ad: "GHT Herbal Wellness Bundles – Nationwide Pay on Delivery | GHT Wellness",
+      about: "About Us | GHT Wellness – SD GHT Health Care Nigeria Ltd",
+      products: "Herbal Nutritional Supplements | GHT Wellness",
+      recommended: "Herbal Wellness Packages | GHT Wellness",
+      combo: "Value Supplement Bundles | GHT Wellness",
+      consultation: "Wellness Consultation | GHT Wellness",
+      history: "Order Status | GHT Wellness",
+      "product-detail": `${viewingProduct?.name || "Supplement Details"} | GHT Wellness`,
+      "package-detail": `${viewingPackage?.name || "Wellness Bundle"} | GHT Wellness`,
+      admin: "Store Administration | GHT Wellness",
+      blog: "Health & Wellness Journal | GHT Wellness",
+      "blog-post": "Wellness Article | GHT Wellness",
+      search: `Search: ${searchQuery} | GHT Wellness`,
+      testimonials: "Customer Reviews | GHT Wellness",
+      "thank-you": "Order Confirmation | GHT Wellness",
+      "return-policy": "Return & Exchange Policy | GHT Wellness",
+      "privacy-policy": "Privacy Policy | GHT Wellness",
+      "terms-of-service": "Terms of Service & Shipping Policy | GHT Wellness"
     };
-    trackPageView(activeTab, titles[activeTab]);
-  }, [activeTab, viewingProduct, searchQuery]);
+
+    const pageTitle = titles[activeTab] || "GHT Wellness – Herbal & Nutritional Supplements";
+    document.title = pageTitle;
+
+    const canonicalEl = document.getElementById("canonical-link") as HTMLLinkElement | null;
+    if (canonicalEl && typeof window !== "undefined") {
+      canonicalEl.href = `${window.location.origin}${window.location.pathname}`;
+    }
+
+    const trackedPath = typeof window !== "undefined" ? window.location.pathname : `/${activeTab}`;
+    trackPageView(trackedPath, pageTitle);
+  }, [activeTab, viewingProduct, viewingPackage, searchQuery]);
 
   const fetchProducts = async () => {
     try {
@@ -553,9 +613,16 @@ export default function App() {
         }
       }
 
-      // 4. Clear URL parameters to prevent "sticky" state
-      const newUrl = window.location.pathname;
-      window.history.replaceState({}, '', newUrl);
+      // 4. Only strip one-time drawer auto-open triggers while preserving gclid, utm_*, and item params
+      if (buyProductId || buyPackageId || buyComboId) {
+        const cleanedParams = new URLSearchParams(window.location.search);
+        cleanedParams.delete('buy_product');
+        cleanedParams.delete('buy_package');
+        cleanedParams.delete('buy_combo');
+        const qs = cleanedParams.toString();
+        const newUrl = `${window.location.pathname}${qs ? `?${qs}` : ''}`;
+        window.history.replaceState({}, '', newUrl);
+      }
     };
 
     handleDeepLinking();
@@ -668,7 +735,8 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] font-sans text-slate-900">
-      {/* Sticky Top Navigation Container */}
+      {/* Sticky Top Navigation Container (hidden on distraction-free /ad funnel) */}
+      {activeTab !== "ad" && (
       <div className="sticky top-0 z-50 shadow-sm">
         {/* Top Announcement Bar */}
         <div className="bg-emerald-900 text-white py-2 px-4 text-center text-[9px] md:text-xs font-black uppercase tracking-[0.1em] md:tracking-[0.2em]">
@@ -837,11 +905,6 @@ export default function App() {
               </div>
               <div className="hidden sm:block h-8 w-[1px] bg-slate-200 mx-1 md:mx-2"></div>
               
-              <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-full text-[10px] font-bold border border-emerald-100">
-                <ShieldCheck size={13} />
-                <span className="whitespace-nowrap">RLS SECURE</span>
-              </div>
-              
               {/* Mobile Menu Toggle */}
               <button 
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -915,9 +978,10 @@ export default function App() {
           </AnimatePresence>
         </header>
       </div>
+      )}
 
       <main className={`mx-auto transition-all duration-500 ${
-        activeTab === "home" || activeTab === "about" || activeTab === "search" || activeTab === "testimonials" || activeTab === "product-detail" || activeTab === "ad"
+        activeTab === "home" || activeTab === "about" || activeTab === "search" || activeTab === "testimonials" || activeTab === "product-detail" || activeTab === "ad" || activeTab === "privacy-policy" || activeTab === "terms-of-service" || activeTab === "return-policy"
           ? "max-w-none px-0 py-0 bg-slate-50 min-h-screen" 
           : activeTab === "combo" 
             ? "max-w-[1440px] px-4 py-8 md:py-12" 
@@ -927,15 +991,16 @@ export default function App() {
           {activeTab === "ad" && (
             <motion.div
               key="ad"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               className="pt-0"
             >
               <AdLandingPage 
                 products={products}
                 packages={recommendedPackages}
                 combos={comboPackages}
+                distributorId={distributorId}
                 onOrderProduct={(p, qty) => openOrderDrawer(p, 'product', qty || 1)}
                 onOrderPackage={(pkg, type, qty, optIdx) => openOrderDrawer(pkg, type, qty || 1, optIdx || 0, true)}
                 onViewProduct={(p) => {
@@ -943,6 +1008,22 @@ export default function App() {
                   navigateTo("product-detail");
                 }}
                 onViewPackage={(pkg) => viewPackageDetailPage(pkg)}
+                onNavigatePolicy={(tab) => navigateTo(tab)}
+                onOrderSuccess={(fullName, itemName, quantity, totalPrice, deliveryDate, paymentMethod) => {
+                  const searchParams = new URLSearchParams();
+                  searchParams.set("full_name", fullName);
+                  searchParams.set("item_name", itemName);
+                  searchParams.set("quantity", String(quantity));
+                  searchParams.set("total_price", String(totalPrice));
+                  searchParams.set("delivery_date", deliveryDate);
+                  searchParams.set("payment_method", paymentMethod);
+                  const attr = getStoredAdAttribution();
+                  if (attr.gclid) searchParams.set("gclid", attr.gclid);
+                  if (attr.utm_campaign) searchParams.set("utm_campaign", attr.utm_campaign);
+                  window.history.pushState(null, "", `/thank-you?${searchParams.toString()}`);
+                  setActiveTab("thank-you");
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
               />
             </motion.div>
           )}
@@ -1889,6 +1970,28 @@ export default function App() {
             </motion.div>
           )}
 
+          {activeTab === "privacy-policy" && (
+            <motion.div
+              key="privacy-policy"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+            >
+              <PrivacyPolicy onNavigate={(tab) => navigateTo(tab)} />
+            </motion.div>
+          )}
+
+          {activeTab === "terms-of-service" && (
+            <motion.div
+              key="terms-of-service"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+            >
+              <TermsOfService onNavigate={(tab) => navigateTo(tab)} />
+            </motion.div>
+          )}
+
           {activeTab === "admin" && (
             <motion.div
               key="admin"
@@ -1938,11 +2041,11 @@ export default function App() {
         </AnimatePresence>
       </main>
 
-      {activeTab !== "product-detail" && activeTab !== "package-detail" && (
-        <footer className="bg-slate-900 text-white py-12 md:py-20 mt-12 md:mt-20">
-        <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
-          <div className="col-span-1 sm:col-span-2">
-            <div className="flex items-center gap-3 mb-6">
+      {activeTab !== "product-detail" && activeTab !== "package-detail" && activeTab !== "ad" && (
+        <footer className="bg-slate-900 text-white py-12 md:py-20">
+        <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
               {CONFIG.company.logoUrl ? (
                 <img 
                   src={CONFIG.company.logoUrl} 
@@ -1955,19 +2058,17 @@ export default function App() {
                   <Activity size={20} className="md:size-6" />
                 </div>
               )}
-              <h1 className="font-bold text-lg md:text-xl tracking-tight">{CONFIG.company.name}</h1>
+              <span className="font-bold text-lg md:text-xl tracking-tight">{CONFIG.company.name}</span>
             </div>
-            <p className="text-slate-400 max-w-md leading-relaxed text-sm md:text-base">
-              Leading distributor and marketer of professional health products. 
-              We are committed to providing high-quality supplements and expert health consultations 
-              to improve the well-being of our community.
+            <p className="text-slate-400 leading-relaxed text-xs md:text-sm">
+              Authorized distributor of {CONFIG.company.name} {CONFIG.company.subtitle}, providing NAFDAC-registered herbal and nutritional dietary supplements for daily wellness support across Nigeria.
             </p>
           </div>
           
-          <div className="sm:col-span-1">
-            <h4 className="font-bold mb-4 md:mb-6 text-sm md:text-base">Quick Links</h4>
-            <ul className="space-y-3 md:space-y-4 text-slate-400 text-xs md:text-sm">
-              {CONFIG.navigation.map(item => (
+          <div>
+            <h4 className="font-bold mb-4 md:mb-6 text-sm md:text-base">Store Navigation</h4>
+            <ul className="space-y-2.5 text-slate-400 text-xs md:text-sm">
+              {CONFIG.navigation.filter(item => item.id !== "admin").map(item => (
                 <li key={item.id}>
                   <button onClick={() => navigateTo(item.id as any)} className="hover:text-emerald-400 transition-colors cursor-pointer">
                     {item.label}
@@ -1975,14 +2076,47 @@ export default function App() {
                 </li>
               ))}
               <li>
-                <button onClick={() => navigateTo("return-policy")} className="hover:text-emerald-400 transition-colors font-semibold text-emerald-500 cursor-pointer">
-                  Return Policy
+                <button onClick={() => navigateTo("admin")} className="hover:text-slate-300 text-slate-500 transition-colors cursor-pointer text-xs">
+                  Admin Portal
                 </button>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="font-bold mb-4 md:mb-6 text-sm md:text-base">Legal &amp; Store Policies</h4>
+            <ul className="space-y-3 text-slate-400 text-xs md:text-sm">
+              <li>
+                <a
+                  href="/privacy-policy"
+                  onClick={(e) => { e.preventDefault(); navigateTo("privacy-policy"); }}
+                  className="hover:text-emerald-400 transition-colors font-medium text-slate-200 cursor-pointer"
+                >
+                  Privacy Policy
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/terms-of-service"
+                  onClick={(e) => { e.preventDefault(); navigateTo("terms-of-service"); }}
+                  className="hover:text-emerald-400 transition-colors font-medium text-slate-200 cursor-pointer"
+                >
+                  Terms of Service &amp; Shipping
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/return-policy"
+                  onClick={(e) => { e.preventDefault(); navigateTo("return-policy"); }}
+                  className="hover:text-emerald-400 transition-colors font-medium text-slate-200 cursor-pointer"
+                >
+                  Return &amp; Exchange Policy
+                </a>
               </li>
               <li>
                 <button 
                   onClick={() => setIsDevCaseStudyOpen(true)} 
-                  className="hover:text-emerald-300 transition-colors font-semibold text-emerald-400 flex items-center gap-1.5 cursor-pointer"
+                  className="hover:text-emerald-300 transition-colors font-semibold text-emerald-400 flex items-center gap-1.5 cursor-pointer pt-1"
                 >
                   <Code2 size={13} />
                   Developer Case Study
@@ -1991,19 +2125,36 @@ export default function App() {
             </ul>
           </div>
 
-          <div className="sm:col-span-1">
-            <h4 className="font-bold mb-4 md:mb-6 text-sm md:text-base">Contact Us</h4>
-            <ul className="space-y-3 md:space-y-4 text-slate-400 text-xs md:text-sm">
-              <li className="flex items-center gap-2">
-                <Phone size={14} />
-                {CONFIG.company.phone}
+          <div>
+            <h4 className="font-bold mb-4 md:mb-6 text-sm md:text-base">Merchant Contact</h4>
+            <ul className="space-y-3 text-slate-400 text-xs md:text-sm">
+              <li className="flex items-start gap-2">
+                <MapPin size={15} className="shrink-0 mt-0.5 text-emerald-400" />
+                <span>{CONFIG.company.address}</span>
               </li>
               <li className="flex items-center gap-2">
-                <ShieldCheck size={14} />
-                NAFDAC Registered Products
+                <Phone size={14} className="shrink-0 text-emerald-400" />
+                <span>{CONFIG.company.phone}</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <Mail size={14} className="shrink-0 text-emerald-400" />
+                <a href={`mailto:${CONFIG.company.email}`} className="hover:text-emerald-400 transition-colors">
+                  {CONFIG.company.email}
+                </a>
+              </li>
+              <li className="flex items-center gap-2">
+                <ShieldCheck size={14} className="shrink-0 text-emerald-400" />
+                <span>NAFDAC Registered Supplements</span>
               </li>
             </ul>
           </div>
+        </div>
+
+        {/* Site-Wide Regulatory Dietary Supplement Disclaimer */}
+        <div className="max-w-7xl mx-auto px-4 mt-10 pt-6 border-t border-slate-800/80">
+          <p className="text-[11px] md:text-xs text-slate-400 leading-relaxed">
+            <strong className="text-slate-300">Health &amp; Dietary Supplement Disclaimer:</strong> Products sold on this website are herbal and nutritional dietary supplements intended to support general wellness and are not intended to diagnose, treat, cure, or prevent any disease. Individual results may vary. Always consult a licensed physician or healthcare professional before starting any supplement regimen, particularly if pregnant, nursing, taking medication, or managing a medical condition.
+          </p>
         </div>
         
         {/* Developer Attribution & Bottom Bar */}
@@ -2512,7 +2663,7 @@ export default function App() {
       <AIChatBot 
         isOpen={isChatOpen}
         setIsOpen={setIsChatOpen}
-        forceHide={!!selectedProduct || !!selectedPackage || isOrderDrawerOpen}
+        forceHide={activeTab === "ad" || !!selectedProduct || !!selectedPackage || isOrderDrawerOpen}
         onProductClick={(itemId, label, type) => {
           // Clean up the ID in case the AI added quotes or prefixes
           let cleanId = itemId.replace(/['"]/g, '').trim();
@@ -2589,7 +2740,8 @@ export default function App() {
         }}
       />
 
-      {/* Floating Lead Developer Showcase Badge for Employers & Visitors */}
+      {/* Floating Lead Developer Showcase Badge for Employers & Visitors (hidden on /ad) */}
+      {activeTab !== "ad" && (
       <div className="fixed bottom-6 left-6 z-[80] hidden md:block">
         <button
           type="button"
@@ -2625,6 +2777,7 @@ export default function App() {
           </div>
         </button>
       </div>
+      )}
 
       {/* Developer Case Study & Portfolio Modal */}
       <DeveloperCaseStudyModal 

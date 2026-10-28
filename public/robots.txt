@@ -1,0 +1,18 @@
+User-agent: AdsBot-Google
+Allow: /
+
+User-agent: AdsBot-Google-Mobile
+Allow: /
+
+User-agent: Mediapartners-Google
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+Disallow: /api/
+
+User-agent: *
+Allow: /
+Disallow: /api/
+
+Sitemap: https://ghtwellness.vercel.app/sitemap.xml

@@ -1290,6 +1290,18 @@ const SettingsAdminView = ({ adminPassword }: { adminPassword: string }) => {
       });
 
       if (res.ok) {
+        if (typeof window !== "undefined") {
+          if (settings.google_tag_id) {
+            localStorage.setItem("google_tag_id_cache", String(settings.google_tag_id).trim());
+          } else {
+            localStorage.removeItem("google_tag_id_cache");
+          }
+          if (settings.google_conversion_label) {
+            localStorage.setItem("google_conversion_label_cache", String(settings.google_conversion_label).trim());
+          } else {
+            localStorage.removeItem("google_conversion_label_cache");
+          }
+        }
         setMessage("Settings saved successfully!");
         setTimeout(() => setMessage(""), 3000);
       } else {
@@ -1365,21 +1377,37 @@ const SettingsAdminView = ({ adminPassword }: { adminPassword: string }) => {
             </p>
           </div>
 
-          <div className="border-t border-slate-100 pt-6 space-y-2">
-            <div className="flex items-center justify-between mb-1">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Google Tag / AdWords ID</label>
-              <span className="text-[9px] bg-emerald-100 text-emerald-700 font-extrabold px-2 py-0.5 rounded-full uppercase tracking-widest">Active Tracker</span>
+          <div className="border-t border-slate-100 pt-6 space-y-4">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Google Tag / Google Ads ID (gtag.js)</label>
+                <span className="text-[9px] bg-emerald-100 text-emerald-700 font-extrabold px-2 py-0.5 rounded-full uppercase tracking-widest">Active Tracker</span>
+              </div>
+              <input 
+                type="text"
+                value={settings.google_tag_id || ""}
+                onChange={e => setSettings({ ...settings, google_tag_id: e.target.value })}
+                className="w-full h-14 bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 font-bold text-slate-900 focus:border-emerald-500 outline-none transition-all font-mono"
+                placeholder="e.g. AW-1234567890"
+              />
+              <p className="text-[10px] text-slate-400 font-medium leading-relaxed pl-1">
+                Enter your Google Ads Tag ID (AW-XXXXXXXXXX) or Google Tag (GT-/G-). Loads immediately on /ad and all storefront pages for Google Ads verification.
+              </p>
             </div>
-            <input 
-              type="text"
-              value={settings.google_tag_id || ""}
-              onChange={e => setSettings({ ...settings, google_tag_id: e.target.value })}
-              className="w-full h-14 bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 font-bold text-slate-900 focus:border-emerald-500 outline-none transition-all font-mono"
-              placeholder="e.g. AW-1234567890"
-            />
-            <p className="text-[10px] text-slate-400 font-medium leading-relaxed pl-1">
-              Enter your Google Tag (gtag.js / Google Ads) ID above. Changes are applied instantly. Leaving this empty disables the tracker or falls back to your VITE_GOOGLE_TAG_ID env variable.
-            </p>
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Google Ads Purchase Conversion Label (Optional)</label>
+              <input 
+                type="text"
+                value={settings.google_conversion_label || ""}
+                onChange={e => setSettings({ ...settings, google_conversion_label: e.target.value })}
+                className="w-full h-14 bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 font-bold text-slate-900 focus:border-emerald-500 outline-none transition-all font-mono"
+                placeholder="e.g. AbCdEfGhIjKlMnOpQr"
+              />
+              <p className="text-[10px] text-slate-400 font-medium leading-relaxed pl-1">
+                Optional: Paste the Conversion Label from your Google Ads Purchase Conversion Action (the part after AW-1234567890/ in send_to) to track exact Naira order values on checkout completion.
+              </p>
+            </div>
           </div>
         </div>
 

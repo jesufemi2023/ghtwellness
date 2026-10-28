@@ -52,7 +52,8 @@ export const NotificationService = {
       total_amount, 
       payment_method, 
       payment_receipt_url,
-      distributor_id 
+      distributor_id,
+      ad_attribution
     } = orderData;
 
     // Format the items list
@@ -99,6 +100,21 @@ export const NotificationService = {
 
     itemsList = itemsList.trim();
 
+    const adSourceParts: string[] = [];
+    if (ad_attribution && typeof ad_attribution === 'object') {
+      if (ad_attribution.utm_source || ad_attribution.gclid) {
+        adSourceParts.push(ad_attribution.gclid ? 'Google Ads (GCLID)' : String(ad_attribution.utm_source));
+      }
+      if (ad_attribution.utm_campaign) adSourceParts.push(`Campaign: ${ad_attribution.utm_campaign}`);
+      if (ad_attribution.utm_term || ad_attribution.matched_condition) {
+        adSourceParts.push(`Intent: ${ad_attribution.utm_term || ad_attribution.matched_condition}`);
+      }
+      if (ad_attribution.landing_path && String(ad_attribution.landing_path).startsWith('/ad')) {
+        if (adSourceParts.length === 0) adSourceParts.push('/ad Landing Funnel');
+      }
+    }
+    const adAttributionLine = adSourceParts.length > 0 ? `Ad Attribution: ${adSourceParts.join(' · ')}\n` : '';
+
     // Create a clean, readable message body
     const messageBody = `
 🚨 NEW ORDER RECEIVED! 🚨
@@ -106,7 +122,7 @@ export const NotificationService = {
 Order ID: #${id.slice(0, 8).toUpperCase()}
 Total Amount: ₦${total_amount.toLocaleString()}
 Payment Method: ${payment_method.toUpperCase()}
-${payment_receipt_url ? `Receipt URL: ${payment_receipt_url}\n` : ''}Distributor ID: ${distributor_id || 'N/A'}
+${payment_receipt_url ? `Receipt URL: ${payment_receipt_url}\n` : ''}${adAttributionLine}Distributor ID: ${distributor_id || 'N/A'}
 
 👤 CUSTOMER DETAILS:
 Name: ${full_name}

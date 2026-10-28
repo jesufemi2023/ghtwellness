@@ -31,6 +31,7 @@ import {
   formatOrderDisplayName, 
   extractBottleCount 
 } from '../utils/bottleFormatter';
+import { getStoredAdAttribution } from '../utils/adAttribution';
 
 interface OrderDrawerProps {
   isOpen: boolean;
@@ -242,7 +243,8 @@ export const OrderDrawer: React.FC<OrderDrawerProps> = ({
         ...formData,
         items: orderItems,
         total_amount: totalPrice,
-        distributor_id: distributorId
+        distributor_id: distributorId,
+        ad_attribution: getStoredAdAttribution()
       };
 
       let activeToken = '';
