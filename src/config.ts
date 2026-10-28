@@ -18,8 +18,6 @@ export const CONFIG = {
     name: getEnv('VITE_COMPANY_NAME', "SD GHT HEALTH CARE"),
     subtitle: getEnv('VITE_COMPANY_SUBTITLE', "NIGERIA LTD"),
     phone: getEnv('VITE_CONTACT_PHONE', "+234 706 073 4773"),
-    email: getEnv('VITE_CONTACT_EMAIL', "support@ghtwellness.com"),
-    address: getEnv('VITE_COMPANY_ADDRESS', "Ikeja, Lagos, Nigeria (Nationwide Dispatch)"),
     logoUrl: getEnv('VITE_LOGO_URL', ""),
     bankDetails: {
       bankName: getEnv('VITE_BANK_NAME', "ZENITH BANK"),
@@ -66,12 +64,15 @@ export const CONFIG = {
 
     // Default placeholders
     return [
-      "https://res.cloudinary.com/drizgfofw/image/upload/v1773906809/compressed_70kb_ox1i8j.jpg",
+      "https://picsum.photos/seed/healthcare-supplement-1/1920/1080",
+      "https://picsum.photos/seed/healthcare-supplement-2/1920/1080",
+      "https://picsum.photos/seed/healthcare-supplement-3/1920/1080",
+      "https://picsum.photos/seed/healthcare-supplement-4/1920/1080",
     ];
   })(),
   navigation: [
     {id: "home", label: "Home"},
-    {id: "ad", label: "Wellness Bundles"},
+    {id: "ad", label: "Special Ad Offer"},
     {id: "about", label: "About Us"},
     {id: "products", label: "Shop Products"},
     {id: "recommended", label: "Health Packages"},

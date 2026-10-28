@@ -1,6 +1,6 @@
 {
   "name": "Copy of GHT Wellness",
-  "description": "NAFDAC-registered herbal and nutritional wellness supplements by SD GHT Health Care Nigeria Ltd, featuring nationwide delivery and Pay on Delivery.",
+  "description": "Professional health e-commerce database schema and management system for SD GHT HEALTH CARE NIG LTD.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

@@ -50,6 +50,15 @@ Please confirm my order and expedite fast delivery! Thank you.`;
   return (
     <div className="min-h-screen bg-slate-50/50 py-12 px-4 sm:px-6 lg:px-8 mt-16">
       <div className="max-w-4xl mx-auto space-y-10">
+        
+        {/* Google Ads & Meta Pixel Tracking Indicator */}
+        <div className="bg-emerald-50 border border-emerald-200/60 rounded-2xl p-4 flex items-center justify-center text-xs text-emerald-800 shadow-sm">
+          <div className="flex items-center gap-2.5">
+            <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="font-extrabold uppercase tracking-wider">Conversion Tracked Successfully</span>
+          </div>
+        </div>
+
         {/* Hero Section */}
         <motion.div 
           initial={{ opacity: 0, y: 30 }}

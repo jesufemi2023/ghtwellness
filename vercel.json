@@ -4,8 +4,7 @@
   "functions": {
     "api/index.ts": {
       "memory": 1024,
-      "maxDuration": 60,
-      "includeFiles": "dist/**"
+      "maxDuration": 60
     }
   },
   "routes": [
@@ -15,13 +14,6 @@
     },
     {
       "src": "/([^.]*)",
-      "has": [
-        {
-          "type": "header",
-          "key": "user-agent",
-          "value": ".*(facebookexternalhit|WhatsApp|Twitterbot|Slackbot|TelegramBot|LinkedInBot|Discordbot).*"
-        }
-      ],
       "dest": "/api/index.ts"
     },
     {
@@ -29,7 +21,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/index.html"
+      "dest": "/api/index.ts"
     }
   ]
 }
