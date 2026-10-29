@@ -62,11 +62,11 @@ type FilterTabId = SymptomCategory | 'singles';
 const SYMPTOM_TABS: Array<{ id: FilterTabId; label: string }> = [
   { id: 'all', label: 'All Wellness Packs' },
   { id: 'prostate', label: 'Prostate Care' },
-  { id: 'joints', label: 'Joints & Mobility' },
+  { id: 'womens', label: "Women's Wellness" },
   { id: 'vitality', label: "Men's Vitality" },
+  { id: 'joints', label: 'Joints & Mobility' },
   { id: 'sugar', label: 'Sugar Balance' },
   { id: 'cardio', label: 'Cardio & Circulation' },
-  { id: 'womens', label: "Women's Wellness" },
   { id: 'singles', label: 'Single Bottles' },
 ];
 
@@ -137,48 +137,24 @@ const SOFT_BOTANICAL_THEMES: Record<string, PackageVisualTheme> = {
 };
 
 function resolvePackageVisualTheme(pkg: PackageData, index: number): PackageVisualTheme {
-  const haystack = `${pkg.package_code || ''} ${pkg.name || ''} ${pkg.description || ''} ${(pkg.symptoms || []).join(' ')}`.toLowerCase();
+  const titleLower = `${pkg.package_code || ''} ${pkg.name || ''}`.toLowerCase();
 
-  if (haystack.includes('prostate') || haystack.includes('p001')) {
+  if (matchesSymptomCategory(pkg, 'prostate')) {
     return SOFT_BOTANICAL_THEMES.prostate;
   }
-  if (
-    haystack.includes('female') ||
-    haystack.includes('women') ||
-    haystack.includes('fibroid') ||
-    haystack.includes('ovulation') ||
-    haystack.includes('p009')
-  ) {
+  if (matchesSymptomCategory(pkg, 'womens')) {
     return SOFT_BOTANICAL_THEMES.womens;
   }
-  if (
-    haystack.includes('arthritis') ||
-    haystack.includes('joint') ||
-    haystack.includes('rheumatism') ||
-    haystack.includes('bone') ||
-    haystack.includes('p004')
-  ) {
+  if (matchesSymptomCategory(pkg, 'joints')) {
     return SOFT_BOTANICAL_THEMES.joints;
   }
-  if (
-    haystack.includes('diabetes') ||
-    haystack.includes('sugar') ||
-    haystack.includes('insulin') ||
-    haystack.includes('p003')
-  ) {
+  if (matchesSymptomCategory(pkg, 'sugar')) {
     return SOFT_BOTANICAL_THEMES.sugar;
   }
-  if (pkg.is_combo || haystack.includes('combo')) {
+  if (pkg.is_combo || titleLower.includes('combo')) {
     return SOFT_BOTANICAL_THEMES.combo;
   }
-  if (
-    haystack.includes('erection') ||
-    haystack.includes('ejaculation') ||
-    haystack.includes('libido') ||
-    haystack.includes('vitality') ||
-    haystack.includes('male') ||
-    haystack.includes('p002')
-  ) {
+  if (matchesSymptomCategory(pkg, 'vitality')) {
     return SOFT_BOTANICAL_THEMES.vitality;
   }
 
@@ -506,6 +482,66 @@ function getDefaultOptionIdx(options?: Array<{ bottles: string }>): number {
   return idx3 >= 0 ? idx3 : 0;
 }
 
+function truncateDescriptionText(
+  rawText: string,
+  maxChars: number
+): { excerpt: string; isTruncated: boolean } {
+  const normalized = rawText.replace(/\s+/g, ' ').trim();
+  if (normalized.length <= maxChars) {
+    return { excerpt: normalized, isTruncated: false };
+  }
+  const sliced = normalized.slice(0, maxChars);
+  const lastSpace = sliced.lastIndexOf(' ');
+  const cleanCut =
+    lastSpace > Math.floor(maxChars * 0.65) ? sliced.slice(0, lastSpace) : sliced;
+  return {
+    excerpt: `${cleanCut.replace(/[,.;:!?-]+$/, '')}…`,
+    isTruncated: true,
+  };
+}
+
+interface ExpandableDescriptionProps {
+  text: string;
+  maxChars?: number;
+  className?: string;
+}
+
+const ExpandableDescription: React.FC<ExpandableDescriptionProps> = ({
+  text,
+  maxChars = 155,
+  className = 'text-base sm:text-[17px] text-[#1E293B] leading-[1.68]',
+}) => {
+  const [expanded, setExpanded] = useState(false);
+
+  useEffect(() => {
+    setExpanded(false);
+  }, [text]);
+
+  const cleanFull = text.trim();
+  if (!cleanFull) return null;
+
+  const { excerpt, isTruncated } = truncateDescriptionText(cleanFull, maxChars);
+
+  if (!isTruncated) {
+    return <p className={className}>{cleanFull}</p>;
+  }
+
+  return (
+    <div className="space-y-1.5">
+      <p className={`${className} ${expanded ? 'whitespace-pre-line' : ''}`}>
+        {expanded ? cleanFull : excerpt}{' '}
+        <button
+          type="button"
+          onClick={() => setExpanded((prev) => !prev)}
+          className="inline font-bold text-[#047857] hover:text-[#065F46] underline underline-offset-4 cursor-pointer whitespace-nowrap"
+        >
+          {expanded ? 'Show less' : 'Read full description'}
+        </button>
+      </p>
+    </div>
+  );
+};
+
 export const AdLandingPage: React.FC<AdLandingPageProps> = ({
   products,
   packages,
@@ -527,6 +563,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
   }, [packages, combos]);
 
   const [activeFilter, setActiveFilter] = useState<FilterTabId>(adIntent.category);
+  const [selectedSpotlightPkgId, setSelectedSpotlightPkgId] = useState<string | null>(null);
   const [packageOptionMap, setPackageOptionMap] = useState<Record<string, number>>({});
   const [productOptionMap, setProductOptionMap] = useState<Record<string, number>>({});
   const [expandedBenefitsMap, setExpandedBenefitsMap] = useState<Record<string, boolean>>({});
@@ -594,6 +631,10 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
 
   const spotlightBundle = useMemo<PackageData | null>(() => {
     if (allBundles.length === 0) return null;
+    if (selectedSpotlightPkgId) {
+      const explicitMatch = allBundles.find((b) => b.id === selectedSpotlightPkgId);
+      if (explicitMatch) return explicitMatch;
+    }
     if (adIntent.requestedPackageCode) {
       const codeMatch = allBundles.find(
         (b) => (b.package_code || '').toUpperCase() === adIntent.requestedPackageCode
@@ -605,7 +646,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
       if (catMatch) return catMatch;
     }
     return allBundles[0];
-  }, [allBundles, adIntent]);
+  }, [allBundles, adIntent, selectedSpotlightPkgId]);
 
   // Keep inlineTarget & modal item synchronized with live Admin catalog refreshes
   useEffect(() => {
@@ -648,6 +689,37 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
     return getDefaultOptionIdx(prod.options);
   };
 
+  const categoryCounts = useMemo<Record<FilterTabId, number>>(() => {
+    const counts: Record<FilterTabId, number> = {
+      all: allBundles.length,
+      prostate: 0,
+      womens: 0,
+      vitality: 0,
+      joints: 0,
+      sugar: 0,
+      cardio: 0,
+      singles: products.length,
+    };
+    for (const pkg of allBundles) {
+      if (matchesSymptomCategory(pkg, 'prostate')) counts.prostate += 1;
+      if (matchesSymptomCategory(pkg, 'womens')) counts.womens += 1;
+      if (matchesSymptomCategory(pkg, 'vitality')) counts.vitality += 1;
+      if (matchesSymptomCategory(pkg, 'joints')) counts.joints += 1;
+      if (matchesSymptomCategory(pkg, 'sugar')) counts.sugar += 1;
+      if (matchesSymptomCategory(pkg, 'cardio')) counts.cardio += 1;
+    }
+    return counts;
+  }, [allBundles, products.length]);
+
+  const visibleSymptomTabs = useMemo(() => {
+    return SYMPTOM_TABS.filter((tab) => {
+      if (tab.id === 'all') return true;
+      if (tab.id === 'singles') return products.length > 0;
+      if (allBundles.length === 0) return true;
+      return categoryCounts[tab.id] > 0 || adIntent.category === tab.id;
+    });
+  }, [allBundles.length, products.length, categoryCounts, adIntent.category]);
+
   const categoryFilteredBundles = useMemo(() => {
     if (activeFilter === 'all' || activeFilter === 'singles') return allBundles;
     return allBundles.filter((pkg) => matchesSymptomCategory(pkg, activeFilter));
@@ -659,6 +731,60 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
     categoryFilteredBundles.length > 0;
 
   const bundlesToDisplay = hasExactCategoryMatch ? categoryFilteredBundles : allBundles;
+
+  const scrollToSection = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  const handleSelectCategory = (
+    tabId: FilterTabId,
+    options?: { scrollToCatalog?: boolean; syncHero?: boolean }
+  ) => {
+    setActiveFilter(tabId);
+
+    if (tabId === 'singles') {
+      if (products.length > 0) {
+        const firstProd = products[0];
+        setInlineTarget({
+          item: firstProd,
+          type: 'product',
+          optionIdx: getProdOptionIdx(firstProd),
+        });
+      }
+    } else if (tabId === 'all') {
+      setSelectedSpotlightPkgId(null);
+      if (allBundles.length > 0) {
+        const defaultPkg = allBundles[0];
+        setInlineTarget({
+          item: defaultPkg,
+          type: 'package',
+          optionIdx: getPkgOptionIdx(defaultPkg),
+        });
+      }
+    } else {
+      const matched = allBundles.filter((pkg) => matchesSymptomCategory(pkg, tabId));
+      if (matched.length > 0) {
+        const primaryPkg = matched[0];
+        setInlineTarget({
+          item: primaryPkg,
+          type: 'package',
+          optionIdx: getPkgOptionIdx(primaryPkg),
+        });
+        if (options?.syncHero) {
+          setSelectedSpotlightPkgId(primaryPkg.id);
+        }
+      }
+    }
+
+    if (options?.scrollToCatalog) {
+      requestAnimationFrame(() => {
+        scrollToSection('ad-bundles');
+      });
+    }
+  };
 
   const openExpressCheckout = (
     item: PackageData | Product,
@@ -672,13 +798,6 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
       type,
       optionIdx,
     });
-  };
-
-  const scrollToSection = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
   };
 
   const handleAdvisorWhatsApp = (contextLabel: string, customSubject?: string) => {
@@ -733,8 +852,8 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
   return (
     <div className="min-h-screen bg-[#FAFBF9] text-[#0F1F18] font-[family-name:var(--font-clinical-body)] pb-16 md:pb-0">
       {/* 1. Strict 3-Zone Top Bar Contract */}
-      <header className="md:sticky md:top-0 z-40 h-16 bg-white/95 backdrop-blur-xs border-b border-[#E4EBE7]">
-        <div className="max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-8">
+      <header className="md:sticky md:top-0 z-40 h-16 sm:h-[70px] bg-white/95 backdrop-blur-xs border-b border-[#DCE5E0]">
+        <div className="max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-6">
           {/* Zone 1: Single clean brand wordmark */}
           <button
             type="button"
@@ -747,33 +866,33 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
           {/* Zone 2: 4 concise single-line navigation links */}
           <nav
             aria-label="Landing page sections"
-            className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600"
+            className="hidden md:flex items-center gap-8 text-[15px] font-semibold text-[#1E293B]"
           >
             <button
               type="button"
               onClick={() => scrollToSection('ad-bundles')}
-              className="hover:text-[#0F1F18] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+              className="hover:text-[#047857] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
             >
               Wellness Packs
             </button>
             <button
               type="button"
               onClick={() => scrollToSection('how-pod-works')}
-              className="hover:text-[#0F1F18] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+              className="hover:text-[#047857] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
             >
               How Delivery Works
             </button>
             <button
               type="button"
               onClick={() => scrollToSection('ad-reviews')}
-              className="hover:text-[#0F1F18] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+              className="hover:text-[#047857] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
             >
               Reviews
             </button>
             <button
               type="button"
               onClick={() => scrollToSection('express-order')}
-              className="hover:text-[#0F1F18] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+              className="hover:text-[#047857] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
             >
               Order Form
             </button>
@@ -783,12 +902,56 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
           <button
             type="button"
             onClick={() => scrollToSection('express-order')}
-            className="px-5 py-2.5 rounded-lg bg-[#047857] hover:bg-[#065F46] text-white text-sm font-semibold whitespace-nowrap shrink-0 transition-colors cursor-pointer"
+            className="min-h-[44px] px-5 py-2.5 rounded-xl bg-[#047857] hover:bg-[#065F46] text-white text-sm sm:text-[15px] font-bold whitespace-nowrap shrink-0 transition-colors cursor-pointer"
           >
             Order on Delivery
           </button>
         </div>
       </header>
+
+      {/* Adult Quick-Jump Wellness Bar — Effortless 1-Tap Category & Section Navigation */}
+      <div className="bg-[#F4F8F5] border-b border-[#DCE5E0]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center gap-2.5 overflow-x-auto no-scrollbar">
+          <span className="text-xs sm:text-sm font-bold text-[#0F1F18] whitespace-nowrap shrink-0 mr-1">
+            Quick Jump:
+          </span>
+          {visibleSymptomTabs
+            .filter((t) => t.id !== 'singles')
+            .map((tab) => {
+              const isSelected = activeFilter === tab.id;
+              return (
+                <button
+                  key={`quick-${tab.id}`}
+                  type="button"
+                  onClick={() =>
+                    handleSelectCategory(tab.id, { scrollToCatalog: true, syncHero: true })
+                  }
+                  className={`min-h-[42px] px-3.5 sm:px-4 py-2 rounded-xl border text-sm sm:text-[15px] font-bold whitespace-nowrap shrink-0 transition-colors cursor-pointer ${
+                    isSelected
+                      ? 'bg-[#047857] border-[#047857] text-white'
+                      : 'bg-white border-[#CBD5CF] text-[#0F1F18] hover:border-[#047857] hover:text-[#047857]'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+          <button
+            type="button"
+            onClick={() => scrollToSection('how-pod-works')}
+            className="md:hidden min-h-[42px] px-3.5 py-2 rounded-xl border border-[#CBD5CF] bg-white text-sm font-bold text-[#0F1F18] hover:border-[#047857] whitespace-nowrap shrink-0 cursor-pointer"
+          >
+            How Delivery Works
+          </button>
+          <button
+            type="button"
+            onClick={() => scrollToSection('express-order')}
+            className="md:hidden min-h-[42px] px-3.5 py-2 rounded-xl border border-[#047857] bg-[#EEF6F2] text-sm font-bold text-[#047857] whitespace-nowrap shrink-0 cursor-pointer"
+          >
+            Order Form ↓
+          </button>
+        </div>
+      </div>
 
       {/* 2. Monumental Split Hero — Scaled-Up Product Showcase as the Centerpiece */}
       <section className="bg-white border-b border-[#E4EBE7]">
@@ -797,34 +960,34 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
             {/* Editorial Headline & Purchase Controls */}
             <div className="lg:col-span-5 flex flex-col justify-center space-y-6 order-2 lg:order-1">
               <div className="hidden lg:block space-y-4">
-                <p className="text-xs sm:text-sm font-semibold text-[#047857]">
+                <p className="text-sm font-bold text-[#047857]">
                   {adIntent.kicker}
                 </p>
 
-                <h1 className="text-[clamp(2.25rem,3.4vw,3.35rem)] font-bold text-[#0F1F18] tracking-tight leading-[1.1] [text-wrap:balance] font-[family-name:var(--font-editorial)]">
+                <h1 className="text-[clamp(2.25rem,3.4vw,3.35rem)] font-bold text-[#0F1F18] tracking-tight leading-[1.12] [text-wrap:balance] font-[family-name:var(--font-editorial)]">
                   {adIntent.headline}
                 </h1>
 
-                <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-xl">
+                <p className="text-base sm:text-lg text-[#1E293B] leading-[1.68] max-w-xl">
                   {adIntent.subheadline}
                 </p>
               </div>
 
               {/* Mobile Subheadline */}
-              <p className="lg:hidden text-base text-slate-600 leading-relaxed">
+              <p className="lg:hidden text-base sm:text-[17px] text-[#1E293B] leading-[1.68]">
                 {adIntent.subheadline}
               </p>
 
               {/* Contiguous Featured Wellness Pack Purchase Module */}
               {spotlightBundle && spotlightPricing && (
-                <div className="pt-2 lg:pt-4 border-t border-[#E4EBE7] space-y-5">
+                <div className="pt-3 lg:pt-5 border-t border-[#DCE5E0] space-y-5">
                   <div className="flex flex-wrap items-baseline justify-between gap-2">
                     <div>
-                      <span className="text-xs font-medium text-slate-500">
+                      <span className="text-xs sm:text-sm font-semibold text-slate-600">
                         Featured Wellness Pack
                         {spotlightBundle.package_code ? ` · ${spotlightBundle.package_code}` : ''}
                       </span>
-                      <h2 className="text-xl sm:text-2xl font-bold text-[#0F1F18] font-[family-name:var(--font-editorial)] mt-0.5">
+                      <h2 className="text-2xl sm:text-[1.7rem] font-bold text-[#0F1F18] font-[family-name:var(--font-editorial)] mt-0.5 leading-snug">
                         {spotlightBundle.name}
                       </h2>
                     </div>
@@ -834,12 +997,12 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                         ₦{spotlightPricing.currentPrice.toLocaleString()}
                       </div>
                       {spotlightPricing.savings > 0 && (
-                        <div className="text-xs sm:text-sm text-slate-400 line-through">
+                        <div className="text-sm text-slate-400 line-through">
                           ₦{spotlightPricing.retailPrice.toLocaleString()}
                         </div>
                       )}
                       {spotlightPricing.discount > 0 && (
-                        <div className="text-xs font-semibold text-[#047857]">
+                        <div className="text-xs sm:text-sm font-bold text-[#047857]">
                           Save ₦{spotlightPricing.savings.toLocaleString()} ({spotlightPricing.discount}% Off)
                         </div>
                       )}
@@ -847,9 +1010,11 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                   </div>
 
                   {spotlightBundle.description && (
-                    <p className="text-sm sm:text-base text-slate-600 leading-relaxed line-clamp-3">
-                      {spotlightBundle.description}
-                    </p>
+                    <ExpandableDescription
+                      text={spotlightBundle.description}
+                      maxChars={150}
+                      className="text-base text-[#1E293B] leading-[1.65]"
+                    />
                   )}
 
                   {spotlightBundle.options && spotlightBundle.options.length > 0 && (
@@ -1048,53 +1213,95 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
       </section>
 
       {/* 3. Featured Collection Showcase — Soft, Distinct Adult Wellness Package Cards */}
-      <section id="ad-bundles" className="py-16 sm:py-24 bg-[#F2F5F3] scroll-mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+      <section id="ad-bundles" className="py-16 sm:py-24 bg-[#F2F5F3] scroll-mt-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
-            <div className="max-w-2xl space-y-2.5">
-              <p className="text-xs sm:text-sm font-semibold text-[#047857]">
+            <div className="max-w-2xl space-y-3">
+              <p className="text-sm font-bold text-[#047857]">
                 Curated Adult Wellness Formulations
               </p>
               <h2 className="text-3xl sm:text-4xl font-bold text-[#0F1F18] font-[family-name:var(--font-editorial)] tracking-tight [text-wrap:balance]">
                 Select Your Targeted Herbal Wellness Pack
               </h2>
-              <p className="text-base sm:text-lg text-slate-600 leading-relaxed">
-                Each wellness pack below is clearly numbered and organized by health focus. Choose
-                your preferred bottle pack and request doorstep Pay-on-Delivery dispatch.
+              <p className="text-base sm:text-lg text-[#1E293B] leading-[1.68]">
+                Tap any wellness category below—such as{' '}
+                <strong className="text-[#0F1F18]">Prostate Care</strong> or{' '}
+                <strong className="text-[#0F1F18]">Women&apos;s Wellness</strong>—to filter right to
+                your focus area, choose your bottle pack, and request Pay-on-Delivery dispatch.
               </p>
             </div>
           </div>
 
-          {/* Clean Segmented Filter Controls */}
-          <div
-            role="tablist"
-            aria-label="Filter supplements by wellness focus"
-            className="flex items-center gap-1.5 p-1.5 bg-[#E3EAE6] rounded-xl overflow-x-auto no-scrollbar"
-          >
-            {SYMPTOM_TABS.map((tab) => {
-              const isActive = activeFilter === tab.id;
-              return (
+          {/* High-Contrast Adult-Friendly Category Filter Buttons */}
+          <div className="space-y-4">
+            <div
+              role="tablist"
+              aria-label="Filter supplements by wellness focus"
+              className="flex flex-wrap items-center gap-2.5 sm:gap-3"
+            >
+              {visibleSymptomTabs.map((tab) => {
+                const isActive = activeFilter === tab.id;
+                const count = categoryCounts[tab.id];
+                return (
+                  <button
+                    key={tab.id}
+                    role="tab"
+                    aria-selected={isActive}
+                    type="button"
+                    onClick={() => handleSelectCategory(tab.id)}
+                    className={`min-h-[48px] sm:min-h-[52px] px-4 sm:px-5 py-2.5 rounded-xl border text-[15px] sm:text-base font-bold whitespace-nowrap shrink-0 transition-all cursor-pointer tabular-nums flex items-center gap-2 ${
+                      isActive
+                        ? 'bg-[#047857] border-[#047857] text-white shadow-xs'
+                        : 'bg-white border-[#C5D3CB] text-[#0F1F18] hover:border-[#047857] hover:bg-[#F6FAF8]'
+                    }`}
+                  >
+                    <span>{tab.label}</span>
+                    {count > 0 && (
+                      <span
+                        className={`text-xs sm:text-sm font-semibold ${
+                          isActive ? 'text-emerald-100' : 'text-slate-500'
+                        }`}
+                      >
+                        ({count})
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {activeFilter !== 'all' && hasExactCategoryMatch && !showSkeletonState && (
+              <div className="flex flex-wrap items-center justify-between gap-3 py-3 px-4 rounded-xl bg-white border border-[#D4E0DA] text-sm sm:text-base text-[#1E293B]">
+                <span>
+                  Showing{' '}
+                  <strong className="text-[#0F1F18] tabular-nums">
+                    {activeFilter === 'singles' ? products.length : bundlesToDisplay.length}
+                  </strong>{' '}
+                  {activeFilter === 'singles'
+                    ? 'individual herbal bottles'
+                    : bundlesToDisplay.length === 1
+                      ? 'recommended wellness pack'
+                      : 'recommended wellness packs'}{' '}
+                  for{' '}
+                  <strong className="text-[#047857]">
+                    {SYMPTOM_TABS.find((t) => t.id === activeFilter)?.label}
+                  </strong>
+                  .
+                </span>
                 <button
-                  key={tab.id}
-                  role="tab"
-                  aria-selected={isActive}
                   type="button"
-                  onClick={() => setActiveFilter(tab.id)}
-                  className={`px-4 py-2.5 rounded-lg text-sm font-semibold whitespace-nowrap shrink-0 transition-colors cursor-pointer ${
-                    isActive
-                      ? 'bg-white text-[#0F1F18] shadow-xs'
-                      : 'text-slate-600 hover:text-[#0F1F18]'
-                  }`}
+                  onClick={() => handleSelectCategory('all')}
+                  className="font-bold text-[#047857] hover:text-[#065F46] underline underline-offset-4 cursor-pointer whitespace-nowrap"
                 >
-                  {tab.label}
+                  Show All {allBundles.length} Wellness Packs
                 </button>
-              );
-            })}
+              </div>
+            )}
           </div>
 
           {!hasExactCategoryMatch && !showSkeletonState && (
             <div className="py-4 px-5 rounded-2xl bg-white border border-[#DCE5E0] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <p className="text-sm sm:text-base text-slate-700">
+              <p className="text-base text-[#1E293B] leading-relaxed">
                 Showing all available multi-bottle wellness packs below. Need personal guidance for
                 your specific health goal? Speak directly with our specialist.
               </p>
@@ -1106,7 +1313,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                     SYMPTOM_TABS.find((t) => t.id === activeFilter)?.label
                   )
                 }
-                className="px-4 py-2.5 rounded-lg bg-[#047857] hover:bg-[#065F46] text-white text-sm font-semibold whitespace-nowrap shrink-0 cursor-pointer"
+                className="min-h-[46px] px-5 py-2.5 rounded-xl bg-[#047857] hover:bg-[#065F46] text-white text-sm sm:text-base font-bold whitespace-nowrap shrink-0 cursor-pointer"
               >
                 Ask Specialist on WhatsApp
               </button>
@@ -1208,23 +1415,25 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                     <div className="p-6 sm:p-8 flex-1 flex flex-col justify-between space-y-6 bg-white">
                       <div className="space-y-5">
                         {pkg.description && pkg.description.trim().length > 0 && (
-                          <p className="text-base text-slate-700 leading-relaxed">
-                            {pkg.description}
-                          </p>
+                          <ExpandableDescription
+                            text={pkg.description}
+                            maxChars={155}
+                            className="text-base sm:text-[17px] text-[#1E293B] leading-[1.68]"
+                          />
                         )}
 
                         {visibleBenefits.length > 0 && (
-                          <div className="space-y-2.5 pt-1">
-                            <h4 className="text-sm font-bold text-[#0F1F18]">
+                          <div className="space-y-3 pt-1">
+                            <h4 className="text-sm sm:text-base font-bold text-[#0F1F18]">
                               Key Health Benefits:
                             </h4>
-                            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-2">
+                            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-2.5">
                               {visibleBenefits.map((benefit, bIdx) => (
                                 <li
                                   key={bIdx}
-                                  className="flex items-start gap-2.5 text-sm sm:text-[15px] text-slate-700 leading-snug"
+                                  className="flex items-start gap-2.5 text-[15px] sm:text-base text-[#1E293B] leading-relaxed"
                                 >
-                                  <CheckCircle2 className="w-4 h-4 text-[#047857] shrink-0 mt-0.5" />
+                                  <CheckCircle2 className="w-4 h-4 text-[#047857] shrink-0 mt-1" />
                                   <span>{benefit}</span>
                                 </li>
                               ))}
@@ -1239,7 +1448,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                                     [pkg.id]: !isBenefitsExpanded,
                                   }))
                                 }
-                                className="text-xs sm:text-sm font-semibold text-[#047857] hover:underline underline-offset-4 pt-1 cursor-pointer"
+                                className="text-sm sm:text-[15px] font-bold text-[#047857] hover:underline underline-offset-4 pt-1 cursor-pointer"
                               >
                                 {isBenefitsExpanded
                                   ? 'Show fewer benefits'
@@ -1321,7 +1530,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                         )}
 
                         {pricing.includedList.length > 0 && (
-                          <p className="text-sm text-slate-600 leading-relaxed pt-1">
+                          <p className="text-[15px] sm:text-base text-[#1E293B] leading-relaxed pt-1">
                             <strong className="text-[#0F1F18]">Included in Pack: </strong>
                             {pricing.includedList.join(' · ')}
                           </p>
@@ -1407,9 +1616,11 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                           {prod.name}
                         </h3>
                         {prod.short_desc && (
-                          <p className="text-sm sm:text-base text-slate-600 line-clamp-3 leading-relaxed">
-                            {prod.short_desc}
-                          </p>
+                          <ExpandableDescription
+                            text={prod.short_desc}
+                            maxChars={135}
+                            className="text-[15px] sm:text-base text-[#1E293B] leading-relaxed"
+                          />
                         )}
 
                         {prod.options && prod.options.length > 0 && (
@@ -1530,18 +1741,18 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
       {/* 4. Editorial Fulfillment & Customer Proof Section */}
       <section
         id="how-pod-works"
-        className="py-16 sm:py-20 bg-white border-t border-[#E4EBE7] scroll-mt-16"
+        className="py-16 sm:py-20 bg-white border-t border-[#E4EBE7] scroll-mt-20"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
           <div className="space-y-10">
-            <div className="max-w-2xl space-y-2">
-              <p className="text-xs sm:text-sm font-semibold text-[#047857]">
+            <div className="max-w-2xl space-y-2.5">
+              <p className="text-sm font-bold text-[#047857]">
                 Zero-Risk Doorstep Fulfillment
               </p>
               <h2 className="text-3xl sm:text-4xl font-bold text-[#0F1F18] font-[family-name:var(--font-editorial)] tracking-tight [text-wrap:balance]">
                 How Nationwide Pay-on-Delivery Works
               </h2>
-              <p className="text-base sm:text-lg text-slate-600">
+              <p className="text-base sm:text-lg text-[#1E293B] leading-[1.68]">
                 Designed for complete peace of mind—you inspect your sealed supplements in person
                 before paying a single Naira.
               </p>
@@ -1549,39 +1760,39 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-4 border-t border-[#E4EBE7]">
               <div className="space-y-3 pt-2">
-                <span className="text-sm font-bold text-[#047857] tabular-nums">
+                <span className="text-sm sm:text-base font-bold text-[#047857] tabular-nums">
                   01. Request Dispatch
                 </span>
-                <h3 className="text-xl font-bold text-[#0F1F18] font-[family-name:var(--font-editorial)]">
+                <h3 className="text-xl sm:text-2xl font-bold text-[#0F1F18] font-[family-name:var(--font-editorial)]">
                   Select Your Wellness Pack
                 </h3>
-                <p className="text-base text-slate-600 leading-relaxed">
+                <p className="text-base sm:text-[17px] text-[#1E293B] leading-[1.68]">
                   Choose your preferred multi-bottle pack and enter your phone number, state, and
                   street address. No card or online payment is required.
                 </p>
               </div>
 
               <div className="space-y-3 pt-2">
-                <span className="text-sm font-bold text-[#047857] tabular-nums">
+                <span className="text-sm sm:text-base font-bold text-[#047857] tabular-nums">
                   02. Rider Scheduling
                 </span>
-                <h3 className="text-xl font-bold text-[#0F1F18] font-[family-name:var(--font-editorial)]">
+                <h3 className="text-xl sm:text-2xl font-bold text-[#0F1F18] font-[family-name:var(--font-editorial)]">
                   Personal Phone Confirmation
                 </h3>
-                <p className="text-base text-slate-600 leading-relaxed">
+                <p className="text-base sm:text-[17px] text-[#1E293B] leading-[1.68]">
                   Our regional fulfillment desk calls or messages you on WhatsApp to confirm your
                   convenient delivery window within 24–48 hours.
                 </p>
               </div>
 
               <div className="space-y-3 pt-2">
-                <span className="text-sm font-bold text-[#047857] tabular-nums">
+                <span className="text-sm sm:text-base font-bold text-[#047857] tabular-nums">
                   03. Doorstep Verification
                 </span>
-                <h3 className="text-xl font-bold text-[#0F1F18] font-[family-name:var(--font-editorial)]">
+                <h3 className="text-xl sm:text-2xl font-bold text-[#0F1F18] font-[family-name:var(--font-editorial)]">
                   Inspect Intact Seals &amp; Pay
                 </h3>
-                <p className="text-base text-slate-600 leading-relaxed">
+                <p className="text-base sm:text-[17px] text-[#1E293B] leading-[1.68]">
                   Verify intact factory seals, NAFDAC numbers, and expiry dates at your door, then
                   pay the rider via Bank Transfer, POS, or Cash.
                 </p>
@@ -1591,8 +1802,8 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
 
           {/* Verified Adult Customer Experiences */}
           <div id="ad-reviews" className="pt-12 border-t border-[#E4EBE7] space-y-10 scroll-mt-20">
-            <div className="max-w-2xl space-y-2">
-              <p className="text-xs sm:text-sm font-semibold text-[#047857]">
+            <div className="max-w-2xl space-y-2.5">
+              <p className="text-sm font-bold text-[#047857]">
                 Verified Doorstep Buyers
               </p>
               <h2 className="text-3xl sm:text-4xl font-bold text-[#0F1F18] font-[family-name:var(--font-editorial)] tracking-tight">
@@ -1615,17 +1826,17 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                         <Star key={sIdx} className="w-4 h-4 fill-current" />
                       ))}
                     </div>
-                    <p className="text-base text-slate-700 leading-relaxed">
+                    <p className="text-base sm:text-[17px] text-[#1E293B] leading-[1.68]">
                       &ldquo;{story.quote}&rdquo;
                     </p>
                   </div>
 
                   <footer className="pt-4 border-t border-[#DCE5E0]">
-                    <div className="font-bold text-base text-[#0F1F18]">{story.name}</div>
-                    <div className="text-xs sm:text-sm text-slate-500 mt-0.5">
+                    <div className="font-bold text-base sm:text-lg text-[#0F1F18]">{story.name}</div>
+                    <div className="text-sm text-slate-600 mt-0.5">
                       {story.role} · {story.location}
                     </div>
-                    <div className="text-xs font-semibold text-[#047857] mt-1">
+                    <div className="text-xs sm:text-sm font-bold text-[#047857] mt-1">
                       {story.packName}
                     </div>
                   </footer>
@@ -1647,19 +1858,19 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                         type="button"
                         onClick={() => setOpenFaqIdx(isOpen ? null : idx)}
                         aria-expanded={isOpen}
-                        className="w-full py-4 text-left flex items-center justify-between gap-4 cursor-pointer"
+                        className="w-full py-4 sm:py-5 text-left flex items-center justify-between gap-4 cursor-pointer"
                       >
                         <span className="text-base sm:text-lg font-bold text-[#0F1F18]">
                           {faq.question}
                         </span>
                         <ChevronDown
-                          className={`w-5 h-5 text-slate-500 shrink-0 transition-transform duration-200 ${
+                          className={`w-5 h-5 text-slate-600 shrink-0 transition-transform duration-200 ${
                             isOpen ? 'rotate-180' : ''
                           }`}
                         />
                       </button>
                       {isOpen && (
-                        <div className="pb-5 text-base text-slate-600 leading-relaxed">
+                        <div className="pb-5 text-base sm:text-[17px] text-[#1E293B] leading-[1.68]">
                           {faq.answer}
                         </div>
                       )}
@@ -1675,17 +1886,17 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
       {/* 5. Contiguous Express Checkout Section — Sticky Large Product Stage Left + Clean Form Right */}
       <section
         id="express-order"
-        className="py-16 sm:py-20 bg-[#F2F5F3] border-t border-[#DCE5E0] scroll-mt-16"
+        className="py-16 sm:py-20 bg-[#F2F5F3] border-t border-[#DCE5E0] scroll-mt-20"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
-          <div className="max-w-2xl space-y-2">
-            <p className="text-xs sm:text-sm font-semibold text-[#047857]">
+          <div className="max-w-2xl space-y-2.5">
+            <p className="text-sm font-bold text-[#047857]">
               1-Step Doorstep Dispatch Form
             </p>
             <h2 className="text-3xl sm:text-4xl font-bold text-[#0F1F18] font-[family-name:var(--font-editorial)] tracking-tight [text-wrap:balance]">
               Complete Your Pay-on-Delivery Order
             </h2>
-            <p className="text-base sm:text-lg text-slate-600">
+            <p className="text-base sm:text-lg text-[#1E293B] leading-[1.68]">
               Enter your delivery address below. Our regional hub dispatches directly to your home
               or office at ₦0 shipping cost.
             </p>

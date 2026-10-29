@@ -50,7 +50,6 @@ export function captureAndPersistAdAttribution(): AdAttributionData {
     const keys: Array<keyof AdAttributionData> = [
       'gclid',
       'gbraid',
-      'gbraid',
       'wbraid',
       'gad_source',
       'utm_source',
@@ -107,31 +106,65 @@ export function getStoredAdAttribution(): AdAttributionData {
 export function matchesSymptomCategory(pkg: PackageData, category: SymptomCategory): boolean {
   if (category === 'all') return true;
 
-  const haystack = [
-    pkg.name,
-    pkg.description,
+  const titleAndCode = `${pkg.name || ''} ${pkg.package_code || ''}`.toLowerCase();
+  const primarySignals = [
+    pkg.name || '',
     pkg.package_code || '',
     ...(pkg.symptoms || []),
-    ...(pkg.health_benefits || []),
-    ...((pkg.products || []).map((p) => p.name)),
-    ...((pkg.options || []).flatMap((o) => o.products || [])),
   ]
     .join(' ')
     .toLowerCase();
 
+  // Short descriptions (< 120 chars) state the primary topic (e.g. "Male Infertility");
+  // long descriptions may mention other conditions as surgical side-effects.
+  const shortTopicDesc =
+    pkg.description && pkg.description.trim().length <= 120
+      ? pkg.description.trim().toLowerCase()
+      : '';
+
+  const coreIdentity = `${primarySignals} ${shortTopicDesc}`;
+  const isExplicitlyMale =
+    /\bmale\b|\bmen\b|\bprostate\b|\bprostbeta\b|\berection\b|\bejaculation\b|\bp001\b|\bp002\b/.test(
+      `${titleAndCode} ${shortTopicDesc}`
+    );
+  const isExplicitlyFemale =
+    /\bfemale\b|\bwomen\b|\bfibroid|\bovulat|\bmenstru|\buter|\bp009\b/.test(coreIdentity);
+
   switch (category) {
     case 'prostate':
-      return /prostate|prostbeta|urinar|frequent\s+urin|bladder|p001/.test(haystack);
-    case 'joints':
-      return /arthrit|joint|rheumat|knee|waist|bone|calcium|panicept|spabucta|mobility|p004/.test(haystack);
-    case 'vitality':
-      return /erection|vitality|stamina|vigor|reodoe|premature|endurance|men|male|zinc|p002/.test(haystack);
-    case 'sugar':
-      return /diabet|sugar|glucose|dialese|metabolic|glycemic|pancreas|p003/.test(haystack);
-    case 'cardio':
-      return /blood\s+pressure|hypertension|cardio|heart|circulation|hyperfree|cholesterol|stroke/.test(haystack);
+      return /\bprostate\b|\bprostbeta\b|\bp001\b/.test(titleAndCode);
+
     case 'womens':
-      return /fibroid|female|women|fertility|infertility|hormon|uter|reproductive|menstru|p009/.test(haystack);
+      if (isExplicitlyMale) return false;
+      return (
+        isExplicitlyFemale ||
+        /\binfertility\b|\bfertility\b|\bconceive\b|\bhormon/.test(coreIdentity)
+      );
+
+    case 'vitality':
+      if (isExplicitlyFemale || /\bprostate\b|\bp001\b/.test(titleAndCode)) return false;
+      return /\berection\b|\bejaculation\b|\bvitality\b|\bstamina\b|\blibido\b|\bimpotence\b|\bmale\s+combo\b|\bmale\s+infertility\b|\bp002\b/.test(
+        coreIdentity
+      );
+
+    case 'joints':
+      if (pkg.is_combo && !/\barthrit|\bjoint|\bbone/.test(titleAndCode)) return false;
+      return /\barthrit|\bjoint|\brheumat|\bknee\b|\bwaist\b|\bspondylitis\b|\bosteoporosis\b|\bp004\b/.test(
+        coreIdentity
+      );
+
+    case 'sugar':
+      if (pkg.is_combo && !/\bdiabet|\bsugar\b/.test(titleAndCode)) return false;
+      return /\bdiabet|\bblood\s+sugar\b|\bglucose\b|\binsulin\b|\bp003\b/.test(coreIdentity);
+
+    case 'cardio':
+      if (pkg.is_combo && !/\bhypertension\b|\bblood\s+pressure\b|\bcardio|\bheart\b/.test(titleAndCode)) {
+        return false;
+      }
+      return /\bhypertension\b|\bblood\s+pressure\b|\bcardio|\bheart\b|\bstroke\b|\bhyperfree\b/.test(
+        coreIdentity
+      );
+
     default:
       return true;
   }
@@ -193,7 +226,23 @@ export function resolveAdIntent(searchString?: string): AdIntentConfig {
     };
   }
 
-  if (/vitality|stamina|erection|endurance|reodoe|vigor|men|male|p002/.test(rawQuery)) {
+  if (/\bfibroid|\bfemale\b|\bwomen\b|\bwomen's\b|\bmenstru|\bovulat|\bp009\b/.test(rawQuery)) {
+    return {
+      category: 'womens',
+      kicker: "NAFDAC Registered Women's Wellness · Nationwide Pay on Delivery",
+      headline: "Gentle Herbal Nutritional Support for Women's Hormonal & Reproductive Wellness",
+      subheadline:
+        'Plant-based GHT nutritional wellness packs crafted to support feminine balance and holistic daily well-being. Free 24–48hr doorstep delivery across Nigeria—pay upon inspection.',
+      pageTitle: "Women's Herbal Wellness Packs – Pay on Delivery | SD GHT Health Care",
+      metaDescription:
+        "Order NAFDAC-registered GHT women's herbal wellness packs with Free 24–48hr Nationwide Pay on Delivery.",
+      ctaLabel: "Select Women's Wellness Pack",
+      matchedKeyword: rawQuery,
+      requestedPackageCode: pkgParam || 'P009',
+    };
+  }
+
+  if (/\bvitality\b|\bstamina\b|\berection\b|\bendurance\b|\breodoe\b|\bvigor\b|\bmen\b|\bmale\b|\bp002\b/.test(rawQuery)) {
     return {
       category: 'vitality',
       kicker: "NAFDAC Registered Men's Stamina Formulas · Discreet Doorstep Dispatch",
@@ -241,7 +290,7 @@ export function resolveAdIntent(searchString?: string): AdIntentConfig {
     };
   }
 
-  if (/fibroid|female|women|fertility|hormon|reproductive|p009/.test(rawQuery)) {
+  if (/fertility|hormon|reproductive/.test(rawQuery)) {
     return {
       category: 'womens',
       kicker: "NAFDAC Registered Women's Wellness · Nationwide Pay on Delivery",

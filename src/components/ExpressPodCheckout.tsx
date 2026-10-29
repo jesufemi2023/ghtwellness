@@ -316,9 +316,6 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
     if (streetAddress.trim().length < 5) {
       errors.streetAddress = 'Please enter your house or office street address.';
     }
-    if (landmark.trim().length < 2) {
-      errors.landmark = 'Please enter the nearest bus-stop, junction, or landmark.';
-    }
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -730,7 +727,7 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
           <div>
             <label
               htmlFor={`${mode}-full-name`}
-              className="block text-sm font-semibold text-[#0F1F18] mb-1.5"
+              className="block text-[15px] sm:text-base font-semibold text-[#0F1F18] mb-1.5"
             >
               Recipient Full Name <span className="text-red-600">*</span>
             </label>
@@ -744,19 +741,19 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
                 setFullName(e.target.value);
                 if (fieldErrors.fullName) setFieldErrors((prev) => ({ ...prev, fullName: '' }));
               }}
-              className={`w-full min-h-[52px] px-4 py-3 text-base text-[#0F1F18] bg-white border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#047857] ${
+              className={`w-full min-h-[54px] px-4 py-3 text-base text-[#0F1F18] bg-white border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#047857] ${
                 fieldErrors.fullName ? 'border-red-500' : 'border-[#CBD5CF]'
               }`}
             />
             {fieldErrors.fullName && (
-              <p className="mt-1.5 text-xs font-medium text-red-600">{fieldErrors.fullName}</p>
+              <p className="mt-1.5 text-sm font-medium text-red-600">{fieldErrors.fullName}</p>
             )}
           </div>
 
           <div>
             <label
               htmlFor={`${mode}-phone`}
-              className="block text-sm font-semibold text-[#0F1F18] mb-1.5"
+              className="block text-[15px] sm:text-base font-semibold text-[#0F1F18] mb-1.5"
             >
               Active Phone / WhatsApp Number <span className="text-red-600">*</span>
             </label>
@@ -772,12 +769,12 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
                 if (fieldErrors.phoneNumber)
                   setFieldErrors((prev) => ({ ...prev, phoneNumber: '' }));
               }}
-              className={`w-full min-h-[52px] px-4 py-3 text-base text-[#0F1F18] bg-white border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#047857] ${
+              className={`w-full min-h-[54px] px-4 py-3 text-base text-[#0F1F18] bg-white border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#047857] ${
                 fieldErrors.phoneNumber ? 'border-red-500' : 'border-[#CBD5CF]'
               }`}
             />
             {fieldErrors.phoneNumber && (
-              <p className="mt-1.5 text-xs font-medium text-red-600">{fieldErrors.phoneNumber}</p>
+              <p className="mt-1.5 text-sm font-medium text-red-600">{fieldErrors.phoneNumber}</p>
             )}
           </div>
         </div>
@@ -786,7 +783,7 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
           <div>
             <label
               htmlFor={`${mode}-state`}
-              className="block text-sm font-semibold text-[#0F1F18] mb-1.5"
+              className="block text-[15px] sm:text-base font-semibold text-[#0F1F18] mb-1.5"
             >
               Delivery State <span className="text-red-600">*</span>
             </label>
@@ -794,7 +791,7 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
               id={`${mode}-state`}
               value={deliveryState}
               onChange={(e) => setDeliveryState(e.target.value)}
-              className="w-full min-h-[52px] px-4 py-3 text-base text-[#0F1F18] bg-white border border-[#CBD5CF] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#047857]"
+              className="w-full min-h-[54px] px-4 py-3 text-base text-[#0F1F18] bg-white border border-[#CBD5CF] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#047857]"
             >
               {NIGERIAN_STATES.map((st) => (
                 <option key={st} value={st}>
@@ -807,7 +804,7 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
           <div className="sm:col-span-2">
             <label
               htmlFor={`${mode}-address`}
-              className="block text-sm font-semibold text-[#0F1F18] mb-1.5"
+              className="block text-[15px] sm:text-base font-semibold text-[#0F1F18] mb-1.5"
             >
               House or Office Delivery Address <span className="text-red-600">*</span>
             </label>
@@ -822,12 +819,12 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
                 if (fieldErrors.streetAddress)
                   setFieldErrors((prev) => ({ ...prev, streetAddress: '' }));
               }}
-              className={`w-full min-h-[52px] px-4 py-3 text-base text-[#0F1F18] bg-white border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#047857] ${
+              className={`w-full min-h-[54px] px-4 py-3 text-base text-[#0F1F18] bg-white border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#047857] ${
                 fieldErrors.streetAddress ? 'border-red-500' : 'border-[#CBD5CF]'
               }`}
             />
             {fieldErrors.streetAddress && (
-              <p className="mt-1.5 text-xs font-medium text-red-600">{fieldErrors.streetAddress}</p>
+              <p className="mt-1.5 text-sm font-medium text-red-600">{fieldErrors.streetAddress}</p>
             )}
           </div>
         </div>
@@ -836,30 +833,23 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
           <div>
             <label
               htmlFor={`${mode}-landmark`}
-              className="block text-sm font-semibold text-[#0F1F18] mb-1.5"
+              className="block text-[15px] sm:text-base font-semibold text-[#0F1F18] mb-1.5"
             >
-              Nearest Bus-Stop / Landmark <span className="text-red-600">*</span>
+              Nearest Bus-Stop / Landmark{' '}
+              <span className="text-slate-500 font-normal text-sm">(Optional)</span>
             </label>
             <input
               id={`${mode}-landmark`}
               type="text"
-              placeholder="e.g. Opposite Total Filling Station, Ikeja"
+              placeholder="e.g. Opposite Total Filling Station, Ikeja (Optional)"
               value={landmark}
-              onChange={(e) => {
-                setLandmark(e.target.value);
-                if (fieldErrors.landmark) setFieldErrors((prev) => ({ ...prev, landmark: '' }));
-              }}
-              className={`w-full min-h-[52px] px-4 py-3 text-base text-[#0F1F18] bg-white border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#047857] ${
-                fieldErrors.landmark ? 'border-red-500' : 'border-[#CBD5CF]'
-              }`}
+              onChange={(e) => setLandmark(e.target.value)}
+              className="w-full min-h-[54px] px-4 py-3 text-base text-[#0F1F18] bg-white border border-[#CBD5CF] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#047857]"
             />
-            {fieldErrors.landmark && (
-              <p className="mt-1.5 text-xs font-medium text-red-600">{fieldErrors.landmark}</p>
-            )}
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-[#0F1F18] mb-1.5">
+            <label className="block text-[15px] sm:text-base font-semibold text-[#0F1F18] mb-1.5">
               Preferred Delivery Day
             </label>
             <div className="grid grid-cols-3 gap-2">
