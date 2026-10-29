@@ -110,7 +110,7 @@ export const CacheService = {
         return false;
       }
 
-      const res = await fetch("/api/sync-check");
+      const res = await fetch("/api/sync-check", { cache: "no-store" });
       if (!res.ok) return false;
 
       const remoteMetadata = await res.json();
@@ -132,6 +132,16 @@ export const CacheService = {
     } catch (e) {
       console.error("Sync Check Error:", e);
       return false;
+    }
+  },
+
+  clearCatalog: () => {
+    try {
+      localStorage.removeItem(CACHE_KEYS.PRODUCTS);
+      localStorage.removeItem(CACHE_KEYS.PACKAGES);
+      localStorage.removeItem(CACHE_KEYS.METADATA);
+    } catch {
+      // Ignore storage errors
     }
   },
 

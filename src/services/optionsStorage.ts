@@ -221,7 +221,7 @@ export class OptionsStorage {
 
     const normalizedTable = table === "products" ? "products" : "recommended_packages";
     const existingOptions = item.options;
-    if (Array.isArray(existingOptions) && existingOptions.length > 0) {
+    if (Array.isArray(existingOptions)) {
       cacheInMemoryOnly(
         normalizedTable,
         item.id,

@@ -10,8 +10,8 @@ export interface ResolvedOptionPrice {
 }
 
 /**
- * Normalizes bottle option labels (fixes minor DB typos such as "Bootles" -> "Bottles"
- * and provides a sensible "1 Bottle" label if blank).
+ * Normalizes bottle option labels (fixes minor typos such as "Bootles" -> "Bottles"
+ * and provides a sensible "1 Bottle" label if left blank).
  */
 export function cleanBottleLabel(rawLabel?: string): string {
   if (!rawLabel || !rawLabel.trim()) return '1 Bottle';
@@ -23,46 +23,27 @@ export function cleanBottleLabel(rawLabel?: string): string {
 
 /**
  * Computes discounted selling price, crossed-out original retail price, and discount percentage
- * for a single bottle option.
+ * for a single bottle option using the exact same formula as AdminDashboard's "Calculated Final Price":
  *
- * Rules matching AdminDashboard & Supabase package records:
- * 1. If `opt.discount > 0` was explicitly entered on the option, `opt.price` is the base price
- *    and `sellingPrice = round(opt.price * (1 - opt.discount / 100))`.
- * 2. If `opt.discount` is omitted/0 while the parent package/product has `parentDiscount > 0`
- *    (e.g., P001 15% off where 3 Bottles `opt.price = 59500` vs `pkg.price = 70000`),
- *    `opt.price` is already the discounted customer selling price, and its pre-discount retail
- *    value is `round((opt.price / (1 - parentDiscount / 100)) / 100) * 100`.
+ *   optDiscount = Number(opt.discount) || 0
+ *   sellingPrice = optDiscount > 0 ? Math.round(opt.price * (1 - optDiscount / 100)) : opt.price
+ *   originalPrice = opt.price
  */
 export function resolveSingleOptionPricing(
   opt: { bottles?: string; price: number; discount?: number },
-  parentDiscountPercent: number = 0
+  _parentDiscountPercent: number = 0
 ): ResolvedOptionPrice {
   const rawPrice = Number(opt.price) || 0;
-  const explicitOptDiscount = Number(opt.discount) || 0;
-  const fallbackParentDiscount =
-    parentDiscountPercent > 0 && parentDiscountPercent < 95 ? Number(parentDiscountPercent) : 0;
+  const optDiscount = Number(opt.discount) || 0;
 
-  if (explicitOptDiscount > 0 && explicitOptDiscount < 95) {
-    const sellingPrice = Math.round(rawPrice * (1 - explicitOptDiscount / 100));
+  if (optDiscount > 0 && optDiscount < 100) {
+    const sellingPrice = Math.round(rawPrice * (1 - optDiscount / 100));
     const originalPrice = rawPrice;
     return {
       label: cleanBottleLabel(opt.bottles),
       sellingPrice,
       originalPrice,
-      discountPercent: explicitOptDiscount,
-      savings: Math.max(0, originalPrice - sellingPrice),
-    };
-  }
-
-  if (fallbackParentDiscount > 0 && rawPrice > 0) {
-    const sellingPrice = rawPrice;
-    const rawOriginal = sellingPrice / (1 - fallbackParentDiscount / 100);
-    const originalPrice = Math.max(sellingPrice, Math.round(rawOriginal / 100) * 100);
-    return {
-      label: cleanBottleLabel(opt.bottles),
-      sellingPrice,
-      originalPrice,
-      discountPercent: fallbackParentDiscount,
+      discountPercent: optDiscount,
       savings: Math.max(0, originalPrice - sellingPrice),
     };
   }

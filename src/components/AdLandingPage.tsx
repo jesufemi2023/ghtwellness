@@ -19,7 +19,6 @@ import {
 import { Product, PackageData } from '../types';
 import { CONFIG } from '../config';
 import { openWhatsAppLink } from '../utils/whatsapp';
-import { sanitizeAdTitle, sanitizeAdText } from '../utils/adCompliance';
 import {
   SymptomCategory,
   captureAndPersistAdAttribution,
@@ -71,12 +70,128 @@ const SYMPTOM_TABS: Array<{ id: FilterTabId; label: string }> = [
   { id: 'singles', label: 'Single Bottles' },
 ];
 
+interface PackageVisualTheme {
+  categoryLabel: string;
+  headerBgClass: string;
+  studioGradientClass: string;
+  cardBorderClass: string;
+  accentTextClass: string;
+  softSurfaceClass: string;
+}
+
+const SOFT_BOTANICAL_THEMES: Record<string, PackageVisualTheme> = {
+  prostate: {
+    categoryLabel: "Men's Prostate Care",
+    headerBgClass: 'bg-[#EEF6F1]',
+    studioGradientClass:
+      'bg-[radial-gradient(circle_at_50%_45%,#ffffff_0%,#ffffff_52%,#e8f3ec_100%)]',
+    cardBorderClass: 'border-[#CFDFD5]',
+    accentTextClass: 'text-[#065F46]',
+    softSurfaceClass: 'bg-[#F6FAF8]',
+  },
+  vitality: {
+    categoryLabel: "Men's Stamina & Vitality",
+    headerBgClass: 'bg-[#FBF4E7]',
+    studioGradientClass:
+      'bg-[radial-gradient(circle_at_50%_45%,#ffffff_0%,#ffffff_52%,#f6ede0_100%)]',
+    cardBorderClass: 'border-[#E6DBC5]',
+    accentTextClass: 'text-[#854D0E]',
+    softSurfaceClass: 'bg-[#FDFBF6]',
+  },
+  joints: {
+    categoryLabel: 'Joint & Bone Comfort',
+    headerBgClass: 'bg-[#ECF5F7]',
+    studioGradientClass:
+      'bg-[radial-gradient(circle_at_50%_45%,#ffffff_0%,#ffffff_52%,#e4f0f3_100%)]',
+    cardBorderClass: 'border-[#CDE0E5]',
+    accentTextClass: 'text-[#155E75]',
+    softSurfaceClass: 'bg-[#F6FAFB]',
+  },
+  sugar: {
+    categoryLabel: 'Blood Sugar & Metabolic Care',
+    headerBgClass: 'bg-[#EEF2FA]',
+    studioGradientClass:
+      'bg-[radial-gradient(circle_at_50%_45%,#ffffff_0%,#ffffff_52%,#e7edf8_100%)]',
+    cardBorderClass: 'border-[#D1DCEB]',
+    accentTextClass: 'text-[#1E40AF]',
+    softSurfaceClass: 'bg-[#F7F9FC]',
+  },
+  womens: {
+    categoryLabel: "Women's Reproductive Care",
+    headerBgClass: 'bg-[#FAF0F3]',
+    studioGradientClass:
+      'bg-[radial-gradient(circle_at_50%_45%,#ffffff_0%,#ffffff_52%,#f4e6eb_100%)]',
+    cardBorderClass: 'border-[#E5CFD7]',
+    accentTextClass: 'text-[#9D174D]',
+    softSurfaceClass: 'bg-[#FCF7F9]',
+  },
+  combo: {
+    categoryLabel: 'Complete Master Combo Pack',
+    headerBgClass: 'bg-[#F4F2EA]',
+    studioGradientClass:
+      'bg-[radial-gradient(circle_at_50%_45%,#ffffff_0%,#ffffff_52%,#edeae0_100%)]',
+    cardBorderClass: 'border-[#DDD9CC]',
+    accentTextClass: 'text-[#57534E]',
+    softSurfaceClass: 'bg-[#FAF9F5]',
+  },
+};
+
+function resolvePackageVisualTheme(pkg: PackageData, index: number): PackageVisualTheme {
+  const haystack = `${pkg.package_code || ''} ${pkg.name || ''} ${pkg.description || ''} ${(pkg.symptoms || []).join(' ')}`.toLowerCase();
+
+  if (haystack.includes('prostate') || haystack.includes('p001')) {
+    return SOFT_BOTANICAL_THEMES.prostate;
+  }
+  if (
+    haystack.includes('female') ||
+    haystack.includes('women') ||
+    haystack.includes('fibroid') ||
+    haystack.includes('ovulation') ||
+    haystack.includes('p009')
+  ) {
+    return SOFT_BOTANICAL_THEMES.womens;
+  }
+  if (
+    haystack.includes('arthritis') ||
+    haystack.includes('joint') ||
+    haystack.includes('rheumatism') ||
+    haystack.includes('bone') ||
+    haystack.includes('p004')
+  ) {
+    return SOFT_BOTANICAL_THEMES.joints;
+  }
+  if (
+    haystack.includes('diabetes') ||
+    haystack.includes('sugar') ||
+    haystack.includes('insulin') ||
+    haystack.includes('p003')
+  ) {
+    return SOFT_BOTANICAL_THEMES.sugar;
+  }
+  if (pkg.is_combo || haystack.includes('combo')) {
+    return SOFT_BOTANICAL_THEMES.combo;
+  }
+  if (
+    haystack.includes('erection') ||
+    haystack.includes('ejaculation') ||
+    haystack.includes('libido') ||
+    haystack.includes('vitality') ||
+    haystack.includes('male') ||
+    haystack.includes('p002')
+  ) {
+    return SOFT_BOTANICAL_THEMES.vitality;
+  }
+
+  const themeList = Object.values(SOFT_BOTANICAL_THEMES);
+  return themeList[index % themeList.length];
+}
+
 const CUSTOMER_STORIES = [
   {
     name: 'Chief Adebayo O.',
     role: 'Retired Civil Engineer, 64',
     location: 'Bodija, Ibadan',
-    packName: '3-Bottle Prostate & Male Comfort Pack',
+    packName: '3-Bottle Prostate Pack',
     quote:
       'The dispatch rider delivered to my residence in Bodija within 36 hours. Every bottle carried its intact factory seal and NAFDAC registration number, and I paid via transfer only after inspecting the package. Consistent daily use has noticeably supported my nighttime comfort.',
   },
@@ -84,7 +199,7 @@ const CUSTOMER_STORIES = [
     name: 'Mrs. Evelyn N.',
     role: 'School Principal, 56',
     location: 'GRA, Benin City',
-    packName: 'Joint Comfort & Calcium Combo Pack',
+    packName: 'Joint Comfort & Calcium Pack',
     quote:
       'What gave my family confidence was the zero-risk Pay on Delivery service. Their specialist explained the morning and evening mealtime schedule clearly on WhatsApp, and my mother moves around the compound with much steadier comfort.',
   },
@@ -117,7 +232,7 @@ const BUYER_FAQS = [
   {
     question: 'Which multi-bottle pack size is recommended for adults?',
     answer:
-      'A 2-Bottle Starter Pack covers initial nutritional support, while our 3-Bottle and 4-Bottle Value Packs are structured for a complete 30 to 60-day herbal wellness regimen with higher multi-bottle discount savings.',
+      'A 2-Bottle Starter Pack covers initial nutritional support, while our 3-Bottle and 4-Bottle Value Packs are structured for a complete 30 to 60-day herbal wellness regimen with multi-bottle discount savings.',
   },
 ];
 
@@ -218,6 +333,7 @@ interface StudioProductStageProps {
   entries: GalleryImageEntry[];
   alt: string;
   heightClassName: string;
+  studioGradientClass?: string;
   optimizeWidth?: number;
   onInspect?: () => void;
 }
@@ -226,6 +342,7 @@ const StudioProductStage: React.FC<StudioProductStageProps> = ({
   entries,
   alt,
   heightClassName,
+  studioGradientClass = 'bg-[radial-gradient(circle_at_50%_46%,#ffffff_0%,#ffffff_55%,#eef4f1_100%)]',
   optimizeWidth = 1200,
   onInspect,
 }) => {
@@ -257,12 +374,10 @@ const StudioProductStage: React.FC<StudioProductStageProps> = ({
 
   const handleImageError = () => {
     if (currentStage === 'optimized' && rawUrl && optimizedUrl !== rawUrl) {
-      // Retry directly with the raw un-transformed Supabase / Cloudinary URL
       setAttemptMap((prev) => ({ ...prev, [safeIdx]: 'raw' }));
       return;
     }
 
-    // Mark current entry as failed and automatically fall forward to next available bottle image if present
     setAttemptMap((prev) => {
       const nextMap: Record<number, ImageAttemptState> = { ...prev, [safeIdx]: 'failed' };
       const fallbackIdx = entries.findIndex((_, i) => i !== safeIdx && nextMap[i] !== 'failed');
@@ -274,107 +389,111 @@ const StudioProductStage: React.FC<StudioProductStageProps> = ({
   };
 
   return (
-    <div
-      className={`relative w-full ${heightClassName} bg-[radial-gradient(circle_at_50%_46%,#ffffff_0%,#ffffff_58%,#eef4f1_100%)] overflow-hidden select-none group`}
-    >
-      {/* Explicit Absolute Geometry Canvas — Prevents Flex Percentage Height Collapse Across Safari & Chrome */}
-      <div
-        onClick={onInspect}
-        role={onInspect ? 'button' : undefined}
-        tabIndex={onInspect ? 0 : undefined}
-        onKeyDown={
-          onInspect
-            ? (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  onInspect();
+    <div className="w-full flex flex-col select-none">
+      {/* Explicit Studio Stage Geometry — Prevents Flex Height Collapse Across Mobile & Desktop */}
+      <div className={`relative w-full ${heightClassName} ${studioGradientClass} overflow-hidden group`}>
+        <div
+          onClick={onInspect}
+          role={onInspect ? 'button' : undefined}
+          tabIndex={onInspect ? 0 : undefined}
+          onKeyDown={
+            onInspect
+              ? (e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onInspect();
+                  }
                 }
-              }
-            : undefined
-        }
-        aria-label={onInspect ? `Inspect ${alt} bottles up close` : undefined}
-        className={`absolute inset-x-0 top-0 ${
-          hasMultipleEntries ? 'bottom-14' : 'bottom-0'
-        } flex items-center justify-center p-3 sm:p-5 ${onInspect ? 'cursor-zoom-in' : ''}`}
-      >
-        {hasFailed ? (
-          <div className="flex flex-col items-center justify-center text-center p-6 max-w-xs">
-            <div className="w-16 h-16 rounded-2xl bg-white border border-[#D5E0DA] flex items-center justify-center text-[#047857] mb-3">
-              <ShieldCheck className="w-8 h-8" />
+              : undefined
+          }
+          aria-label={onInspect ? `Inspect ${alt} bottles up close` : undefined}
+          className={`absolute inset-0 flex items-center justify-center p-4 sm:p-6 ${
+            onInspect ? 'cursor-zoom-in' : ''
+          }`}
+        >
+          {hasFailed ? (
+            <div className="flex flex-col items-center justify-center text-center p-6 max-w-xs">
+              <div className="w-16 h-16 rounded-2xl bg-white border border-[#D5E0DA] flex items-center justify-center text-[#047857] mb-3">
+                <ShieldCheck className="w-8 h-8" />
+              </div>
+              <span className="text-base font-bold text-[#0F1F18] font-[family-name:var(--font-editorial)]">
+                {alt}
+              </span>
+              <span className="text-xs text-[#047857] font-medium mt-1">
+                NAFDAC Registered Herbal Formulation
+              </span>
             </div>
-            <span className="text-base font-bold text-[#0F1F18] font-[family-name:var(--font-editorial)]">
-              {alt}
-            </span>
-            <span className="text-xs text-[#047857] font-medium mt-1">
-              NAFDAC Registered Herbal Formulation
-            </span>
-          </div>
-        ) : (
-          <img
-            key={`${safeIdx}-${currentStage}`}
-            src={activeSrc}
-            alt={`${alt} — ${currentEntry.label}`}
-            loading="eager"
-            decoding="async"
-            onError={handleImageError}
-            className="max-w-full max-h-full w-full h-full object-contain transition-transform duration-300 group-hover:scale-[1.04]"
-          />
+          ) : (
+            <img
+              key={`${safeIdx}-${currentStage}`}
+              src={activeSrc}
+              alt={`${alt} — ${currentEntry.label}`}
+              loading="eager"
+              decoding="async"
+              referrerPolicy="no-referrer"
+              onError={handleImageError}
+              className="max-w-full max-h-full w-full h-full object-contain transition-transform duration-300 group-hover:scale-[1.03]"
+            />
+          )}
+        </div>
+
+        {/* Subtle Zoom Affordance Button */}
+        {onInspect && !hasFailed && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onInspect();
+            }}
+            className="absolute top-3.5 right-3.5 z-10 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/95 hover:bg-white text-[#0F1F18] border border-slate-200/90 text-xs font-semibold shadow-2xs transition-colors cursor-pointer whitespace-nowrap"
+          >
+            <ZoomIn className="w-3.5 h-3.5 text-[#047857]" />
+            <span>Enlarge</span>
+          </button>
         )}
       </div>
 
-      {/* Subtle Zoom Affordance Button */}
-      {onInspect && !hasFailed && (
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onInspect();
-          }}
-          className="absolute top-3.5 right-3.5 z-10 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/95 hover:bg-white text-[#0F1F18] border border-[#D5DFDA] text-xs font-semibold shadow-2xs transition-colors cursor-pointer whitespace-nowrap"
-        >
-          <ZoomIn className="w-3.5 h-3.5 text-[#047857]" />
-          <span>Enlarge</span>
-        </button>
-      )}
-
-      {/* Multi-Bottle Interactive Gallery Strip */}
+      {/* Dedicated Non-Clipped Gallery Switcher Row — Full Pack Always 100% Visible on Mobile */}
       {hasMultipleEntries && (
         <div
-          className="absolute inset-x-0 bottom-0 h-14 z-10 px-3 sm:px-5 bg-white/85 backdrop-blur-xs border-t border-[#E6ECE8] flex items-center justify-center gap-2 overflow-x-auto no-scrollbar"
+          className="w-full bg-white/95 border-t border-slate-200/75 overflow-x-auto no-scrollbar py-2.5 px-3.5 sm:px-5"
           onClick={(e) => e.stopPropagation()}
         >
-          {entries.slice(0, 5).map((entry, idx) => {
-            const isSelected = idx === safeIdx;
-            const thumbSrc = getOptimizedImageUrl(entry.url, 180) || entry.url;
-            return (
-              <button
-                key={idx}
-                type="button"
-                onClick={() => setActiveIdx(idx)}
-                title={entry.label}
-                className={`flex items-center gap-2 px-2.5 py-1 rounded-lg border text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
-                  isSelected
-                    ? 'bg-[#F2F7F4] border-[#047857] text-[#0F1F18] ring-1 ring-[#047857]'
-                    : 'bg-white hover:bg-slate-50 border-[#D5DFDA] text-slate-600'
-                }`}
-              >
-                <img
-                  src={thumbSrc}
-                  alt={entry.label}
-                  loading="eager"
-                  decoding="async"
-                  onError={(e) => {
-                    const imgEl = e.currentTarget;
-                    if (imgEl.src !== entry.url) {
-                      imgEl.src = entry.url;
-                    }
-                  }}
-                  className="w-6 h-6 object-contain shrink-0"
-                />
-                <span className="max-w-[105px] truncate">{entry.label}</span>
-              </button>
-            );
-          })}
+          <div className="flex items-center gap-2 w-max sm:mx-auto">
+            {entries.map((entry, idx) => {
+              const isSelected = idx === safeIdx;
+              const thumbSrc = getOptimizedImageUrl(entry.url, 180) || entry.url;
+              return (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => setActiveIdx(idx)}
+                  title={entry.label}
+                  className={`min-h-[42px] flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs sm:text-[13px] font-semibold transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
+                    isSelected
+                      ? 'bg-[#EEF6F2] border-[#047857] text-[#0F1F18] ring-1 ring-[#047857]'
+                      : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-600'
+                  }`}
+                >
+                  <img
+                    src={thumbSrc}
+                    alt={entry.label}
+                    loading="eager"
+                    decoding="async"
+                    referrerPolicy="no-referrer"
+                    onError={(e) => {
+                      const imgEl = e.currentTarget;
+                      if (imgEl.src !== entry.url) {
+                        imgEl.src = entry.url;
+                      }
+                    }}
+                    className="w-6 h-6 object-contain shrink-0"
+                  />
+                  <span>{entry.label}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
       )}
     </div>
@@ -410,6 +529,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
   const [activeFilter, setActiveFilter] = useState<FilterTabId>(adIntent.category);
   const [packageOptionMap, setPackageOptionMap] = useState<Record<string, number>>({});
   const [productOptionMap, setProductOptionMap] = useState<Record<string, number>>({});
+  const [expandedBenefitsMap, setExpandedBenefitsMap] = useState<Record<string, boolean>>({});
   const [openFaqIdx, setOpenFaqIdx] = useState<number | null>(0);
   const [showMobileBar, setShowMobileBar] = useState(false);
 
@@ -487,6 +607,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
     return allBundles[0];
   }, [allBundles, adIntent]);
 
+  // Keep inlineTarget & modal item synchronized with live Admin catalog refreshes
   useEffect(() => {
     if (!inlineTarget.item && spotlightBundle) {
       setInlineTarget({
@@ -494,14 +615,28 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
         type: 'package',
         optionIdx: getDefaultOptionIdx(spotlightBundle.options),
       });
-    } else if (!inlineTarget.item && products.length > 0) {
+      return;
+    }
+    if (!inlineTarget.item && products.length > 0) {
       setInlineTarget({
         item: products[0],
         type: 'product',
         optionIdx: getDefaultOptionIdx(products[0].options),
       });
+      return;
     }
-  }, [spotlightBundle, products, inlineTarget.item]);
+    if (inlineTarget.item && inlineTarget.type === 'package') {
+      const updatedPkg = allBundles.find((b) => b.id === inlineTarget.item?.id);
+      if (updatedPkg && updatedPkg !== inlineTarget.item) {
+        setInlineTarget((prev) => ({ ...prev, item: updatedPkg }));
+      }
+    } else if (inlineTarget.item && inlineTarget.type === 'product') {
+      const updatedProd = products.find((p) => p.id === inlineTarget.item?.id);
+      if (updatedProd && updatedProd !== inlineTarget.item) {
+        setInlineTarget((prev) => ({ ...prev, item: updatedProd }));
+      }
+    }
+  }, [spotlightBundle, allBundles, products, inlineTarget.item, inlineTarget.type]);
 
   const getPkgOptionIdx = (pkg: PackageData): number => {
     if (packageOptionMap[pkg.id] !== undefined) return packageOptionMap[pkg.id];
@@ -558,6 +693,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
   const spotlightPricing = spotlightBundle
     ? computePackagePricing(spotlightBundle, spotlightOptIdx)
     : null;
+  const spotlightTheme = spotlightBundle ? resolvePackageVisualTheme(spotlightBundle, 0) : null;
   const spotlightGallery = useMemo(
     () => (spotlightBundle ? getPackageGalleryEntries(spotlightBundle) : []),
     [spotlightBundle]
@@ -595,7 +731,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
   const showSkeletonState = isLoading && allBundles.length === 0 && products.length === 0;
 
   return (
-    <div className="min-h-screen bg-white text-[#0F1F18] font-[family-name:var(--font-clinical-body)] pb-16 md:pb-0">
+    <div className="min-h-screen bg-[#FAFBF9] text-[#0F1F18] font-[family-name:var(--font-clinical-body)] pb-16 md:pb-0">
       {/* 1. Strict 3-Zone Top Bar Contract */}
       <header className="md:sticky md:top-0 z-40 h-16 bg-white/95 backdrop-blur-xs border-b border-[#E4EBE7]">
         <div className="max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-8">
@@ -689,7 +825,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                         {spotlightBundle.package_code ? ` · ${spotlightBundle.package_code}` : ''}
                       </span>
                       <h2 className="text-xl sm:text-2xl font-bold text-[#0F1F18] font-[family-name:var(--font-editorial)] mt-0.5">
-                        {sanitizeAdTitle(spotlightBundle.name)}
+                        {spotlightBundle.name}
                       </h2>
                     </div>
 
@@ -710,10 +846,16 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                     </div>
                   </div>
 
+                  {spotlightBundle.description && (
+                    <p className="text-sm sm:text-base text-slate-600 leading-relaxed line-clamp-3">
+                      {spotlightBundle.description}
+                    </p>
+                  )}
+
                   {spotlightBundle.options && spotlightBundle.options.length > 0 && (
                     <div className="space-y-2.5">
                       <div className="text-xs sm:text-sm font-semibold text-slate-700">
-                        Select Bottle Pack &amp; Discounted Price:
+                        Select Bottle Pack &amp; Configured Price:
                       </div>
                       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-2.5">
                         {spotlightBundle.options.map((opt, idx) => {
@@ -737,7 +879,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                                   optionIdx: idx,
                                 });
                                 trackAdBundleSelect(
-                                  sanitizeAdTitle(spotlightBundle.name),
+                                  spotlightBundle.name,
                                   optPriceInfo.label,
                                   optPriceInfo.sellingPrice
                                 );
@@ -828,11 +970,12 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
               </div>
 
               {spotlightBundle ? (
-                <div className="flex-1 rounded-3xl border border-[#DCE5E0] overflow-hidden flex flex-col bg-white">
+                <div className="flex-1 rounded-[28px] border border-[#D8E2DC] shadow-[0_14px_38px_-18px_rgba(15,31,24,0.09)] overflow-hidden flex flex-col bg-white">
                   <StudioProductStage
                     entries={spotlightGallery}
-                    alt={sanitizeAdTitle(spotlightBundle.name)}
-                    heightClassName="h-[380px] sm:h-[500px] lg:h-[580px]"
+                    alt={spotlightBundle.name}
+                    heightClassName="h-[360px] sm:h-[470px] lg:h-[530px]"
+                    studioGradientClass={spotlightTheme?.studioGradientClass}
                     optimizeWidth={1400}
                     onInspect={() =>
                       setDetailModalItem({ item: spotlightBundle, type: 'package' })
@@ -849,12 +992,12 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                       }
                       className="font-semibold text-[#047857] hover:underline cursor-pointer whitespace-nowrap"
                     >
-                      View Supplement Facts →
+                      View Supplement Details →
                     </button>
                   </div>
                 </div>
               ) : (
-                <div className="h-[380px] sm:h-[520px] rounded-3xl bg-[#F6F8F7] border border-[#DCE5E0] flex flex-col items-center justify-center p-8 text-center space-y-3">
+                <div className="h-[380px] sm:h-[520px] rounded-[28px] bg-[#F6F8F7] border border-[#DCE5E0] flex flex-col items-center justify-center p-8 text-center space-y-3">
                   <Loader2 className="w-9 h-9 text-[#047857] animate-spin" />
                   <p className="text-base font-semibold text-slate-700">
                     Loading Authentic NAFDAC-Registered Herbal Wellness Packs...
@@ -904,9 +1047,9 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
         </div>
       </section>
 
-      {/* 3. Featured Collection Showcase — Oversized Gallery Cards Centered Around Big Bottle Imagery */}
-      <section id="ad-bundles" className="py-14 sm:py-20 bg-[#F6F8F7]/65 scroll-mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+      {/* 3. Featured Collection Showcase — Soft, Distinct Adult Wellness Package Cards */}
+      <section id="ad-bundles" className="py-16 sm:py-24 bg-[#F2F5F3] scroll-mt-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
             <div className="max-w-2xl space-y-2.5">
               <p className="text-xs sm:text-sm font-semibold text-[#047857]">
@@ -916,8 +1059,8 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                 Select Your Targeted Herbal Wellness Pack
               </h2>
               <p className="text-base sm:text-lg text-slate-600 leading-relaxed">
-                Tap any bottle image to inspect up close, choose your preferred bottle pack with
-                discounted bundle pricing, and request doorstep Pay-on-Delivery dispatch.
+                Each wellness pack below is clearly numbered and organized by health focus. Choose
+                your preferred bottle pack and request doorstep Pay-on-Delivery dispatch.
               </p>
             </div>
           </div>
@@ -926,7 +1069,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
           <div
             role="tablist"
             aria-label="Filter supplements by wellness focus"
-            className="flex items-center gap-1.5 p-1.5 bg-[#E9EFEC] rounded-xl overflow-x-auto no-scrollbar"
+            className="flex items-center gap-1.5 p-1.5 bg-[#E3EAE6] rounded-xl overflow-x-auto no-scrollbar"
           >
             {SYMPTOM_TABS.map((tab) => {
               const isActive = activeFilter === tab.id;
@@ -950,10 +1093,10 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
           </div>
 
           {!hasExactCategoryMatch && !showSkeletonState && (
-            <div className="py-4 px-5 rounded-xl bg-white border border-[#DCE5E0] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="py-4 px-5 rounded-2xl bg-white border border-[#DCE5E0] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <p className="text-sm sm:text-base text-slate-700">
-                Showing all complete multi-bottle wellness packs below. Need personal guidance for
-                your specific wellness goal? Speak directly with our specialist.
+                Showing all available multi-bottle wellness packs below. Need personal guidance for
+                your specific health goal? Speak directly with our specialist.
               </p>
               <button
                 type="button"
@@ -971,16 +1114,16 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
           )}
 
           {showSkeletonState ? (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12">
               {[0, 1].map((skeletonKey) => (
                 <div
                   key={skeletonKey}
-                  className="bg-white rounded-3xl border border-[#DCE5E0] overflow-hidden animate-pulse"
+                  className="bg-white rounded-[28px] border border-[#DCE5E0] overflow-hidden animate-pulse"
                 >
-                  <div className="h-[360px] sm:h-[430px] bg-[#EEF4F1]" />
+                  <div className="h-24 bg-[#EEF4F1]" />
+                  <div className="h-[360px] sm:h-[420px] bg-[#F6F9F7]" />
                   <div className="p-6 sm:p-8 space-y-4">
-                    <div className="h-4 w-40 bg-slate-200 rounded" />
-                    <div className="h-8 w-3/4 bg-slate-200 rounded" />
+                    <div className="h-5 w-3/4 bg-slate-200 rounded" />
                     <div className="h-16 w-full bg-slate-100 rounded-xl" />
                     <div className="h-14 w-full bg-emerald-100 rounded-xl" />
                   </div>
@@ -988,81 +1131,136 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
               ))}
             </div>
           ) : activeFilter !== 'singles' ? (
-            /* 2-Column Flagship Gallery Layout so Every Package Image Is Huge */
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10">
-              {bundlesToDisplay.map((pkg) => {
+            /* Soft, Distinct, Easy-to-Identify Adult Wellness Package Cards */
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12">
+              {bundlesToDisplay.map((pkg, cardIndex) => {
                 const selectedIdx = getPkgOptionIdx(pkg);
                 const pricing = computePackagePricing(pkg, selectedIdx);
-                const cleanTitle = sanitizeAdTitle(pkg.name);
-                const cleanDesc = sanitizeAdText(pkg.description);
-                const cleanBenefits = (pkg.health_benefits || [])
-                  .slice(0, 3)
-                  .map((b) => sanitizeAdText(b));
                 const galleryEntries = getPackageGalleryEntries(pkg);
+                const theme = resolvePackageVisualTheme(pkg, cardIndex);
+                const indexDisplay = String(cardIndex + 1).padStart(2, '0');
+                const benefits = Array.isArray(pkg.health_benefits)
+                  ? pkg.health_benefits.filter((b) => b && b.trim().length > 0)
+                  : [];
+                const isBenefitsExpanded = Boolean(expandedBenefitsMap[pkg.id]);
+                const visibleBenefits = isBenefitsExpanded ? benefits : benefits.slice(0, 5);
+                const hiddenBenefitCount = Math.max(0, benefits.length - 5);
 
                 return (
                   <article
                     key={pkg.id}
-                    className="bg-white rounded-3xl border border-[#DCE5E0] hover:border-[#047857]/50 transition-all duration-200 hover:-translate-y-0.5 flex flex-col overflow-hidden"
+                    className={`bg-white rounded-[28px] border ${theme.cardBorderClass} shadow-[0_14px_38px_-16px_rgba(15,31,24,0.08)] hover:shadow-[0_20px_46px_-16px_rgba(15,31,24,0.13)] transition-all duration-200 flex flex-col overflow-hidden`}
                   >
-                    {/* Oversized Studio Product Stage */}
-                    <div className="border-b border-[#E6ECE8]">
+                    {/* Top Package Identity Header — Immediate Clarity & Visual Differentiation for Adults */}
+                    <div
+                      className={`${theme.headerBgClass} px-6 sm:px-8 py-5 sm:py-6 border-b border-slate-200/70 space-y-2`}
+                    >
+                      <div className="flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className={`font-bold tabular-nums ${theme.accentTextClass}`}>
+                            Package {indexDisplay}
+                          </span>
+                          <span aria-hidden="true" className="text-slate-400">
+                            ·
+                          </span>
+                          <span className={`font-semibold ${theme.accentTextClass}`}>
+                            {theme.categoryLabel}
+                          </span>
+                        </div>
+
+                        <div className="text-slate-500 font-medium tabular-nums">
+                          {pkg.package_code ? `${pkg.package_code} · ` : ''}
+                          NAFDAC Registered
+                        </div>
+                      </div>
+
+                      <div className="flex flex-wrap items-baseline justify-between gap-3 pt-0.5">
+                        <h3 className="text-2xl sm:text-[1.8rem] font-bold text-[#0F1F18] font-[family-name:var(--font-editorial)] leading-tight [text-wrap:balance]">
+                          {pkg.name}
+                        </h3>
+
+                        <div className="tabular-nums text-left sm:text-right shrink-0">
+                          <span className="text-xl sm:text-2xl font-extrabold text-[#0F1F18]">
+                            ₦{pricing.currentPrice.toLocaleString()}
+                          </span>
+                          {pricing.savings > 0 && (
+                            <span className="ml-2 text-xs sm:text-sm text-slate-400 line-through">
+                              ₦{pricing.retailPrice.toLocaleString()}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Oversized Soft-Lit Studio Product Stage + Non-Clipped Full Pack Switcher */}
+                    <div className="border-b border-slate-200/75">
                       <StudioProductStage
                         entries={galleryEntries}
-                        alt={cleanTitle}
-                        heightClassName="h-[350px] sm:h-[430px] lg:h-[460px]"
+                        alt={pkg.name}
+                        heightClassName="h-[330px] sm:h-[410px] lg:h-[430px]"
+                        studioGradientClass={theme.studioGradientClass}
                         optimizeWidth={1200}
                         onInspect={() => setDetailModalItem({ item: pkg, type: 'package' })}
                       />
                     </div>
 
-                    {/* Clean Uncluttered Adult Purchase Area */}
-                    <div className="p-6 sm:p-8 flex-1 flex flex-col justify-between space-y-6">
-                      <div className="space-y-4">
-                        {/* Unboxed Metadata with Middot Separators */}
-                        <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-slate-500">
-                          <span className="font-semibold text-[#047857]">
-                            {pkg.is_combo ? 'Complete Combo Pack' : 'Targeted Wellness Pack'}
-                          </span>
-                          <span aria-hidden="true">·</span>
-                          <span>NAFDAC Registered</span>
-                          {pkg.package_code && (
-                            <>
-                              <span aria-hidden="true">·</span>
-                              <span className="tabular-nums">{pkg.package_code}</span>
-                            </>
-                          )}
-                        </div>
-
-                        <div>
-                          <h3 className="text-2xl sm:text-[1.7rem] font-bold text-[#0F1F18] font-[family-name:var(--font-editorial)] leading-snug">
-                            {cleanTitle}
-                          </h3>
-                          <p className="text-base text-slate-600 mt-2 line-clamp-2 leading-relaxed">
-                            {cleanDesc}
+                    {/* Soft, Spacious Adult Reading & Purchase Body */}
+                    <div className="p-6 sm:p-8 flex-1 flex flex-col justify-between space-y-6 bg-white">
+                      <div className="space-y-5">
+                        {pkg.description && pkg.description.trim().length > 0 && (
+                          <p className="text-base text-slate-700 leading-relaxed">
+                            {pkg.description}
                           </p>
-                        </div>
+                        )}
 
-                        {cleanBenefits.length > 0 && (
-                          <ul className="space-y-2 pt-1">
-                            {cleanBenefits.map((benefit, bIdx) => (
-                              <li
-                                key={bIdx}
-                                className="flex items-start gap-2.5 text-sm sm:text-base text-slate-700"
+                        {visibleBenefits.length > 0 && (
+                          <div className="space-y-2.5 pt-1">
+                            <h4 className="text-sm font-bold text-[#0F1F18]">
+                              Key Health Benefits:
+                            </h4>
+                            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-2">
+                              {visibleBenefits.map((benefit, bIdx) => (
+                                <li
+                                  key={bIdx}
+                                  className="flex items-start gap-2.5 text-sm sm:text-[15px] text-slate-700 leading-snug"
+                                >
+                                  <CheckCircle2 className="w-4 h-4 text-[#047857] shrink-0 mt-0.5" />
+                                  <span>{benefit}</span>
+                                </li>
+                              ))}
+                            </ul>
+
+                            {hiddenBenefitCount > 0 && (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setExpandedBenefitsMap((prev) => ({
+                                    ...prev,
+                                    [pkg.id]: !isBenefitsExpanded,
+                                  }))
+                                }
+                                className="text-xs sm:text-sm font-semibold text-[#047857] hover:underline underline-offset-4 pt-1 cursor-pointer"
                               >
-                                <CheckCircle2 className="w-4 h-4 text-[#047857] shrink-0 mt-1" />
-                                <span className="line-clamp-2">{benefit}</span>
-                              </li>
-                            ))}
-                          </ul>
+                                {isBenefitsExpanded
+                                  ? 'Show fewer benefits'
+                                  : `+ Show ${hiddenBenefitCount} more benefits`}
+                              </button>
+                            )}
+                          </div>
                         )}
 
                         {pkg.options && pkg.options.length > 0 && (
-                          <div className="space-y-2.5 pt-2 border-t border-[#EBF0ED]">
-                            <span className="block text-sm font-semibold text-[#0F1F18]">
-                              Select Bottle Pack &amp; Discounted Price:
-                            </span>
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                          <div className="space-y-3 pt-4 border-t border-slate-200/80">
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-sm font-bold text-[#0F1F18]">
+                                Choose Your Bottle Pack:
+                              </span>
+                              <span className="text-xs font-medium text-slate-500">
+                                Tap to switch pack size
+                              </span>
+                            </div>
+
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                               {pkg.options.map((opt, oIdx) => {
                                 const isSel = oIdx === selectedIdx;
                                 const optPriceInfo = resolveSingleOptionPricing(
@@ -1084,15 +1282,15 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                                         optionIdx: oIdx,
                                       });
                                       trackAdBundleSelect(
-                                        cleanTitle,
+                                        pkg.name,
                                         optPriceInfo.label,
                                         optPriceInfo.sellingPrice
                                       );
                                     }}
-                                    className={`p-3 rounded-xl border text-left transition-colors cursor-pointer tabular-nums ${
+                                    className={`min-h-[68px] p-3.5 rounded-2xl border text-left transition-colors cursor-pointer tabular-nums ${
                                       isSel
-                                        ? 'border-[#047857] bg-[#F2F7F4] ring-1 ring-[#047857]'
-                                        : 'border-[#DCE5E0] bg-white hover:border-slate-400'
+                                        ? 'border-[#047857] bg-[#F1F8F4] ring-1 ring-[#047857]'
+                                        : 'border-slate-200 bg-[#FAFBF9] hover:bg-white hover:border-slate-400'
                                     }`}
                                   >
                                     <div className="flex items-center justify-between gap-1">
@@ -1106,7 +1304,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                                       )}
                                     </div>
                                     <div className="mt-1 space-y-0.5">
-                                      <div className="text-sm font-extrabold text-[#047857]">
+                                      <div className="text-sm sm:text-base font-extrabold text-[#047857]">
                                         ₦{optPriceInfo.sellingPrice.toLocaleString()}
                                       </div>
                                       {optPriceInfo.savings > 0 && (
@@ -1123,15 +1321,15 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                         )}
 
                         {pricing.includedList.length > 0 && (
-                          <p className="text-sm text-slate-600 leading-relaxed">
-                            <strong className="text-[#0F1F18]">Included Bottles: </strong>
+                          <p className="text-sm text-slate-600 leading-relaxed pt-1">
+                            <strong className="text-[#0F1F18]">Included in Pack: </strong>
                             {pricing.includedList.join(' · ')}
                           </p>
                         )}
                       </div>
 
-                      {/* Price & Primary Action Row */}
-                      <div className="pt-5 border-t border-[#E4EBE7] space-y-4">
+                      {/* Clear Package Summary & Primary Conversion Button */}
+                      <div className="pt-5 border-t border-slate-200/80 space-y-4">
                         <div className="flex flex-wrap items-baseline justify-between gap-3 tabular-nums">
                           <div>
                             <div className="flex items-baseline gap-2.5 flex-wrap">
@@ -1156,17 +1354,17 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                             onClick={() => setDetailModalItem({ item: pkg, type: 'package' })}
                             className="text-sm font-semibold text-slate-600 hover:text-[#047857] underline underline-offset-4 cursor-pointer whitespace-nowrap"
                           >
-                            Supplement Facts
+                            Full Details
                           </button>
                         </div>
 
                         <button
                           type="button"
                           onClick={() => openExpressCheckout(pkg, 'package', selectedIdx)}
-                          className="w-full min-h-[54px] px-6 py-3.5 rounded-xl bg-[#047857] hover:bg-[#065F46] text-white font-bold text-base sm:text-lg transition-colors flex items-center justify-center gap-2.5 cursor-pointer"
+                          className="w-full min-h-[56px] px-6 py-4 rounded-2xl bg-[#047857] hover:bg-[#065F46] text-white font-bold text-base sm:text-lg transition-colors flex items-center justify-center gap-2.5 cursor-pointer"
                         >
                           <ShoppingBag className="w-5 h-5 shrink-0" />
-                          <span>Order Now — Pay on Delivery</span>
+                          <span>Order {pkg.name} — Pay on Delivery</span>
                         </button>
                       </div>
                     </div>
@@ -1175,7 +1373,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
               })}
             </div>
           ) : (
-            /* Single Supplements — Tall Studio Pedestals */
+            /* Single Supplements — Soft Studio Pedestals */
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {products.map((prod) => {
                 const selectedIdx = getProdOptionIdx(prod);
@@ -1187,13 +1385,13 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                 return (
                   <article
                     key={prod.id}
-                    className="bg-white rounded-3xl border border-[#DCE5E0] hover:border-[#047857]/50 transition-all duration-200 hover:-translate-y-0.5 flex flex-col overflow-hidden"
+                    className="bg-white rounded-[26px] border border-[#D8E2DC] shadow-[0_12px_32px_-16px_rgba(15,31,24,0.08)] hover:border-[#047857]/50 transition-all duration-200 flex flex-col overflow-hidden"
                   >
                     <div className="border-b border-[#E6ECE8]">
                       <StudioProductStage
                         entries={prodEntries}
                         alt={prod.name}
-                        heightClassName="h-[330px] sm:h-[370px]"
+                        heightClassName="h-[320px] sm:h-[360px]"
                         optimizeWidth={900}
                         onInspect={() => setDetailModalItem({ item: prod, type: 'product' })}
                       />
@@ -1208,9 +1406,11 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                         <h3 className="text-xl font-bold text-[#0F1F18] font-[family-name:var(--font-editorial)]">
                           {prod.name}
                         </h3>
-                        <p className="text-sm sm:text-base text-slate-600 line-clamp-2 leading-relaxed">
-                          {sanitizeAdText(prod.short_desc)}
-                        </p>
+                        {prod.short_desc && (
+                          <p className="text-sm sm:text-base text-slate-600 line-clamp-3 leading-relaxed">
+                            {prod.short_desc}
+                          </p>
+                        )}
 
                         {prod.options && prod.options.length > 0 && (
                           <div className="grid grid-cols-2 gap-2 pt-2">
@@ -1356,7 +1556,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                   Select Your Wellness Pack
                 </h3>
                 <p className="text-base text-slate-600 leading-relaxed">
-                  Choose your discounted multi-bottle pack and enter your phone number, state, and
+                  Choose your preferred multi-bottle pack and enter your phone number, state, and
                   street address. No card or online payment is required.
                 </p>
               </div>
@@ -1475,7 +1675,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
       {/* 5. Contiguous Express Checkout Section — Sticky Large Product Stage Left + Clean Form Right */}
       <section
         id="express-order"
-        className="py-16 sm:py-20 bg-[#F6F8F7] border-t border-[#DCE5E0] scroll-mt-16"
+        className="py-16 sm:py-20 bg-[#F2F5F3] border-t border-[#DCE5E0] scroll-mt-16"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
           <div className="max-w-2xl space-y-2">
@@ -1495,15 +1695,11 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
             {/* Sticky Visual Showcase of the Selected Pack on Desktop */}
             <div className="hidden lg:block lg:col-span-5 lg:sticky lg:top-24 space-y-5">
               {inlineTarget.item && inlineSummaryPricing && (
-                <div className="bg-white rounded-3xl border border-[#DCE5E0] overflow-hidden">
+                <div className="bg-white rounded-[28px] border border-[#DCE5E0] shadow-[0_12px_34px_-16px_rgba(15,31,24,0.08)] overflow-hidden">
                   <StudioProductStage
                     entries={inlineGallery}
-                    alt={
-                      inlineTarget.type === 'package'
-                        ? sanitizeAdTitle(inlineTarget.item.name)
-                        : inlineTarget.item.name
-                    }
-                    heightClassName="h-[380px]"
+                    alt={inlineTarget.item.name}
+                    heightClassName="h-[360px]"
                     optimizeWidth={1000}
                     onInspect={() =>
                       setDetailModalItem({
@@ -1517,9 +1713,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                       Selected for Doorstep Dispatch
                     </div>
                     <h3 className="text-2xl font-bold text-[#0F1F18] font-[family-name:var(--font-editorial)]">
-                      {inlineTarget.type === 'package'
-                        ? sanitizeAdTitle(inlineTarget.item.name)
-                        : inlineTarget.item.name}
+                      {inlineTarget.item.name}
                     </h3>
                     {inlineSummaryPricing.includedList.length > 0 && (
                       <p className="text-sm text-slate-600 leading-relaxed">
@@ -1673,7 +1867,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
           <div className="md:hidden fixed bottom-0 inset-x-0 z-40 h-14 bg-white/95 backdrop-blur-xs border-t border-[#DCE5E0] shadow-lg px-4 flex items-center justify-between gap-3">
             <div className="min-w-0">
               <div className="text-[11px] font-medium text-slate-500 truncate">
-                Pay on Delivery · Free Shipping
+                {mobileBarItem.name}
               </div>
               <div className="flex items-baseline gap-1.5 tabular-nums">
                 <span className="text-base font-extrabold text-[#0F1F18]">
@@ -1724,7 +1918,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
         />
       )}
 
-      {/* High-Resolution Bottle Lightbox & Supplement Facts Modal */}
+      {/* High-Resolution Bottle Lightbox & Supplement Details Modal */}
       {detailModalItem && (
         <div
           className="fixed inset-0 z-[155] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-950/70 backdrop-blur-xs"
@@ -1740,12 +1934,10 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
             <div className="px-6 py-4 border-b border-[#E4EBE7] flex items-center justify-between gap-3 shrink-0">
               <div>
                 <div className="text-xs font-semibold text-[#047857]">
-                  High-Resolution Bottle &amp; Formulation View
+                  High-Resolution Bottle &amp; Formulation Details
                 </div>
                 <h3 className="text-lg sm:text-2xl font-bold text-[#0F1F18] font-[family-name:var(--font-editorial)]">
-                  {detailModalItem.type === 'package'
-                    ? sanitizeAdTitle(detailModalItem.item.name)
-                    : detailModalItem.item.name}
+                  {detailModalItem.item.name}
                 </h3>
               </div>
               <button
@@ -1774,7 +1966,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                         : []
                   }
                   alt={detailModalItem.item.name}
-                  heightClassName="h-[340px] sm:h-[440px] md:h-[480px]"
+                  heightClassName="h-[330px] sm:h-[420px] md:h-[460px]"
                   optimizeWidth={1400}
                 />
               </div>
@@ -1783,23 +1975,19 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                 <div className="space-y-4">
                   <p className="leading-relaxed">
                     {detailModalItem.type === 'package'
-                      ? sanitizeAdText((detailModalItem.item as PackageData).description)
-                      : sanitizeAdText(
-                          (detailModalItem.item as Product).long_desc ||
-                            (detailModalItem.item as Product).short_desc
-                        )}
+                      ? (detailModalItem.item as PackageData).description
+                      : (detailModalItem.item as Product).long_desc ||
+                        (detailModalItem.item as Product).short_desc}
                   </p>
 
                   {(detailModalItem.item.health_benefits || []).length > 0 && (
                     <div className="space-y-2.5 pt-2 border-t border-[#E4EBE7]">
-                      <h4 className="text-sm font-bold text-[#0F1F18]">
-                        Nutritional &amp; Daily Wellness Support:
-                      </h4>
+                      <h4 className="text-sm font-bold text-[#0F1F18]">Health Benefits:</h4>
                       <ul className="space-y-2">
                         {detailModalItem.item.health_benefits.map((b, idx) => (
                           <li key={idx} className="flex items-start gap-2.5 text-sm text-slate-700">
                             <CheckCircle2 className="w-4 h-4 text-[#047857] shrink-0 mt-0.5" />
-                            <span>{sanitizeAdText(b)}</span>
+                            <span>{b}</span>
                           </li>
                         ))}
                       </ul>

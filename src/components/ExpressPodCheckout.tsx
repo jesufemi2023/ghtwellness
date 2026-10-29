@@ -30,7 +30,6 @@ import {
   formatOrderDisplayName,
   extractBottleCount,
 } from '../utils/bottleFormatter';
-import { sanitizeAdTitle } from '../utils/adCompliance';
 import { getStoredAdAttribution } from '../utils/adAttribution';
 import { getOptimizedImageUrl } from '../utils/cloudinary';
 import {
@@ -238,8 +237,7 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
     return null;
   }
 
-  const displayTitle =
-    activeType === 'package' ? sanitizeAdTitle(activeItem.name) : activeItem.name;
+  const displayTitle = activeItem.name;
 
   const resolvedDeliveryDate =
     deliveryWindow === 'today'
@@ -558,7 +556,7 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
               )}
               {allBundles.map((b) => (
                 <option key={b.id} value={b.id}>
-                  {sanitizeAdTitle(b.name)} {b.package_code ? `(${b.package_code})` : ''}
+                  {b.name} {b.package_code ? `(${b.package_code})` : ''}
                 </option>
               ))}
             </select>

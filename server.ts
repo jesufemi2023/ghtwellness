@@ -263,6 +263,7 @@ export async function createServer() {
   }
 
   app.get("/api/sync-check", async (req, res) => {
+    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
     if (!supabase) return res.json({ last_updated: new Date().toISOString() });
     
     try {
@@ -806,6 +807,7 @@ export async function createServer() {
   });
 
   app.get("/api/products", async (req, res) => {
+    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
     if (!supabase) return res.status(503).json({ error: "Database not initialized. Please ensure environment variables are set." });
     const { data, error } = await supabase.from('products').select('*');
     if (error) {
@@ -817,6 +819,7 @@ export async function createServer() {
   });
 
   app.get("/api/products/:id", async (req, res) => {
+    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
     if (!supabase) return res.status(503).json({ error: "Database not initialized" });
     const { id } = req.params;
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -847,6 +850,7 @@ export async function createServer() {
   });
 
   app.get("/api/recommended-packages", async (req, res) => {
+    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
     if (!supabase) return res.status(503).json({ error: "Database not initialized. Please ensure environment variables are set." });
     try {
       const { data, error } = await supabase
@@ -899,6 +903,7 @@ export async function createServer() {
   });
 
   app.get("/api/packages/:id", async (req, res) => {
+    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
     if (!supabase) return res.status(503).json({ error: "Database not initialized" });
     const { id } = req.params;
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

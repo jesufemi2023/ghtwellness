@@ -11,7 +11,7 @@
           "discount": 10
         }
       ],
-      "updated_at": "2026-10-28T21:24:19.220Z"
+      "updated_at": "2026-10-29T08:02:43.904Z"
     },
     "code_a12": {
       "id": "a3a6eb5a-71cc-4bef-ad6c-a72dbf70058a",
@@ -24,7 +24,7 @@
           "discount": 10
         }
       ],
-      "updated_at": "2026-10-28T21:24:19.220Z"
+      "updated_at": "2026-10-29T08:02:43.904Z"
     }
   },
   "recommended_packages": {
@@ -34,16 +34,18 @@
       "name": "Prostate Enlargement",
       "options": [
         {
-          "price": 49500,
+          "price": 55000,
           "bottles": "2 Bottles",
+          "discount": 10,
           "products": [
             "Prostbeta",
             "Longzit"
           ]
         },
         {
-          "price": 59500,
+          "price": 70000,
           "bottles": "3 Bottles",
+          "discount": 10,
           "products": [
             "Prostbeta",
             "Longzit",
@@ -51,8 +53,9 @@
           ]
         },
         {
-          "price": 78500,
+          "price": 87000,
           "bottles": "4 Bottles",
+          "discount": 10,
           "products": [
             "Prostbeta",
             "Mycobalance",
@@ -61,8 +64,9 @@
           ]
         },
         {
-          "price": 98500,
+          "price": 109500,
           "bottles": "5 Bottles",
+          "discount": 10,
           "products": [
             "Prostbeta",
             "Mycobalance",
@@ -72,7 +76,7 @@
           ]
         }
       ],
-      "updated_at": "2026-10-28T21:24:18.964Z"
+      "updated_at": "2026-10-29T08:02:43.904Z"
     },
     "code_p001": {
       "id": "97f0cc17-fa5e-4189-8f39-7c142407f69c",
@@ -80,16 +84,18 @@
       "name": "Prostate Enlargement",
       "options": [
         {
-          "price": 49500,
+          "price": 55000,
           "bottles": "2 Bottles",
+          "discount": 10,
           "products": [
             "Prostbeta",
             "Longzit"
           ]
         },
         {
-          "price": 59500,
+          "price": 70000,
           "bottles": "3 Bottles",
+          "discount": 10,
           "products": [
             "Prostbeta",
             "Longzit",
@@ -97,8 +103,9 @@
           ]
         },
         {
-          "price": 78500,
+          "price": 87000,
           "bottles": "4 Bottles",
+          "discount": 10,
           "products": [
             "Prostbeta",
             "Mycobalance",
@@ -107,8 +114,9 @@
           ]
         },
         {
-          "price": 98500,
+          "price": 109500,
           "bottles": "5 Bottles",
+          "discount": 10,
           "products": [
             "Prostbeta",
             "Mycobalance",
@@ -118,7 +126,7 @@
           ]
         }
       ],
-      "updated_at": "2026-10-28T21:24:18.964Z"
+      "updated_at": "2026-10-29T08:02:43.904Z"
     },
     "c66d3473-d480-4e6a-bf89-cf8f0d8c8547": {
       "id": "c66d3473-d480-4e6a-bf89-cf8f0d8c8547",
@@ -126,16 +134,18 @@
       "name": "Weak Erection/Premature Ejaculation",
       "options": [
         {
-          "price": 45500,
-          "bottles": "2 Bootles",
+          "price": 51000,
+          "bottles": "2 Bottles",
+          "discount": 10,
           "products": [
             "1-Reodoe",
             "1-Zinc"
           ]
         },
         {
-          "price": 63000,
+          "price": 70000,
           "bottles": "3 Bottles",
+          "discount": 10,
           "products": [
             "1-Reodoe",
             "1-Zinc",
@@ -143,8 +153,9 @@
           ]
         },
         {
-          "price": 77500,
+          "price": 86000,
           "bottles": "4 Bottles",
+          "discount": 10,
           "products": [
             "2-Reodoe",
             "1-Zinc",
@@ -152,8 +163,9 @@
           ]
         },
         {
-          "price": 89500,
+          "price": 99500,
           "bottles": "5 Bottles",
+          "discount": 10,
           "products": [
             "3-Reodoe",
             "1-Zinc",
@@ -161,8 +173,9 @@
           ]
         },
         {
-          "price": 99650,
+          "price": 109650,
           "bottles": "6 Bottles",
+          "discount": 10,
           "products": [
             "4-Reodoe",
             "1-Zinc",
@@ -170,7 +183,7 @@
           ]
         }
       ],
-      "updated_at": "2026-10-28T21:24:18.965Z"
+      "updated_at": "2026-10-29T08:02:43.904Z"
     },
     "code_p002": {
       "id": "c66d3473-d480-4e6a-bf89-cf8f0d8c8547",
@@ -178,16 +191,18 @@
       "name": "Weak Erection/Premature Ejaculation",
       "options": [
         {
-          "price": 45500,
-          "bottles": "2 Bootles",
+          "price": 51000,
+          "bottles": "2 Bottles",
+          "discount": 10,
           "products": [
             "1-Reodoe",
             "1-Zinc"
           ]
         },
         {
-          "price": 63000,
+          "price": 70000,
           "bottles": "3 Bottles",
+          "discount": 10,
           "products": [
             "1-Reodoe",
             "1-Zinc",
@@ -195,8 +210,9 @@
           ]
         },
         {
-          "price": 77500,
+          "price": 86000,
           "bottles": "4 Bottles",
+          "discount": 10,
           "products": [
             "2-Reodoe",
             "1-Zinc",
@@ -204,8 +220,9 @@
           ]
         },
         {
-          "price": 89500,
+          "price": 99500,
           "bottles": "5 Bottles",
+          "discount": 10,
           "products": [
             "3-Reodoe",
             "1-Zinc",
@@ -213,8 +230,9 @@
           ]
         },
         {
-          "price": 99650,
+          "price": 109650,
           "bottles": "6 Bottles",
+          "discount": 10,
           "products": [
             "4-Reodoe",
             "1-Zinc",
@@ -222,7 +240,7 @@
           ]
         }
       ],
-      "updated_at": "2026-10-28T21:24:18.965Z"
+      "updated_at": "2026-10-29T08:02:43.904Z"
     },
     "b527274b-68c4-4167-a4ce-983202c2fd0b": {
       "id": "b527274b-68c4-4167-a4ce-983202c2fd0b",
@@ -230,8 +248,9 @@
       "name": "Arthritis",
       "options": [
         {
-          "price": 65700,
+          "price": 72500,
           "bottles": "4 Bottles",
+          "discount": 10,
           "products": [
             "Calcium",
             "Longzit",
@@ -240,8 +259,9 @@
           ]
         },
         {
-          "price": 58500,
+          "price": 73000,
           "bottles": "3 Bottles",
+          "discount": 10,
           "products": [
             "Calcium",
             "Spabucta spray",
@@ -249,15 +269,16 @@
           ]
         },
         {
-          "price": 48500,
+          "price": 53900,
           "bottles": "2 Bottles",
+          "discount": 10,
           "products": [
             "Calcium",
             "Panicept"
           ]
         }
       ],
-      "updated_at": "2026-10-28T21:24:18.965Z"
+      "updated_at": "2026-10-29T08:02:43.904Z"
     },
     "code_p004": {
       "id": "b527274b-68c4-4167-a4ce-983202c2fd0b",
@@ -265,8 +286,9 @@
       "name": "Arthritis",
       "options": [
         {
-          "price": 65700,
+          "price": 72500,
           "bottles": "4 Bottles",
+          "discount": 10,
           "products": [
             "Calcium",
             "Longzit",
@@ -275,8 +297,9 @@
           ]
         },
         {
-          "price": 58500,
+          "price": 73000,
           "bottles": "3 Bottles",
+          "discount": 10,
           "products": [
             "Calcium",
             "Spabucta spray",
@@ -284,15 +307,16 @@
           ]
         },
         {
-          "price": 48500,
+          "price": 53900,
           "bottles": "2 Bottles",
+          "discount": 10,
           "products": [
             "Calcium",
             "Panicept"
           ]
         }
       ],
-      "updated_at": "2026-10-28T21:24:18.965Z"
+      "updated_at": "2026-10-29T08:02:43.904Z"
     }
   }
 }

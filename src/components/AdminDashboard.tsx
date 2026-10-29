@@ -40,15 +40,17 @@ import { Order, Consultation, BlogPost } from "../types";
 import { BlogAdmin } from "./blog/BlogAdmin";
 import { getOptimizedImageUrl } from "../utils/cloudinary";
 import { formatProductNameWithBottles, formatOptionProductList } from "../utils/bottleFormatter";
+import { CacheService } from "../utils/cache";
 
 interface AdminDashboardProps {
   adminPassword: string;
   onLogout: () => void;
+  onCatalogChange?: () => void;
 }
 
 type TableName = "overview" | "products" | "recommended_packages" | "consultations" | "profiles" | "orders" | "blog_posts" | "settings";
 
-export default function AdminDashboard({ adminPassword, onLogout }: AdminDashboardProps) {
+export default function AdminDashboard({ adminPassword, onLogout, onCatalogChange }: AdminDashboardProps) {
   const [activeTable, setActiveTable] = useState<TableName>("overview");
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -202,6 +204,8 @@ export default function AdminDashboard({ adminPassword, onLogout }: AdminDashboa
       });
 
       if (res.ok) {
+        CacheService.clearCatalog();
+        onCatalogChange?.();
         setEditingId(null);
         setIsAdding(false);
         setEditForm({});
@@ -226,6 +230,8 @@ export default function AdminDashboard({ adminPassword, onLogout }: AdminDashboa
         headers: { "x-admin-password": adminPassword }
       });
       if (res.ok) {
+        CacheService.clearCatalog();
+        onCatalogChange?.();
         fetchData();
       }
     } catch (e) {

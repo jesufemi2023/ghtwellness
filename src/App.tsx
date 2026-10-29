@@ -379,23 +379,15 @@ export default function App() {
         setIsCatalogLoading(false);
       }
 
-      // 2. On cold visit (no cache), fetch fresh Supabase data IMMEDIATELY without waiting on sync-check
+      // 2. Always fetch live Supabase catalog immediately (even when warm cache rendered an instant preview)
+      // so Admin price, description, name, and health benefit updates always appear immediately on /ad and /
       if (!hasCachedProducts || !hasCachedPackages) {
         setIsCatalogLoading(true);
-        await Promise.allSettled([
-          fetchProducts(),
-          fetchRecommendedPackages(),
-          CacheService.isCacheValid(),
-        ]);
-        setIsCatalogLoading(false);
-        return;
       }
-
-      // 3. When warm cache exists, validate in background and refresh if stale or updated
-      const isValid = await CacheService.isCacheValid();
-      if (!isValid) {
-        await Promise.allSettled([fetchProducts(), fetchRecommendedPackages()]);
-      }
+      await Promise.allSettled([
+        fetchProducts(),
+        fetchRecommendedPackages(),
+      ]);
       setIsCatalogLoading(false);
     };
 
@@ -442,7 +434,7 @@ export default function App() {
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch("/api/products");
+      const res = await fetch("/api/products", { cache: "no-store" });
       if (!res.ok) {
         if (res.status === 404) {
           throw new Error("API endpoint not found. Please ensure the server is configured correctly.");
@@ -496,7 +488,7 @@ export default function App() {
 
   const fetchRecommendedPackages = async () => {
     try {
-      const res = await fetch("/api/recommended-packages");
+      const res = await fetch("/api/recommended-packages", { cache: "no-store" });
       if (!res.ok) {
         if (res.status === 404) {
           throw new Error("API endpoint not found. Please ensure the server is configured correctly.");
@@ -2082,7 +2074,14 @@ export default function App() {
                   </div>
                 </div>
               ) : (
-                <AdminDashboard adminPassword={adminPassword} onLogout={handleAdminLogout} />
+                <AdminDashboard
+                  adminPassword={adminPassword}
+                  onLogout={handleAdminLogout}
+                  onCatalogChange={() => {
+                    fetchProducts();
+                    fetchRecommendedPackages();
+                  }}
+                />
               )}
             </motion.div>
           )}
