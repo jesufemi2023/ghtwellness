@@ -13,6 +13,7 @@ import {
   Clock,
   FileText,
   ZoomIn,
+  MessageCircle,
 } from 'lucide-react';
 import { Product, PackageData } from '../types';
 import { CONFIG } from '../config';
@@ -65,7 +66,7 @@ const SYMPTOM_TABS: Array<{ id: FilterTabId; label: string }> = [
   { id: 'joints', label: 'Joints & Mobility' },
   { id: 'sugar', label: 'Sugar Balance' },
   { id: 'cardio', label: 'Cardio & Circulation' },
-  { id: 'singles', label: 'Single Bottles' },
+  { id: 'singles', label: 'Single Bottle' },
 ];
 
 interface PackageVisualTheme {
@@ -507,7 +508,7 @@ interface ExpandableDescriptionProps {
 const ExpandableDescription: React.FC<ExpandableDescriptionProps> = ({
   text,
   maxChars = 155,
-  className = 'text-base sm:text-[17px] text-[#1E293B] leading-[1.68]',
+  className = 'text-[16px] sm:text-[17px] text-[#33453D] leading-[1.72] font-normal tracking-[0.005em]',
 }) => {
   const [expanded, setExpanded] = useState(false);
 
@@ -531,7 +532,7 @@ const ExpandableDescription: React.FC<ExpandableDescriptionProps> = ({
         <button
           type="button"
           onClick={() => setExpanded((prev) => !prev)}
-          className="inline font-bold text-[#047857] hover:text-[#065F46] underline underline-offset-4 cursor-pointer whitespace-nowrap"
+          className="inline font-semibold text-[#047857] hover:text-[#065F46] underline underline-offset-4 cursor-pointer whitespace-nowrap"
         >
           {expanded ? 'Show less' : 'Read full description'}
         </button>
@@ -825,23 +826,23 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
   const showSkeletonState = isLoading && allBundles.length === 0 && products.length === 0;
 
   return (
-    <div className="min-h-screen bg-[#FAFBF9] text-[#0F1F18] font-[family-name:var(--font-clinical-body)] pb-16 md:pb-0">
-      {/* 1. Strict 3-Zone Top Bar Contract */}
-      <header className="md:sticky md:top-0 z-40 h-16 sm:h-[68px] bg-white/95 backdrop-blur-xs border-b border-[#DCE5E0]">
-        <div className="max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-8">
+    <div className="min-h-screen bg-[#FAFBF9] text-[#162820] font-[family-name:var(--font-soft-body)] antialiased pb-20 lg:pb-0">
+      {/* 1. Strict 3-Zone Top Bar Contract — Mobile & Tablet Ergonomic Proportions */}
+      <header className="lg:sticky lg:top-0 z-40 h-[58px] sm:h-16 bg-white/95 backdrop-blur-xs border-b border-[#DFE7E2]">
+        <div className="max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4 lg:gap-8">
           {/* Zone 1: Single clean brand wordmark */}
           <button
             type="button"
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="text-lg sm:text-xl font-bold tracking-tight text-[#0F1F18] font-[family-name:var(--font-editorial)] whitespace-nowrap shrink-0 cursor-pointer"
+            className="text-[17px] sm:text-xl font-semibold tracking-tight text-[#162820] font-[family-name:var(--font-editorial)] whitespace-nowrap shrink-0 cursor-pointer"
           >
             {CONFIG.company.name}
           </button>
 
-          {/* Zone 2: 4 concise single-line navigation links */}
+          {/* Zone 2: 4 concise single-line navigation links on desktop */}
           <nav
             aria-label="Landing page sections"
-            className="hidden md:flex items-center gap-8 text-[15px] font-semibold text-[#1E293B]"
+            className="hidden lg:flex items-center gap-8 text-[15px] font-medium text-[#2F4239]"
           >
             <button
               type="button"
@@ -877,112 +878,132 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
           <button
             type="button"
             onClick={() => scrollToSection('express-order')}
-            className="min-h-[44px] px-5 py-2.5 rounded-xl bg-[#047857] hover:bg-[#065F46] text-white text-sm sm:text-[15px] font-bold whitespace-nowrap shrink-0 transition-colors cursor-pointer"
+            className="min-h-[42px] sm:min-h-[44px] px-4 sm:px-5 py-2 rounded-xl bg-[#047857] hover:bg-[#065F46] text-white text-sm sm:text-[15px] font-semibold whitespace-nowrap shrink-0 transition-colors cursor-pointer"
           >
             Order on Delivery
           </button>
         </div>
       </header>
 
-      {/* 2. Compact Above-the-Fold Trust & Pay-on-Delivery Headline Banner */}
-      <section className="bg-white border-b border-[#DCE5E0]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-7">
-          <div className="max-w-4xl space-y-2.5">
-            <p className="text-xs sm:text-sm font-bold text-[#047857]">
+      {/* 2. Compact, Soft Above-the-Fold Trust & Pay-on-Delivery Headline Banner */}
+      <section className="bg-white border-b border-[#DFE7E2]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5 lg:py-7">
+          <div className="max-w-4xl space-y-2">
+            <p className="text-[13px] sm:text-sm font-medium text-[#047857] tracking-[0.01em]">
               {adIntent.kicker}
             </p>
-            <h1 className="text-[clamp(1.65rem,2.7vw,2.45rem)] font-bold text-[#0F1F18] tracking-tight leading-[1.16] [text-wrap:balance] font-[family-name:var(--font-editorial)]">
+            <h1 className="text-[1.42rem] phablet:text-[1.6rem] sm:text-[1.9rem] lg:text-[2.4rem] font-semibold text-[#162820] tracking-[-0.012em] leading-[1.24] [text-wrap:balance] font-[family-name:var(--font-editorial)]">
               {adIntent.headline}
             </h1>
           </div>
 
-          {/* Unboxed High-Trust Buyer Assurances — Zero Decorative Pills */}
-          <div className="mt-4 pt-3.5 border-t border-[#E8EFEA] flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm sm:text-[15px] text-[#1E293B]">
-            <strong className="font-bold text-[#0F1F18]">
-              Pay ₦0 Upfront — Pay Only on Delivery
+          {/* Unboxed High-Trust Buyer Assurances — 'Pay ₦0 Upfront' Hidden on Mobile & Tablet Only */}
+          <div className="mt-3.5 pt-3 border-t border-[#EBF1ED] flex flex-wrap items-center gap-x-2.5 sm:gap-x-3 gap-y-1.5 text-[14px] sm:text-[15px] text-[#33453D] leading-relaxed">
+            <strong className="hidden lg:inline font-semibold text-[#162820]">
+              Pay ₦0 Upfront
             </strong>
-            <span aria-hidden="true" className="text-slate-400">
+            <span aria-hidden="true" className="hidden lg:inline text-slate-300">
+              ·
+            </span>
+            <span className="font-semibold text-[#162820]">Pay Only on Delivery</span>
+            <span aria-hidden="true" className="text-slate-300">
               ·
             </span>
             <span className="tabular-nums">24–48h Free Nationwide Dispatch</span>
-            <span aria-hidden="true" className="text-slate-400">
+            <span aria-hidden="true" className="hidden sm:inline text-slate-300">
               ·
             </span>
-            <span>100% Authentic NAFDAC-Registered Formulas</span>
-            <span aria-hidden="true" className="text-slate-400">
+            <span className="hidden sm:inline">NAFDAC-Registered Herbal Formulas</span>
+            <span aria-hidden="true" className="text-slate-300">
               ·
             </span>
             <button
               type="button"
               onClick={() => handleAdvisorWhatsApp('Ad Trust Banner Specialist')}
-              className="font-semibold text-[#047857] hover:text-[#065F46] underline underline-offset-4 cursor-pointer whitespace-nowrap tabular-nums"
+              className="font-medium text-[#047857] hover:text-[#065F46] underline underline-offset-4 cursor-pointer whitespace-nowrap tabular-nums"
             >
-              Pharmacist &amp; Specialist Support: {CONFIG.company.phone}
+              Chat / Call Specialist: {CONFIG.company.phone}
             </button>
           </div>
         </div>
       </section>
 
-      {/* 3. Above-the-Fold Unified Wellness Pack Catalog — Single Category Bar + Oversized Adult Cards */}
-      <section id="ad-bundles" className="pt-7 sm:pt-10 pb-16 sm:pb-24 bg-[#FAFBF9] scroll-mt-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-7 sm:space-y-8">
-          <div className="max-w-3xl space-y-2">
-            <h2 className="text-2xl sm:text-3xl font-bold text-[#0F1F18] font-[family-name:var(--font-editorial)] tracking-tight [text-wrap:balance]">
+      {/* 3. Above-the-Fold Unified Wellness Pack Catalog — Horizontal Touch Selection + Soft Adult Cards */}
+      <section
+        id="ad-bundles"
+        className="pt-4 sm:pt-5 lg:pt-10 pb-14 sm:pb-20 lg:pb-24 bg-[#FAFBF9] scroll-mt-20"
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-5 sm:space-y-6 lg:space-y-8">
+          {/* Desktop-Only Section Heading — Removed from Mobile & Tablet View Only */}
+          <div className="hidden lg:block max-w-3xl space-y-2">
+            <h2 className="text-3xl font-semibold text-[#162820] font-[family-name:var(--font-editorial)] tracking-[-0.01em] leading-[1.24] [text-wrap:balance]">
               Select Your Targeted Herbal Wellness Pack
             </h2>
-            <p className="text-[15px] sm:text-lg text-[#1E293B] leading-[1.6]">
-              Tap your wellness category below—such as{' '}
-              <strong className="text-[#0F1F18]">Prostate Care</strong> or{' '}
-              <strong className="text-[#0F1F18]">Women&apos;s Wellness</strong>—to filter packs
-              instantly, pick your bottle tier, and order with Pay on Delivery.
+            <p className="text-[17px] text-[#33453D] leading-[1.72]">
+              Tap any wellness category below—such as{' '}
+              <strong className="font-semibold text-[#162820]">Prostate Care</strong> or{' '}
+              <strong className="font-semibold text-[#162820]">Women&apos;s Wellness</strong>—to
+              filter right to your focus area, choose your bottle pack, and request Pay-on-Delivery
+              dispatch.
             </p>
           </div>
 
-          {/* Single Unified High-Contrast Adult Category Filter Bar */}
-          <div className="space-y-3.5">
-            <div
-              role="tablist"
-              aria-label="Filter supplements by wellness focus"
-              className="flex flex-wrap items-center gap-2.5 sm:gap-3"
-            >
-              {visibleSymptomTabs.map((tab) => {
-                const isActive = activeFilter === tab.id;
-                const count = categoryCounts[tab.id];
-                return (
-                  <button
-                    key={tab.id}
-                    role="tab"
-                    aria-selected={isActive}
-                    type="button"
-                    onClick={() => handleSelectCategory(tab.id)}
-                    className={`min-h-[48px] sm:min-h-[52px] px-4 sm:px-5 py-2.5 rounded-xl border text-[15px] sm:text-base font-bold whitespace-nowrap shrink-0 transition-colors duration-150 cursor-pointer tabular-nums flex items-center gap-2 ${
-                      isActive
-                        ? 'bg-[#047857] border-[#047857] text-white shadow-2xs'
-                        : 'bg-white border-[#C5D3CB] text-[#0F1F18] hover:border-[#047857] hover:bg-[#F4F9F6]'
-                    }`}
-                  >
-                    <span>{tab.label}</span>
-                    {count > 0 && (
-                      <span
-                        className={`text-xs sm:text-sm font-semibold ${
-                          isActive ? 'text-emerald-100' : 'text-slate-500'
-                        }`}
-                      >
-                        ({count})
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
+          {/* Smooth Horizontal Category Selection for Mobile, Tablet & Desktop */}
+          <div className="space-y-3">
+            <div className="relative -mx-4 px-4 sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0">
+              <div
+                role="tablist"
+                aria-label="Filter supplements by wellness focus"
+                className="flex flex-nowrap items-center gap-2 sm:gap-2.5 overflow-x-auto no-scrollbar scroll-smooth snap-x py-1 pr-6 lg:pr-0"
+              >
+                {visibleSymptomTabs.map((tab) => {
+                  const isActive = activeFilter === tab.id;
+                  const count = categoryCounts[tab.id];
+                  return (
+                    <button
+                      key={tab.id}
+                      role="tab"
+                      aria-selected={isActive}
+                      type="button"
+                      onClick={(e) => {
+                        e.currentTarget.scrollIntoView({
+                          behavior: 'smooth',
+                          inline: 'center',
+                          block: 'nearest',
+                        });
+                        handleSelectCategory(tab.id);
+                      }}
+                      className={`snap-start min-h-[46px] sm:min-h-[48px] px-4 sm:px-5 py-2.5 rounded-xl border text-[15px] sm:text-[15.5px] whitespace-nowrap shrink-0 transition-all duration-150 cursor-pointer tabular-nums flex items-center gap-2 ${
+                        isActive
+                          ? 'bg-[#047857] border-[#047857] text-white font-semibold shadow-2xs'
+                          : 'bg-white border-[#CBD8D1] text-[#22352C] font-medium hover:border-[#047857] hover:bg-[#F4F9F6]'
+                      }`}
+                    >
+                      <span>{tab.label}</span>
+                      {count > 0 && (
+                        <span
+                          className={`text-xs sm:text-[13px] ${
+                            isActive ? 'text-emerald-100' : 'text-[#5C7066]'
+                          }`}
+                        >
+                          ({count})
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
-            {/* Steady Unboxed Status & Reset Row — Keeps Card Grid Position Calm with Zero Jump */}
+            {/* Steady Unboxed Status & Reset Row — Soft & Calm Reading Line */}
             {!showSkeletonState && hasExactCategoryMatch && (
-              <div className="min-h-[32px] flex flex-wrap items-center gap-x-2.5 gap-y-1 text-sm sm:text-base text-[#1E293B]">
+              <div className="min-h-[28px] flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[14.5px] sm:text-[15.5px] text-[#3A4D44] leading-relaxed">
                 {activeFilter === 'all' ? (
                   <span>
                     Showing all{' '}
-                    <strong className="text-[#0F1F18] tabular-nums">{allBundles.length}</strong>{' '}
+                    <strong className="font-semibold text-[#162820] tabular-nums">
+                      {allBundles.length}
+                    </strong>{' '}
                     authentic wellness packs · Inspect intact factory seals at your doorstep before
                     paying
                   </span>
@@ -990,7 +1011,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                   <>
                     <span>
                       Showing{' '}
-                      <strong className="text-[#0F1F18] tabular-nums">
+                      <strong className="font-semibold text-[#162820] tabular-nums">
                         {activeFilter === 'singles' ? products.length : bundlesToDisplay.length}
                       </strong>{' '}
                       {activeFilter === 'singles'
@@ -999,17 +1020,17 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                           ? 'wellness pack'
                           : 'wellness packs'}{' '}
                       for{' '}
-                      <strong className="text-[#047857]">
+                      <strong className="font-semibold text-[#047857]">
                         {SYMPTOM_TABS.find((t) => t.id === activeFilter)?.label}
                       </strong>
                     </span>
-                    <span aria-hidden="true" className="text-slate-400">
+                    <span aria-hidden="true" className="text-slate-300">
                       —
                     </span>
                     <button
                       type="button"
                       onClick={() => handleSelectCategory('all')}
-                      className="font-bold text-[#047857] hover:text-[#065F46] underline underline-offset-4 cursor-pointer whitespace-nowrap"
+                      className="font-semibold text-[#047857] hover:text-[#065F46] underline underline-offset-4 cursor-pointer whitespace-nowrap"
                     >
                       Show All Wellness Packs
                     </button>
@@ -1021,9 +1042,9 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
 
           {!hasExactCategoryMatch && !showSkeletonState && (
             <div className="py-4 px-5 rounded-2xl bg-white border border-[#DCE5E0] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <p className="text-base text-[#1E293B] leading-relaxed">
+              <p className="text-[16px] text-[#33453D] leading-[1.7]">
                 Showing all available multi-bottle wellness packs below. Need personal guidance for
-                your specific health goal? Speak directly with our specialist.
+                your specific wellness goal? Chat directly with our specialist.
               </p>
               <button
                 type="button"
@@ -1033,23 +1054,24 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                     SYMPTOM_TABS.find((t) => t.id === activeFilter)?.label
                   )
                 }
-                className="min-h-[46px] px-5 py-2.5 rounded-xl bg-[#047857] hover:bg-[#065F46] text-white text-sm sm:text-base font-bold whitespace-nowrap shrink-0 cursor-pointer"
+                className="min-h-[48px] px-5 py-2.5 rounded-xl bg-[#047857] hover:bg-[#065F46] text-white text-[15px] sm:text-base font-semibold whitespace-nowrap shrink-0 cursor-pointer flex items-center justify-center gap-2"
               >
-                Ask Specialist on WhatsApp
+                <MessageCircle className="w-4 h-4 shrink-0" />
+                <span>Chat with us</span>
               </button>
             </div>
           )}
 
           {showSkeletonState ? (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-7 lg:gap-10">
               {[0, 1].map((skeletonKey) => (
                 <div
                   key={skeletonKey}
-                  className="bg-white rounded-[28px] border border-[#DCE5E0] overflow-hidden animate-pulse"
+                  className="bg-white rounded-[26px] border border-[#DCE5E0] overflow-hidden animate-pulse"
                 >
                   <div className="h-24 bg-[#EEF4F1]" />
-                  <div className="h-[360px] sm:h-[420px] bg-[#F6F9F7]" />
-                  <div className="p-6 sm:p-8 space-y-4">
+                  <div className="h-[310px] sm:h-[360px] bg-[#F6F9F7]" />
+                  <div className="p-5 sm:p-7 space-y-4">
                     <div className="h-5 w-3/4 bg-slate-200 rounded" />
                     <div className="h-16 w-full bg-slate-100 rounded-xl" />
                     <div className="h-14 w-full bg-emerald-100 rounded-xl" />
@@ -1058,8 +1080,8 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
               ))}
             </div>
           ) : activeFilter !== 'singles' ? (
-            /* Soft, Distinct, Easy-to-Identify Adult Wellness Package Cards */
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12">
+            /* Soft, Distinct, Easy-to-Identify Adult Wellness Package Cards — Optimized for Mobile & Tablet */
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-7 lg:gap-10">
               {bundlesToDisplay.map((pkg, cardIndex) => {
                 const selectedIdx = getPkgOptionIdx(pkg);
                 const pricing = computePackagePricing(pkg, selectedIdx);
@@ -1076,38 +1098,38 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                 return (
                   <article
                     key={pkg.id}
-                    className={`bg-white rounded-[28px] border ${theme.cardBorderClass} shadow-[0_14px_38px_-16px_rgba(15,31,24,0.08)] hover:-translate-y-0.5 hover:shadow-[0_20px_46px_-16px_rgba(15,31,24,0.13)] transition-all duration-200 flex flex-col overflow-hidden`}
+                    className={`bg-white rounded-[26px] sm:rounded-[28px] border ${theme.cardBorderClass} shadow-[0_12px_34px_-16px_rgba(15,31,24,0.07)] hover:-translate-y-0.5 hover:shadow-[0_18px_42px_-16px_rgba(15,31,24,0.12)] transition-all duration-200 flex flex-col overflow-hidden`}
                   >
-                    {/* Top Package Identity Header — Immediate Clarity & Visual Differentiation for Adults */}
+                    {/* Top Package Identity Header — Soft Tinted Clarity for Adult Differentiation */}
                     <div
-                      className={`${theme.headerBgClass} px-6 sm:px-8 py-5 sm:py-6 border-b border-slate-200/70 space-y-2`}
+                      className={`${theme.headerBgClass} px-5 sm:px-7 py-4 sm:py-5 border-b border-slate-200/65 space-y-1.5`}
                     >
-                      <div className="flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm">
+                      <div className="flex flex-wrap items-center justify-between gap-2 text-[13px] sm:text-sm">
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className={`font-bold tabular-nums ${theme.accentTextClass}`}>
+                          <span className={`font-semibold tabular-nums ${theme.accentTextClass}`}>
                             Package {indexDisplay}
                           </span>
                           <span aria-hidden="true" className="text-slate-400">
                             ·
                           </span>
-                          <span className={`font-semibold ${theme.accentTextClass}`}>
+                          <span className={`font-medium ${theme.accentTextClass}`}>
                             {theme.categoryLabel}
                           </span>
                         </div>
 
-                        <div className="text-slate-500 font-medium tabular-nums">
+                        <div className="text-[#52655C] font-normal tabular-nums text-xs sm:text-[13px]">
                           {pkg.package_code ? `${pkg.package_code} · ` : ''}
                           NAFDAC Registered
                         </div>
                       </div>
 
-                      <div className="flex flex-wrap items-baseline justify-between gap-3 pt-0.5">
-                        <h3 className="text-2xl sm:text-[1.8rem] font-bold text-[#0F1F18] font-[family-name:var(--font-editorial)] leading-tight [text-wrap:balance]">
+                      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 pt-0.5">
+                        <h3 className="text-[1.42rem] sm:text-[1.65rem] lg:text-[1.75rem] font-semibold text-[#162820] font-[family-name:var(--font-editorial)] leading-[1.24] tracking-[-0.01em] [text-wrap:balance]">
                           {pkg.name}
                         </h3>
 
                         <div className="tabular-nums text-left sm:text-right shrink-0">
-                          <span className="text-xl sm:text-2xl font-extrabold text-[#0F1F18]">
+                          <span className="text-xl sm:text-2xl font-bold text-[#162820]">
                             ₦{pricing.currentPrice.toLocaleString()}
                           </span>
                           {pricing.savings > 0 && (
@@ -1120,11 +1142,11 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                     </div>
 
                     {/* Oversized Soft-Lit Studio Product Stage + Non-Clipped Full Pack Switcher */}
-                    <div className="border-b border-slate-200/75">
+                    <div className="border-b border-slate-200/70">
                       <StudioProductStage
                         entries={galleryEntries}
                         alt={pkg.name}
-                        heightClassName="h-[330px] sm:h-[410px] lg:h-[430px]"
+                        heightClassName="h-[300px] phablet:h-[340px] sm:h-[380px] md:h-[320px] lg:h-[410px]"
                         studioGradientClass={theme.studioGradientClass}
                         optimizeWidth={1200}
                         onInspect={() => setDetailModalItem({ item: pkg, type: 'package' })}
@@ -1132,28 +1154,28 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                     </div>
 
                     {/* Soft, Spacious Adult Reading & Purchase Body */}
-                    <div className="p-6 sm:p-8 flex-1 flex flex-col justify-between space-y-6 bg-white">
-                      <div className="space-y-5">
+                    <div className="p-5 sm:p-7 lg:p-8 flex-1 flex flex-col justify-between space-y-5 sm:space-y-6 bg-white">
+                      <div className="space-y-4 sm:space-y-5">
                         {pkg.description && pkg.description.trim().length > 0 && (
                           <ExpandableDescription
                             text={pkg.description}
                             maxChars={155}
-                            className="text-base sm:text-[17px] text-[#1E293B] leading-[1.68]"
+                            className="text-[16px] sm:text-[16.5px] lg:text-[17px] text-[#33453D] leading-[1.72] font-normal tracking-[0.005em]"
                           />
                         )}
 
                         {visibleBenefits.length > 0 && (
-                          <div className="space-y-3 pt-1">
-                            <h4 className="text-sm sm:text-base font-bold text-[#0F1F18]">
-                              Key Health Benefits:
+                          <div className="space-y-2.5 pt-0.5">
+                            <h4 className="text-[14.5px] sm:text-[15.5px] font-semibold text-[#162820]">
+                              Key Wellness Benefits:
                             </h4>
-                            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-2.5">
+                            <ul className="grid grid-cols-1 xl:grid-cols-2 gap-x-5 gap-y-2.5">
                               {visibleBenefits.map((benefit, bIdx) => (
                                 <li
                                   key={bIdx}
-                                  className="flex items-start gap-2.5 text-[15px] sm:text-base text-[#1E293B] leading-relaxed"
+                                  className="flex items-start gap-2.5 text-[15.5px] sm:text-[16px] text-[#2F4239] leading-[1.66] font-normal"
                                 >
-                                  <CheckCircle2 className="w-4 h-4 text-[#047857] shrink-0 mt-1" />
+                                  <CheckCircle2 className="w-[17px] h-[17px] text-[#057A55] shrink-0 mt-1" />
                                   <span>{benefit}</span>
                                 </li>
                               ))}
@@ -1168,7 +1190,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                                     [pkg.id]: !isBenefitsExpanded,
                                   }))
                                 }
-                                className="text-sm sm:text-[15px] font-bold text-[#047857] hover:underline underline-offset-4 pt-1 cursor-pointer"
+                                className="text-[14.5px] sm:text-[15px] font-semibold text-[#047857] hover:underline underline-offset-4 pt-1 cursor-pointer"
                               >
                                 {isBenefitsExpanded
                                   ? 'Show fewer benefits'
@@ -1179,17 +1201,17 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                         )}
 
                         {pkg.options && pkg.options.length > 0 && (
-                          <div className="space-y-3 pt-4 border-t border-slate-200/80">
+                          <div className="space-y-2.5 pt-4 border-t border-slate-200/75">
                             <div className="flex items-center justify-between gap-2">
-                              <span className="text-sm font-bold text-[#0F1F18]">
+                              <span className="text-[14.5px] sm:text-[15px] font-semibold text-[#162820]">
                                 Choose Your Bottle Pack:
                               </span>
-                              <span className="text-xs font-medium text-slate-500">
-                                Tap to switch pack size
+                              <span className="text-xs sm:text-[13px] font-normal text-[#566A60]">
+                                Tap to select size
                               </span>
                             </div>
 
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-2 xl:grid-cols-3 gap-2.5">
                               {pkg.options.map((opt, oIdx) => {
                                 const isSel = oIdx === selectedIdx;
                                 const optPriceInfo = resolveSingleOptionPricing(
@@ -1216,24 +1238,24 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                                         optPriceInfo.sellingPrice
                                       );
                                     }}
-                                    className={`min-h-[68px] p-3.5 rounded-2xl border text-left transition-colors cursor-pointer tabular-nums ${
+                                    className={`min-h-[68px] p-3 sm:p-3.5 rounded-2xl border text-left transition-colors cursor-pointer tabular-nums ${
                                       isSel
-                                        ? 'border-[#047857] bg-[#F1F8F4] ring-1 ring-[#047857]'
-                                        : 'border-slate-200 bg-[#FAFBF9] hover:bg-white hover:border-slate-400'
+                                        ? 'border-[#047857] bg-[#F2F9F5] ring-1 ring-[#047857]'
+                                        : 'border-[#D8E2DC] bg-[#FAFBF9] hover:bg-white hover:border-[#94ACA0]'
                                     }`}
                                   >
                                     <div className="flex items-center justify-between gap-1">
-                                      <span className="text-xs sm:text-sm font-bold text-[#0F1F18] whitespace-nowrap">
+                                      <span className="text-[13px] sm:text-sm font-semibold text-[#162820] whitespace-nowrap">
                                         {optPriceInfo.label}
                                       </span>
                                       {optPriceInfo.discountPercent > 0 && (
-                                        <span className="text-[11px] font-bold text-[#047857]">
+                                        <span className="text-[11px] font-semibold text-[#047857]">
                                           -{optPriceInfo.discountPercent}%
                                         </span>
                                       )}
                                     </div>
                                     <div className="mt-1 space-y-0.5">
-                                      <div className="text-sm sm:text-base font-extrabold text-[#047857]">
+                                      <div className="text-[15px] sm:text-base font-bold text-[#047857]">
                                         ₦{optPriceInfo.sellingPrice.toLocaleString()}
                                       </div>
                                       {optPriceInfo.savings > 0 && (
@@ -1250,19 +1272,21 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                         )}
 
                         {pricing.includedList.length > 0 && (
-                          <p className="text-[15px] sm:text-base text-[#1E293B] leading-relaxed pt-1">
-                            <strong className="text-[#0F1F18]">Included in Pack: </strong>
+                          <p className="text-[15px] sm:text-[15.5px] text-[#33453D] leading-[1.68] pt-0.5">
+                            <strong className="font-semibold text-[#162820]">
+                              Included in Pack:{' '}
+                            </strong>
                             {pricing.includedList.join(' · ')}
                           </p>
                         )}
                       </div>
 
-                      {/* Clear Package Summary & Primary Conversion Button */}
-                      <div className="pt-5 border-t border-slate-200/80 space-y-4">
+                      {/* Clear Package Summary, Primary Order Action & 'Chat with us' Button */}
+                      <div className="pt-5 border-t border-slate-200/75 space-y-4">
                         <div className="flex flex-wrap items-baseline justify-between gap-3 tabular-nums">
                           <div>
                             <div className="flex items-baseline gap-2.5 flex-wrap">
-                              <span className="text-3xl font-extrabold text-[#0F1F18]">
+                              <span className="text-[1.65rem] sm:text-[1.85rem] font-bold text-[#162820] tracking-tight">
                                 ₦{pricing.currentPrice.toLocaleString()}
                               </span>
                               {pricing.savings > 0 && (
@@ -1271,7 +1295,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                                 </span>
                               )}
                             </div>
-                            <div className="text-xs sm:text-sm text-[#047857] font-semibold mt-0.5">
+                            <div className="text-[13px] sm:text-sm text-[#047857] font-medium mt-0.5">
                               {pricing.savings > 0
                                 ? `Save ₦${pricing.savings.toLocaleString()} (${pricing.discount}% Off) · Free Doorstep Delivery`
                                 : 'Free Nationwide Delivery · Pay on Delivery'}
@@ -1281,20 +1305,36 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                           <button
                             type="button"
                             onClick={() => setDetailModalItem({ item: pkg, type: 'package' })}
-                            className="text-sm font-semibold text-slate-600 hover:text-[#047857] underline underline-offset-4 cursor-pointer whitespace-nowrap"
+                            className="text-sm font-medium text-[#475A50] hover:text-[#047857] underline underline-offset-4 cursor-pointer whitespace-nowrap"
                           >
                             Full Details
                           </button>
                         </div>
 
-                        <button
-                          type="button"
-                          onClick={() => openExpressCheckout(pkg, 'package', selectedIdx)}
-                          className="w-full min-h-[56px] px-6 py-4 rounded-2xl bg-[#047857] hover:bg-[#065F46] text-white font-bold text-base sm:text-lg transition-colors flex items-center justify-center gap-2.5 whitespace-nowrap cursor-pointer"
-                        >
-                          <ShoppingBag className="w-5 h-5 shrink-0" />
-                          <span className="truncate">Order on Delivery</span>
-                        </button>
+                        <div className="grid grid-cols-1 sm:grid-cols-5 md:grid-cols-1 xl:grid-cols-5 gap-2.5">
+                          <button
+                            type="button"
+                            onClick={() => openExpressCheckout(pkg, 'package', selectedIdx)}
+                            className="sm:col-span-3 md:col-span-1 xl:col-span-3 min-h-[52px] sm:min-h-[54px] px-5 py-3.5 rounded-2xl bg-[#047857] hover:bg-[#065F46] text-white font-semibold text-[16px] sm:text-[17px] transition-colors flex items-center justify-center gap-2.5 whitespace-nowrap cursor-pointer shadow-2xs"
+                          >
+                            <ShoppingBag className="w-5 h-5 shrink-0" />
+                            <span>Order on Delivery</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleAdvisorWhatsApp(
+                                `Ad Package Card Chat: ${pkg.name}`,
+                                `${pkg.name}${pricing.activeOption ? ` (${pricing.activeOption.bottles})` : ''}`
+                              )
+                            }
+                            className="sm:col-span-2 md:col-span-1 xl:col-span-2 min-h-[50px] sm:min-h-[54px] px-4 py-3 rounded-2xl border border-[#BBD6C8] bg-[#F4FAF7] hover:bg-[#E7F4ED] text-[#065F46] font-semibold text-[15.5px] sm:text-[16px] transition-colors flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer"
+                          >
+                            <MessageCircle className="w-[18px] h-[18px] shrink-0" />
+                            <span>Chat with us</span>
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </article>
@@ -1302,8 +1342,8 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
               })}
             </div>
           ) : (
-            /* Single Supplements — Soft Studio Pedestals */
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            /* Single Supplements — Soft Studio Pedestals + 'Chat with us' on Every Card */
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
               {products.map((prod) => {
                 const selectedIdx = getProdOptionIdx(prod);
                 const pricing = computeProductPricing(prod, selectedIdx);
@@ -1314,32 +1354,32 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                 return (
                   <article
                     key={prod.id}
-                    className="bg-white rounded-[26px] border border-[#D8E2DC] shadow-[0_12px_32px_-16px_rgba(15,31,24,0.08)] hover:border-[#047857]/50 transition-all duration-200 flex flex-col overflow-hidden"
+                    className="bg-white rounded-[26px] border border-[#D8E2DC] shadow-[0_12px_32px_-16px_rgba(15,31,24,0.07)] hover:border-[#047857]/50 transition-all duration-200 flex flex-col overflow-hidden"
                   >
                     <div className="border-b border-[#E6ECE8]">
                       <StudioProductStage
                         entries={prodEntries}
                         alt={prod.name}
-                        heightClassName="h-[320px] sm:h-[360px]"
+                        heightClassName="h-[290px] sm:h-[330px]"
                         optimizeWidth={900}
                         onInspect={() => setDetailModalItem({ item: prod, type: 'product' })}
                       />
                     </div>
 
-                    <div className="p-6 flex-1 flex flex-col justify-between space-y-5">
+                    <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between space-y-5">
                       <div className="space-y-2.5">
-                        <div className="text-xs text-[#047857] font-semibold">
+                        <div className="text-xs sm:text-[13px] text-[#047857] font-medium">
                           Single Herbal Supplement
                           {prod.nafdac_no ? ` · NAFDAC ${prod.nafdac_no}` : ''}
                         </div>
-                        <h3 className="text-xl font-bold text-[#0F1F18] font-[family-name:var(--font-editorial)]">
+                        <h3 className="text-[1.3rem] sm:text-[1.4rem] font-semibold text-[#162820] font-[family-name:var(--font-editorial)] leading-[1.26]">
                           {prod.name}
                         </h3>
                         {prod.short_desc && (
                           <ExpandableDescription
                             text={prod.short_desc}
                             maxChars={135}
-                            className="text-[15px] sm:text-base text-[#1E293B] leading-relaxed"
+                            className="text-[15.5px] sm:text-[16px] text-[#33453D] leading-[1.7] font-normal"
                           />
                         )}
 
@@ -1371,24 +1411,24 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                                       optPriceInfo.sellingPrice
                                     );
                                   }}
-                                  className={`p-2.5 rounded-xl border text-left text-xs sm:text-sm cursor-pointer tabular-nums ${
+                                  className={`min-h-[58px] p-2.5 rounded-xl border text-left text-xs sm:text-sm cursor-pointer tabular-nums transition-colors ${
                                     isSel
-                                      ? 'border-[#047857] bg-[#F2F7F4] ring-1 ring-[#047857] text-[#0F1F18]'
-                                      : 'border-[#DCE5E0] bg-white text-slate-700'
+                                      ? 'border-[#047857] bg-[#F2F9F5] ring-1 ring-[#047857] text-[#162820]'
+                                      : 'border-[#DCE5E0] bg-[#FAFBF9] hover:bg-white text-[#2F4239]'
                                   }`}
                                 >
                                   <div className="flex items-center justify-between gap-1">
-                                    <span className="font-bold whitespace-nowrap">
+                                    <span className="font-semibold whitespace-nowrap">
                                       {optPriceInfo.label}
                                     </span>
                                     {optPriceInfo.discountPercent > 0 && (
-                                      <span className="text-[11px] font-bold text-[#047857]">
+                                      <span className="text-[11px] font-semibold text-[#047857]">
                                         -{optPriceInfo.discountPercent}%
                                       </span>
                                     )}
                                   </div>
                                   <div className="flex items-baseline gap-1.5 mt-0.5 flex-wrap">
-                                    <span className="font-extrabold text-[#047857]">
+                                    <span className="font-bold text-[#047857]">
                                       ₦{optPriceInfo.sellingPrice.toLocaleString()}
                                     </span>
                                     {optPriceInfo.savings > 0 && (
@@ -1408,7 +1448,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                         <div className="flex items-baseline justify-between gap-2 tabular-nums">
                           <div>
                             <div className="flex items-baseline gap-2">
-                              <span className="text-2xl font-extrabold text-[#0F1F18]">
+                              <span className="text-2xl font-bold text-[#162820]">
                                 ₦{pricing.currentPrice.toLocaleString()}
                               </span>
                               {pricing.savings > 0 && (
@@ -1417,34 +1457,46 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                                 </span>
                               )}
                             </div>
-                            {pricing.discount > 0 && (
-                              <div className="text-xs font-semibold text-[#047857] mt-0.5">
-                                Save {pricing.discount}% · Free POD Delivery
-                              </div>
-                            )}
+                            <div className="text-xs sm:text-[13px] font-medium text-[#047857] mt-0.5">
+                              {pricing.discount > 0
+                                ? `Save ${pricing.discount}% · Free POD Delivery`
+                                : 'Free Nationwide Delivery · Pay on Delivery'}
+                            </div>
                           </div>
-                          {pricing.discount === 0 && (
-                            <span className="text-xs sm:text-sm text-[#047857] font-medium">
-                              Free Delivery · POD
-                            </span>
-                          )}
+
+                          <button
+                            type="button"
+                            onClick={() => setDetailModalItem({ item: prod, type: 'product' })}
+                            className="text-xs sm:text-sm font-medium text-[#475A50] hover:text-[#047857] underline underline-offset-4 cursor-pointer whitespace-nowrap"
+                          >
+                            Details
+                          </button>
                         </div>
 
-                        <button
-                          type="button"
-                          onClick={() => openExpressCheckout(prod, 'product', selectedIdx)}
-                          className="w-full min-h-[50px] px-5 py-3 rounded-xl bg-[#047857] hover:bg-[#065F46] text-white font-bold text-base transition-colors whitespace-nowrap cursor-pointer"
-                        >
-                          Order Bottle — Pay on Delivery
-                        </button>
+                        <div className="grid grid-cols-1 gap-2.5">
+                          <button
+                            type="button"
+                            onClick={() => openExpressCheckout(prod, 'product', selectedIdx)}
+                            className="w-full min-h-[50px] px-5 py-3 rounded-xl bg-[#047857] hover:bg-[#065F46] text-white font-semibold text-[16px] transition-colors flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer shadow-2xs"
+                          >
+                            <ShoppingBag className="w-4 h-4 shrink-0" />
+                            <span>Order on Delivery</span>
+                          </button>
 
-                        <button
-                          type="button"
-                          onClick={() => setDetailModalItem({ item: prod, type: 'product' })}
-                          className="w-full text-center text-xs sm:text-sm font-semibold text-slate-600 hover:text-[#047857] underline underline-offset-4 cursor-pointer"
-                        >
-                          Inspect Bottle &amp; Daily Usage
-                        </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleAdvisorWhatsApp(
+                                `Ad Single Bottle Card Chat: ${prod.name}`,
+                                `${prod.name}${pricing.activeOption ? ` (${pricing.activeOption.bottles})` : ''}`
+                              )
+                            }
+                            className="w-full min-h-[48px] px-4 py-2.5 rounded-xl border border-[#BBD6C8] bg-[#F4FAF7] hover:bg-[#E7F4ED] text-[#065F46] font-semibold text-[15.5px] transition-colors flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer"
+                          >
+                            <MessageCircle className="w-[18px] h-[18px] shrink-0" />
+                            <span>Chat with us</span>
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </article>
@@ -1454,11 +1506,11 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
           )}
 
           {activeFilter !== 'singles' && products.length > 0 && (
-            <div className="text-center pt-4">
+            <div className="text-center pt-3">
               <button
                 type="button"
                 onClick={() => handleSelectCategory('singles')}
-                className="text-sm sm:text-base font-semibold text-[#047857] hover:text-[#065F46] underline underline-offset-4 cursor-pointer"
+                className="text-[15px] sm:text-base font-medium text-[#047857] hover:text-[#065F46] underline underline-offset-4 cursor-pointer"
               >
                 Looking for an individual GHT supplement bottle instead? View all {products.length}{' '}
                 single bottles →
@@ -1468,61 +1520,61 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
         </div>
       </section>
 
-      {/* 4. Editorial Fulfillment & Customer Proof Section */}
+      {/* 4. Editorial Fulfillment & Customer Proof Section — Calm Adult Typography */}
       <section
         id="how-pod-works"
-        className="py-16 sm:py-20 bg-white border-t border-[#E4EBE7] scroll-mt-20"
+        className="py-14 sm:py-20 bg-white border-t border-[#E4EBE7] scroll-mt-20"
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
-          <div className="space-y-10">
-            <div className="max-w-2xl space-y-2.5">
-              <p className="text-sm font-bold text-[#047857]">
-                Zero-Risk Doorstep Fulfillment
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-14 sm:space-y-16">
+          <div className="space-y-8 sm:space-y-10">
+            <div className="max-w-2xl space-y-2">
+              <p className="text-sm font-medium text-[#047857]">
+                Peace-of-Mind Doorstep Fulfillment
               </p>
-              <h2 className="text-3xl sm:text-4xl font-bold text-[#0F1F18] font-[family-name:var(--font-editorial)] tracking-tight [text-wrap:balance]">
+              <h2 className="text-[1.75rem] sm:text-4xl font-semibold text-[#162820] font-[family-name:var(--font-editorial)] tracking-[-0.01em] leading-[1.24] [text-wrap:balance]">
                 How Nationwide Pay-on-Delivery Works
               </h2>
-              <p className="text-base sm:text-lg text-[#1E293B] leading-[1.68]">
-                Designed for complete peace of mind—you inspect your sealed supplements in person
-                before paying a single Naira.
+              <p className="text-[16px] sm:text-[17.5px] text-[#33453D] leading-[1.72]">
+                Designed for complete comfort and confidence—you inspect your sealed supplements in
+                person at your doorstep before paying.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-4 border-t border-[#E4EBE7]">
-              <div className="space-y-3 pt-2">
-                <span className="text-sm sm:text-base font-bold text-[#047857] tabular-nums">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-7 sm:gap-8 pt-4 border-t border-[#E4EBE7]">
+              <div className="space-y-2.5 pt-2">
+                <span className="text-sm sm:text-[15px] font-semibold text-[#047857] tabular-nums">
                   01. Request Dispatch
                 </span>
-                <h3 className="text-xl sm:text-2xl font-bold text-[#0F1F18] font-[family-name:var(--font-editorial)]">
+                <h3 className="text-xl sm:text-2xl font-semibold text-[#162820] font-[family-name:var(--font-editorial)] leading-snug">
                   Select Your Wellness Pack
                 </h3>
-                <p className="text-base sm:text-[17px] text-[#1E293B] leading-[1.68]">
+                <p className="text-[16px] sm:text-[16.5px] text-[#33453D] leading-[1.72]">
                   Choose your preferred multi-bottle pack and enter your phone number, state, and
                   street address. No card or online payment is required.
                 </p>
               </div>
 
-              <div className="space-y-3 pt-2">
-                <span className="text-sm sm:text-base font-bold text-[#047857] tabular-nums">
+              <div className="space-y-2.5 pt-2">
+                <span className="text-sm sm:text-[15px] font-semibold text-[#047857] tabular-nums">
                   02. Rider Scheduling
                 </span>
-                <h3 className="text-xl sm:text-2xl font-bold text-[#0F1F18] font-[family-name:var(--font-editorial)]">
+                <h3 className="text-xl sm:text-2xl font-semibold text-[#162820] font-[family-name:var(--font-editorial)] leading-snug">
                   Personal Phone Confirmation
                 </h3>
-                <p className="text-base sm:text-[17px] text-[#1E293B] leading-[1.68]">
+                <p className="text-[16px] sm:text-[16.5px] text-[#33453D] leading-[1.72]">
                   Our regional fulfillment desk calls or messages you on WhatsApp to confirm your
                   convenient delivery window within 24–48 hours.
                 </p>
               </div>
 
-              <div className="space-y-3 pt-2">
-                <span className="text-sm sm:text-base font-bold text-[#047857] tabular-nums">
+              <div className="space-y-2.5 pt-2">
+                <span className="text-sm sm:text-[15px] font-semibold text-[#047857] tabular-nums">
                   03. Doorstep Verification
                 </span>
-                <h3 className="text-xl sm:text-2xl font-bold text-[#0F1F18] font-[family-name:var(--font-editorial)]">
+                <h3 className="text-xl sm:text-2xl font-semibold text-[#162820] font-[family-name:var(--font-editorial)] leading-snug">
                   Inspect Intact Seals &amp; Pay
                 </h3>
-                <p className="text-base sm:text-[17px] text-[#1E293B] leading-[1.68]">
+                <p className="text-[16px] sm:text-[16.5px] text-[#33453D] leading-[1.72]">
                   Verify intact factory seals, NAFDAC numbers, and expiry dates at your door, then
                   pay the rider via Bank Transfer, POS, or Cash.
                 </p>
@@ -1531,23 +1583,23 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
           </div>
 
           {/* Verified Adult Customer Experiences */}
-          <div id="ad-reviews" className="pt-12 border-t border-[#E4EBE7] space-y-10 scroll-mt-20">
-            <div className="max-w-2xl space-y-2.5">
-              <p className="text-sm font-bold text-[#047857]">
+          <div id="ad-reviews" className="pt-12 border-t border-[#E4EBE7] space-y-8 sm:space-y-10 scroll-mt-20">
+            <div className="max-w-2xl space-y-2">
+              <p className="text-sm font-medium text-[#047857]">
                 Verified Doorstep Buyers
               </p>
-              <h2 className="text-3xl sm:text-4xl font-bold text-[#0F1F18] font-[family-name:var(--font-editorial)] tracking-tight">
+              <h2 className="text-[1.75rem] sm:text-4xl font-semibold text-[#162820] font-[family-name:var(--font-editorial)] tracking-[-0.01em] leading-[1.24]">
                 Trusted by Adults &amp; Families Nationwide
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
               {CUSTOMER_STORIES.map((story, idx) => (
                 <blockquote
                   key={idx}
-                  className="p-7 rounded-2xl bg-[#F6F8F7] border border-[#DCE5E0] flex flex-col justify-between space-y-6"
+                  className="p-6 sm:p-7 rounded-2xl bg-[#F7FAF8] border border-[#DCE5E0] flex flex-col justify-between space-y-5"
                 >
-                  <div className="space-y-4">
+                  <div className="space-y-3.5">
                     <div
                       className="flex items-center gap-1 text-amber-500"
                       aria-label="5 out of 5 stars"
@@ -1556,17 +1608,19 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                         <Star key={sIdx} className="w-4 h-4 fill-current" />
                       ))}
                     </div>
-                    <p className="text-base sm:text-[17px] text-[#1E293B] leading-[1.68]">
+                    <p className="text-[16px] sm:text-[16.5px] text-[#33453D] leading-[1.74] font-normal">
                       &ldquo;{story.quote}&rdquo;
                     </p>
                   </div>
 
                   <footer className="pt-4 border-t border-[#DCE5E0]">
-                    <div className="font-bold text-base sm:text-lg text-[#0F1F18]">{story.name}</div>
-                    <div className="text-sm text-slate-600 mt-0.5">
+                    <div className="font-semibold text-[16px] sm:text-[17px] text-[#162820]">
+                      {story.name}
+                    </div>
+                    <div className="text-sm text-[#54685E] mt-0.5">
                       {story.role} · {story.location}
                     </div>
-                    <div className="text-xs sm:text-sm font-bold text-[#047857] mt-1">
+                    <div className="text-xs sm:text-sm font-medium text-[#047857] mt-1">
                       {story.packName}
                     </div>
                   </footer>
@@ -1575,8 +1629,8 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
             </div>
 
             {/* Clean High-Legibility FAQ Accordion */}
-            <div className="max-w-3xl mx-auto pt-6 space-y-5">
-              <h3 className="text-2xl sm:text-3xl font-bold text-[#0F1F18] font-[family-name:var(--font-editorial)] text-center">
+            <div className="max-w-3xl mx-auto pt-4 sm:pt-6 space-y-5">
+              <h3 className="text-[1.5rem] sm:text-3xl font-semibold text-[#162820] font-[family-name:var(--font-editorial)] text-center leading-snug">
                 Questions Before Placing Your Order
               </h3>
               <div className="divide-y divide-[#E4EBE7] border-y border-[#E4EBE7]">
@@ -1590,17 +1644,17 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                         aria-expanded={isOpen}
                         className="w-full py-4 sm:py-5 text-left flex items-center justify-between gap-4 cursor-pointer"
                       >
-                        <span className="text-base sm:text-lg font-bold text-[#0F1F18]">
+                        <span className="text-[16px] sm:text-[17.5px] font-semibold text-[#162820] leading-snug">
                           {faq.question}
                         </span>
                         <ChevronDown
-                          className={`w-5 h-5 text-slate-600 shrink-0 transition-transform duration-200 ${
+                          className={`w-5 h-5 text-[#54685E] shrink-0 transition-transform duration-200 ${
                             isOpen ? 'rotate-180' : ''
                           }`}
                         />
                       </button>
                       {isOpen && (
-                        <div className="pb-5 text-base sm:text-[17px] text-[#1E293B] leading-[1.68]">
+                        <div className="pb-5 text-[16px] sm:text-[16.5px] text-[#33453D] leading-[1.74] font-normal">
                           {faq.answer}
                         </div>
                       )}
@@ -1616,19 +1670,19 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
       {/* 5. Contiguous Express Checkout Section — Sticky Large Product Stage Left + Clean Form Right */}
       <section
         id="express-order"
-        className="py-16 sm:py-20 bg-[#F2F5F3] border-t border-[#DCE5E0] scroll-mt-20"
+        className="py-14 sm:py-20 bg-[#F2F5F3] border-t border-[#DCE5E0] scroll-mt-20"
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
-          <div className="max-w-2xl space-y-2.5">
-            <p className="text-sm font-bold text-[#047857]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-10">
+          <div className="max-w-2xl space-y-2">
+            <p className="text-sm font-medium text-[#047857]">
               1-Step Doorstep Dispatch Form
             </p>
-            <h2 className="text-3xl sm:text-4xl font-bold text-[#0F1F18] font-[family-name:var(--font-editorial)] tracking-tight [text-wrap:balance]">
+            <h2 className="text-[1.75rem] sm:text-4xl font-semibold text-[#162820] font-[family-name:var(--font-editorial)] tracking-[-0.01em] leading-[1.24] [text-wrap:balance]">
               Complete Your Pay-on-Delivery Order
             </h2>
-            <p className="text-base sm:text-lg text-[#1E293B] leading-[1.68]">
+            <p className="text-[16px] sm:text-[17.5px] text-[#33453D] leading-[1.72]">
               Enter your delivery address below. Our regional hub dispatches directly to your home
-              or office at ₦0 shipping cost.
+              or office with free nationwide doorstep delivery.
             </p>
           </div>
 
@@ -1650,15 +1704,15 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                     }
                   />
                   <div className="p-6 border-t border-[#E4EBE7] space-y-3">
-                    <div className="text-xs font-semibold text-[#047857]">
+                    <div className="text-xs font-medium text-[#047857]">
                       Selected for Doorstep Dispatch
                     </div>
-                    <h3 className="text-2xl font-bold text-[#0F1F18] font-[family-name:var(--font-editorial)]">
+                    <h3 className="text-2xl font-semibold text-[#162820] font-[family-name:var(--font-editorial)]">
                       {inlineTarget.item.name}
                     </h3>
                     {inlineSummaryPricing.includedList.length > 0 && (
-                      <p className="text-sm text-slate-600 leading-relaxed">
-                        <strong className="text-[#0F1F18]">Includes: </strong>
+                      <p className="text-[15px] text-[#33453D] leading-[1.68]">
+                        <strong className="font-semibold text-[#162820]">Includes: </strong>
                         {inlineSummaryPricing.includedList.join(' · ')}
                       </p>
                     )}
@@ -1778,19 +1832,13 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
             </div>
           </div>
 
-          <div className="pt-8 border-t border-white/10 space-y-3 text-xs text-slate-400 leading-relaxed">
+          <div className="pt-8 border-t border-white/10 space-y-3 text-sm text-slate-300 leading-relaxed">
             <p>
-              <strong className="text-slate-200">
-                Mandatory Health &amp; Dietary Supplement Disclaimer:
-              </strong>{' '}
-              Products offered on this landing page are herbal and nutritional dietary supplements
-              formulated to support general daily wellness. These statements have not been evaluated
-              to diagnose, treat, cure, or prevent any disease. Individual results vary depending on
-              consistency, diet, and baseline health. Always consult a qualified physician or
-              healthcare professional before starting any supplement regimen, especially if you are
-              pregnant, nursing, taking prescription medication, or under medical supervision.
+              <strong className="text-white font-semibold">Health Disclaimer:</strong> These
+              products are dietary supplements intended for general wellness support and do not
+              replace professional medical advice or treatments.
             </p>
-            <p className="text-slate-500">
+            <p className="text-xs text-slate-500">
               © {new Date().getFullYear()} {CONFIG.company.name} {CONFIG.company.subtitle}. All
               Rights Reserved.
             </p>
@@ -1798,20 +1846,20 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
         </div>
       </footer>
 
-      {/* Mobile Compact Sticky Quick-Order Bar (Strictly <= 15% Viewport Height) */}
+      {/* Mobile & Tablet Compact Sticky Quick-Order Bar (Strictly <= 15% Viewport Height) */}
       {showMobileBar &&
         !expressModalState.isOpen &&
         !detailModalItem &&
         !activePolicyModal &&
         mobileBarItem &&
         mobileBarPricing && (
-          <div className="md:hidden fixed bottom-0 inset-x-0 z-40 h-14 bg-white/95 backdrop-blur-xs border-t border-[#DCE5E0] shadow-lg px-4 flex items-center justify-between gap-3">
+          <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 h-[60px] bg-white/95 backdrop-blur-xs border-t border-[#DCE5E0] shadow-lg px-4 sm:px-6 flex items-center justify-between gap-2.5">
             <div className="min-w-0">
-              <div className="text-[11px] font-medium text-slate-500 truncate">
+              <div className="text-xs font-medium text-[#54685E] truncate">
                 {mobileBarItem.name}
               </div>
               <div className="flex items-baseline gap-1.5 tabular-nums">
-                <span className="text-base font-extrabold text-[#0F1F18]">
+                <span className="text-base sm:text-lg font-bold text-[#162820]">
                   ₦{mobileBarPricing.currentPrice.toLocaleString()}
                 </span>
                 {mobileBarPricing.savings > 0 && (
@@ -1821,19 +1869,32 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                 )}
               </div>
             </div>
-            <button
-              type="button"
-              onClick={() =>
-                openExpressCheckout(
-                  mobileBarItem,
-                  inlineTarget.item ? inlineTarget.type : 'package',
-                  inlineTarget.item ? inlineTarget.optionIdx : defaultBundleOptIdx
-                )
-              }
-              className="px-5 py-2.5 rounded-lg bg-[#047857] hover:bg-[#065F46] text-white font-bold text-sm whitespace-nowrap shrink-0 cursor-pointer"
-            >
-              Order Now (POD)
-            </button>
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={() =>
+                  handleAdvisorWhatsApp(`Ad Sticky Bar Chat: ${mobileBarItem.name}`, mobileBarItem.name)
+                }
+                aria-label="Chat with us on WhatsApp"
+                className="min-h-[42px] px-3 py-2 rounded-xl border border-[#BBD6C8] bg-[#F4FAF7] hover:bg-[#E7F4ED] text-[#065F46] font-semibold text-xs sm:text-sm flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer"
+              >
+                <MessageCircle className="w-4 h-4 shrink-0" />
+                <span className="hidden phablet:inline">Chat with us</span>
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  openExpressCheckout(
+                    mobileBarItem,
+                    inlineTarget.item ? inlineTarget.type : 'package',
+                    inlineTarget.item ? inlineTarget.optionIdx : defaultBundleOptIdx
+                  )
+                }
+                className="min-h-[42px] px-4 sm:px-5 py-2 rounded-xl bg-[#047857] hover:bg-[#065F46] text-white font-semibold text-sm whitespace-nowrap shrink-0 cursor-pointer"
+              >
+                Order Now (POD)
+              </button>
+            </div>
           </div>
         )}
 
@@ -1874,10 +1935,10 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
           <div className="relative z-10 w-full max-w-4xl max-h-[92vh] bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl border border-[#DCE5E0] flex flex-col overflow-hidden">
             <div className="px-6 py-4 border-b border-[#E4EBE7] flex items-center justify-between gap-3 shrink-0">
               <div>
-                <div className="text-xs font-semibold text-[#047857]">
+                <div className="text-xs font-medium text-[#047857]">
                   High-Resolution Bottle &amp; Formulation Details
                 </div>
-                <h3 className="text-lg sm:text-2xl font-bold text-[#0F1F18] font-[family-name:var(--font-editorial)]">
+                <h3 className="text-lg sm:text-2xl font-semibold text-[#162820] font-[family-name:var(--font-editorial)]">
                   {detailModalItem.item.name}
                 </h3>
               </div>
@@ -1907,14 +1968,14 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                         : []
                   }
                   alt={detailModalItem.item.name}
-                  heightClassName="h-[330px] sm:h-[420px] md:h-[460px]"
+                  heightClassName="h-[320px] sm:h-[420px] md:h-[460px]"
                   optimizeWidth={1400}
                 />
               </div>
 
-              <div className="md:col-span-5 p-6 sm:p-7 flex flex-col justify-between space-y-6 text-base text-slate-700">
+              <div className="md:col-span-5 p-6 sm:p-7 flex flex-col justify-between space-y-6 text-[16px] text-[#33453D]">
                 <div className="space-y-4">
-                  <p className="leading-relaxed">
+                  <p className="leading-[1.72]">
                     {detailModalItem.type === 'package'
                       ? (detailModalItem.item as PackageData).description
                       : (detailModalItem.item as Product).long_desc ||
@@ -1923,11 +1984,11 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
 
                   {(detailModalItem.item.health_benefits || []).length > 0 && (
                     <div className="space-y-2.5 pt-2 border-t border-[#E4EBE7]">
-                      <h4 className="text-sm font-bold text-[#0F1F18]">Health Benefits:</h4>
+                      <h4 className="text-sm font-semibold text-[#162820]">Wellness Benefits:</h4>
                       <ul className="space-y-2">
                         {detailModalItem.item.health_benefits.map((b, idx) => (
-                          <li key={idx} className="flex items-start gap-2.5 text-sm text-slate-700">
-                            <CheckCircle2 className="w-4 h-4 text-[#047857] shrink-0 mt-0.5" />
+                          <li key={idx} className="flex items-start gap-2.5 text-[15px] text-[#2F4239] leading-[1.66]">
+                            <CheckCircle2 className="w-4 h-4 text-[#057A55] shrink-0 mt-0.5" />
                             <span>{b}</span>
                           </li>
                         ))}
@@ -1937,11 +1998,11 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
 
                   {detailModalItem.type === 'product' &&
                     (detailModalItem.item as Product).usage && (
-                      <div className="pt-3 border-t border-[#E4EBE7] text-sm">
-                        <strong className="text-[#0F1F18] block mb-1">
+                      <div className="pt-3 border-t border-[#E4EBE7] text-[15px]">
+                        <strong className="font-semibold text-[#162820] block mb-1">
                           Suggested Daily Usage:
                         </strong>
-                        <span className="text-slate-600">
+                        <span className="text-[#33453D] leading-[1.68]">
                           {(detailModalItem.item as Product).usage}
                         </span>
                       </div>
@@ -1960,14 +2021,27 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                           : getProdOptionIdx(target.item as Product);
                       openExpressCheckout(target.item, target.type, optIdx);
                     }}
-                    className="w-full min-h-[52px] px-5 py-3 rounded-xl bg-[#047857] hover:bg-[#065F46] text-white text-base font-bold cursor-pointer"
+                    className="w-full min-h-[50px] px-5 py-3 rounded-xl bg-[#047857] hover:bg-[#065F46] text-white text-base font-semibold cursor-pointer whitespace-nowrap"
                   >
                     Order Now — Pay on Delivery
                   </button>
                   <button
                     type="button"
+                    onClick={() =>
+                      handleAdvisorWhatsApp(
+                        `Ad Detail Modal Chat: ${detailModalItem.item.name}`,
+                        detailModalItem.item.name
+                      )
+                    }
+                    className="w-full min-h-[48px] px-4 py-2.5 rounded-xl border border-[#BBD6C8] bg-[#F4FAF7] hover:bg-[#E7F4ED] text-[#065F46] text-[15.5px] font-semibold flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
+                  >
+                    <MessageCircle className="w-[18px] h-[18px] shrink-0" />
+                    <span>Chat with us</span>
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => setDetailModalItem(null)}
-                    className="w-full py-2.5 rounded-xl border border-[#CBD5CF] bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer"
+                    className="w-full py-2.5 rounded-xl border border-[#CBD5CF] bg-white text-sm font-medium text-[#475A50] hover:bg-slate-50 cursor-pointer"
                   >
                     Close Preview
                   </button>

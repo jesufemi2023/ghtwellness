@@ -216,7 +216,7 @@ export function resolveAdIntent(searchString?: string): AdIntentConfig {
       kicker: 'NAFDAC Registered Bone & Joint Support · Nationwide Pay on Delivery',
       headline: 'Targeted Herbal & Calcium Nutrition for Joint Comfort & Daily Mobility',
       subheadline:
-        'Support flexible knees, waist comfort, and bone strength with authentic NAFDAC-registered GHT wellness packs. Dispatched to your doorstep in 24–48 hours with zero upfront payment.',
+        'Support flexible knees, waist comfort, and bone strength with authentic NAFDAC-registered GHT wellness packs. Dispatched to your doorstep in 24–48 hours—inspect intact seals before you pay.',
       pageTitle: 'Joint Comfort & Mobility Wellness Packs – Pay on Delivery | SD GHT Health Care',
       metaDescription:
         'Shop NAFDAC-registered GHT joint comfort and calcium wellness packs. Free 24–48hr delivery across Nigeria with Pay on Delivery.',

@@ -596,10 +596,10 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
             <div className="text-xs font-medium text-[#047857]">
               NAFDAC Registered · Free Doorstep Delivery · Pay on Delivery
             </div>
-            <h4 className="text-xl sm:text-2xl font-bold text-[#0F1F18] font-[family-name:var(--font-editorial)] leading-snug">
+            <h4 className="text-xl sm:text-2xl font-semibold text-[#162820] font-[family-name:var(--font-editorial)] leading-snug">
               {displayTitle}
             </h4>
-            <div className="text-2xl font-extrabold text-[#0F1F18] tabular-nums">
+            <div className="text-2xl font-bold text-[#162820] tabular-nums">
               ₦{totalPrice.toLocaleString()}
               {totalSavings > 0 && (
                 <span className="ml-2 text-sm font-normal text-slate-400 line-through">
@@ -608,7 +608,7 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
               )}
             </div>
             {totalSavings > 0 && (
-              <div className="text-xs font-semibold text-[#047857]">
+              <div className="text-xs font-medium text-[#047857]">
                 You Save ₦{totalSavings.toLocaleString()} ({computedPricing.discount}% Off)
               </div>
             )}
@@ -1018,10 +1018,10 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
             <span className="font-semibold text-[#047857]">FREE (₦0)</span>
           </div>
           <div className="pt-3 border-t border-[#E4EBE7] flex justify-between items-baseline">
-            <span className="text-base sm:text-lg font-bold text-[#0F1F18]">
+            <span className="text-base sm:text-lg font-semibold text-[#162820]">
               {paymentMethod === 'pod' ? 'Total Payable on Delivery' : 'Total Order Amount'}
             </span>
-            <span className="text-2xl sm:text-3xl font-extrabold text-[#047857]">
+            <span className="text-2xl sm:text-3xl font-bold text-[#047857]">
               ₦{totalPrice.toLocaleString()}
             </span>
           </div>
@@ -1038,7 +1038,7 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full min-h-[58px] px-6 py-4 rounded-xl bg-[#047857] hover:bg-[#065F46] disabled:opacity-60 text-white font-bold text-base sm:text-lg transition-colors flex items-center justify-center gap-2.5 cursor-pointer tabular-nums"
+            className="w-full min-h-[56px] px-6 py-4 rounded-xl bg-[#047857] hover:bg-[#065F46] disabled:opacity-60 text-white font-semibold text-base sm:text-[17px] transition-colors flex items-center justify-center gap-2.5 cursor-pointer tabular-nums"
           >
             {isSubmitting ? (
               <>
@@ -1057,7 +1057,7 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
             )}
           </button>
 
-          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs sm:text-sm text-slate-600 text-center">
+          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs sm:text-sm text-[#4B5E54] text-center">
             <span className="inline-flex items-center gap-1">
               <Lock className="w-3.5 h-3.5 text-[#047857]" />
               <span>Discreet Sealed Parcel</span>
@@ -1070,7 +1070,7 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
               onClick={handleWhatsAppConfirm}
               className="text-[#047857] hover:text-[#065F46] font-semibold underline cursor-pointer"
             >
-              Order via WhatsApp Instead
+              Chat / Order via WhatsApp
             </button>
           </div>
         </div>
@@ -1080,28 +1080,30 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
 
   if (mode === 'inline') {
     return (
-      <div className="bg-white border border-[#DDE5E0] rounded-2xl overflow-hidden">{formBody}</div>
+      <div className="bg-white border border-[#DDE5E0] rounded-2xl overflow-hidden font-[family-name:var(--font-soft-body)] antialiased">
+        {formBody}
+      </div>
     );
   }
 
   return (
     <div
-      className="fixed inset-0 z-[160] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-950/65 backdrop-blur-xs"
+      className="fixed inset-0 z-[160] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-950/65 backdrop-blur-xs font-[family-name:var(--font-soft-body)] antialiased"
       role="dialog"
       aria-modal="true"
       aria-labelledby="express-pod-modal-title"
     >
       <div className="fixed inset-0" onClick={onClose} aria-hidden="true" />
       <div className="relative z-10 w-full max-w-2xl max-h-[92vh] bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl border border-[#DDE5E0] flex flex-col overflow-hidden">
-        <div className="px-6 py-4 bg-white border-b border-[#E4EBE7] flex items-center justify-between gap-3 shrink-0">
+        <div className="px-5 sm:px-6 py-4 bg-white border-b border-[#E4EBE7] flex items-center justify-between gap-3 shrink-0">
           <div>
             <h3
               id="express-pod-modal-title"
-              className="text-lg sm:text-xl font-bold text-[#0F1F18] font-[family-name:var(--font-editorial)]"
+              className="text-lg sm:text-xl font-semibold text-[#162820] font-[family-name:var(--font-editorial)]"
             >
               Express Doorstep Order
             </h3>
-            <p className="text-xs sm:text-sm text-slate-500">
+            <p className="text-xs sm:text-sm text-[#54685E]">
               No online payment required · Inspect intact seals before paying
             </p>
           </div>

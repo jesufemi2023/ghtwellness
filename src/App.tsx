@@ -2199,8 +2199,8 @@ export default function App() {
 
         {/* Site-Wide Regulatory Dietary Supplement Disclaimer */}
         <div className="max-w-7xl mx-auto px-4 mt-10 pt-6 border-t border-slate-800/80">
-          <p className="text-[11px] md:text-xs text-slate-400 leading-relaxed">
-            <strong className="text-slate-300">Health &amp; Dietary Supplement Disclaimer:</strong> Products sold on this website are herbal and nutritional dietary supplements intended to support general wellness and are not intended to diagnose, treat, cure, or prevent any disease. Individual results may vary. Always consult a licensed physician or healthcare professional before starting any supplement regimen, particularly if pregnant, nursing, taking medication, or managing a medical condition.
+          <p className="text-xs md:text-sm text-slate-400 leading-relaxed">
+            <strong className="text-slate-200">Health Disclaimer:</strong> These products are dietary supplements intended for general wellness support and do not replace professional medical advice or treatments.
           </p>
         </div>
         
