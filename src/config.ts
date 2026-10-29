@@ -20,7 +20,13 @@ export const CONFIG = {
     phone: getEnv('VITE_CONTACT_PHONE', "+234 706 073 4773"),
     email: getEnv('VITE_CONTACT_EMAIL', "support@ghtwellness.com"),
     address: getEnv('VITE_COMPANY_ADDRESS', "Ikeja, Lagos, Nigeria (Nationwide Dispatch)"),
-    logoUrl: getEnv('VITE_LOGO_URL', ""),
+    logoUrl: (() => {
+      const envLogo = getEnv('VITE_LOGO_URL', '');
+      if (envLogo && !envLogo.includes('your-logo-url.com')) {
+        return envLogo;
+      }
+      return 'https://res.cloudinary.com/drizgfofw/image/upload/v1771685247/ght-logo_dcsmck.png';
+    })(),
     bankDetails: {
       bankName: getEnv('VITE_BANK_NAME', "ZENITH BANK"),
       accountNumber: getEnv('VITE_ACCOUNT_NUMBER', "1234567890"),

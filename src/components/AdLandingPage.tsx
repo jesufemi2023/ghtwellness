@@ -14,6 +14,7 @@ import {
   FileText,
   ZoomIn,
   MessageCircle,
+  ArrowDown,
 } from 'lucide-react';
 import { Product, PackageData } from '../types';
 import { CONFIG } from '../config';
@@ -507,8 +508,8 @@ interface ExpandableDescriptionProps {
 
 const ExpandableDescription: React.FC<ExpandableDescriptionProps> = ({
   text,
-  maxChars = 155,
-  className = 'text-[16px] sm:text-[17px] text-[#33453D] leading-[1.72] font-normal tracking-[0.005em]',
+  maxChars = 160,
+  className = 'text-[16.5px] sm:text-[17px] text-[#263930] leading-[1.74] font-normal tracking-[0.006em]',
 }) => {
   const [expanded, setExpanded] = useState(false);
 
@@ -567,6 +568,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
   const [expandedBenefitsMap, setExpandedBenefitsMap] = useState<Record<string, boolean>>({});
   const [openFaqIdx, setOpenFaqIdx] = useState<number | null>(0);
   const [showMobileBar, setShowMobileBar] = useState(false);
+  const [logoLoadFailed, setLogoLoadFailed] = useState(false);
 
   const [expressModalState, setExpressModalState] = useState<{
     isOpen: boolean;
@@ -825,24 +827,60 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
 
   const showSkeletonState = isLoading && allBundles.length === 0 && products.length === 0;
 
+  const brandLogoSrc = useMemo(() => {
+    if (!CONFIG.company.logoUrl) return '';
+    return getOptimizedImageUrl(CONFIG.company.logoUrl, 240) || CONFIG.company.logoUrl;
+  }, []);
+
   return (
-    <div className="min-h-screen bg-[#FAFBF9] text-[#162820] font-[family-name:var(--font-soft-body)] antialiased pb-20 lg:pb-0">
-      {/* 1. Strict 3-Zone Top Bar Contract — Mobile & Tablet Ergonomic Proportions */}
-      <header className="lg:sticky lg:top-0 z-40 h-[58px] sm:h-16 bg-white/95 backdrop-blur-xs border-b border-[#DFE7E2]">
-        <div className="max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4 lg:gap-8">
-          {/* Zone 1: Single clean brand wordmark */}
+    <div className="min-h-screen bg-[#FAFBF9] text-[#14261E] font-[family-name:var(--font-soft-body)] antialiased pb-20 lg:pb-0">
+      {/* 1. Strict 3-Zone Top Bar — Official Company Logo & Name + Calm Adult Navigation */}
+      <header className="lg:sticky lg:top-0 z-40 h-[64px] sm:h-[72px] bg-white/95 backdrop-blur-xs border-b border-[#DCE5E0]">
+        <div className="max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-3 sm:gap-6 lg:gap-8">
+          {/* Zone 1: Official Company Logo + Company Name Lockup */}
           <button
             type="button"
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="text-[17px] sm:text-xl font-semibold tracking-tight text-[#162820] font-[family-name:var(--font-editorial)] whitespace-nowrap shrink-0 cursor-pointer"
+            className="flex items-center gap-2.5 sm:gap-3 min-w-0 text-left shrink-0 cursor-pointer group"
+            title={CONFIG.company.name}
           >
-            {CONFIG.company.name}
+            {brandLogoSrc && !logoLoadFailed ? (
+              <img
+                src={brandLogoSrc}
+                alt={CONFIG.company.name}
+                referrerPolicy="no-referrer"
+                onError={(e) => {
+                  const imgEl = e.currentTarget;
+                  if (CONFIG.company.logoUrl && imgEl.src !== CONFIG.company.logoUrl) {
+                    imgEl.src = CONFIG.company.logoUrl;
+                  } else {
+                    setLogoLoadFailed(true);
+                  }
+                }}
+                className="h-9 sm:h-11 w-auto object-contain shrink-0 transition-transform duration-200 group-hover:scale-[1.03]"
+              />
+            ) : (
+              <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-[#0E261D] flex items-center justify-center text-[#95E4B9] shrink-0">
+                <ShieldCheck className="w-5 h-5 sm:w-6 sm:h-6" />
+              </div>
+            )}
+
+            <div className="flex flex-col justify-center min-w-0">
+              <span className="text-[14.5px] phablet:text-[16px] sm:text-[19px] font-semibold tracking-[-0.012em] text-[#14261E] font-[family-name:var(--font-editorial)] leading-[1.15] whitespace-nowrap">
+                {CONFIG.company.name}
+              </span>
+              {CONFIG.company.subtitle && (
+                <span className="text-[10.5px] sm:text-xs font-medium text-[#047857] tracking-[0.04em] leading-none mt-1 whitespace-nowrap">
+                  {CONFIG.company.subtitle}
+                </span>
+              )}
+            </div>
           </button>
 
           {/* Zone 2: 4 concise single-line navigation links on desktop */}
           <nav
             aria-label="Landing page sections"
-            className="hidden lg:flex items-center gap-8 text-[15px] font-medium text-[#2F4239]"
+            className="hidden lg:flex items-center gap-8 text-[15.5px] font-medium text-[#283B32]"
           >
             <button
               type="button"
@@ -878,52 +916,96 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
           <button
             type="button"
             onClick={() => scrollToSection('express-order')}
-            className="min-h-[42px] sm:min-h-[44px] px-4 sm:px-5 py-2 rounded-xl bg-[#047857] hover:bg-[#065F46] text-white text-sm sm:text-[15px] font-semibold whitespace-nowrap shrink-0 transition-colors cursor-pointer"
+            className="min-h-[42px] sm:min-h-[46px] px-3.5 sm:px-5 py-2 rounded-xl bg-[#0E261D] hover:bg-[#065F46] text-white text-[13.5px] sm:text-[15px] font-semibold whitespace-nowrap shrink-0 transition-colors cursor-pointer"
           >
-            Order on Delivery
+            <span className="sm:hidden">Order Now</span>
+            <span className="hidden sm:inline">Order on Delivery</span>
           </button>
         </div>
       </header>
 
-      {/* 2. Compact, Soft Above-the-Fold Trust & Pay-on-Delivery Headline Banner */}
-      <section className="bg-white border-b border-[#DFE7E2]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5 lg:py-7">
-          <div className="max-w-4xl space-y-2">
-            <p className="text-[13px] sm:text-sm font-medium text-[#047857] tracking-[0.01em]">
+      {/* 2. Refined Botanical Apothecary Hero — Persuasive, Dignified & High-Trust for Adult Buyers */}
+      <section className="relative bg-[#0E261D] text-[#FAF9F5] border-b border-[#1D3E31] overflow-hidden">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(95%_120%_at_90%_0%,rgba(16,185,129,0.18)_0%,rgba(14,38,29,0)_60%),radial-gradient(65%_90%_at_5%_100%,rgba(217,185,120,0.09)_0%,rgba(14,38,29,0)_55%)]"
+        />
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-9 lg:py-12">
+          <div className="max-w-3xl space-y-3 sm:space-y-4">
+            <p className="text-[13px] sm:text-[14px] font-medium text-[#95E4B9] tracking-[0.02em] leading-snug">
               {adIntent.kicker}
             </p>
-            <h1 className="text-[1.42rem] phablet:text-[1.6rem] sm:text-[1.9rem] lg:text-[2.4rem] font-semibold text-[#162820] tracking-[-0.012em] leading-[1.24] [text-wrap:balance] font-[family-name:var(--font-editorial)]">
+
+            <h1 className="text-[1.6rem] phablet:text-[1.82rem] sm:text-[2.3rem] lg:text-[2.8rem] font-semibold text-[#FAF9F5] tracking-[-0.015em] leading-[1.2] [text-wrap:balance] font-[family-name:var(--font-editorial)]">
               {adIntent.headline}
             </h1>
+
+            <p className="text-[15.5px] sm:text-[17px] lg:text-[18px] text-[#DCE8E1] leading-[1.68] tracking-[0.01em] max-w-2xl font-normal">
+              {adIntent.subheadline}
+            </p>
+
+            {/* Primary Exploration CTA + Direct Specialist Advisory */}
+            <div className="pt-1.5 flex flex-wrap items-center gap-3 sm:gap-3.5">
+              <button
+                type="button"
+                onClick={() => scrollToSection('ad-bundles')}
+                className="min-h-[48px] sm:min-h-[52px] px-5 sm:px-6 py-2.5 rounded-xl bg-[#F5FAF7] hover:bg-white text-[#0E261D] text-[15px] sm:text-[16px] font-semibold transition-colors inline-flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer shadow-xs"
+              >
+                <span>{adIntent.ctaLabel}</span>
+                <ArrowDown className="w-4 h-4 text-[#047857] shrink-0" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleAdvisorWhatsApp('Ad Hero Specialist')}
+                className="min-h-[48px] sm:min-h-[52px] px-4 sm:px-5 py-2.5 rounded-xl border border-white/25 bg-white/[0.07] hover:bg-white/[0.14] text-[#FAF9F5] text-[15px] sm:text-[16px] font-medium transition-colors inline-flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer"
+              >
+                <MessageCircle className="w-[18px] h-[18px] text-[#95E4B9] shrink-0" />
+                <span>Speak with a Specialist</span>
+              </button>
+
+              <a
+                href={`tel:${CONFIG.company.phone.replace(/\s+/g, '')}`}
+                className="inline-flex items-center gap-1.5 text-[14.5px] sm:text-[15.5px] text-[#C8DDD2] hover:text-white transition-colors py-1 sm:pl-1 tabular-nums whitespace-nowrap"
+              >
+                <Phone className="w-4 h-4 text-[#95E4B9] shrink-0" />
+                <span>Call {CONFIG.company.phone}</span>
+              </a>
+            </div>
           </div>
 
-          {/* Unboxed High-Trust Buyer Assurances — 'Pay ₦0 Upfront' Hidden on Mobile & Tablet Only */}
-          <div className="mt-3.5 pt-3 border-t border-[#EBF1ED] flex flex-wrap items-center gap-x-2.5 sm:gap-x-3 gap-y-1.5 text-[14px] sm:text-[15px] text-[#33453D] leading-relaxed">
-            <strong className="hidden lg:inline font-semibold text-[#162820]">
-              Pay ₦0 Upfront
-            </strong>
-            <span aria-hidden="true" className="hidden lg:inline text-slate-300">
-              ·
-            </span>
-            <span className="font-semibold text-[#162820]">Pay Only on Delivery</span>
-            <span aria-hidden="true" className="text-slate-300">
-              ·
-            </span>
-            <span className="tabular-nums">24–48h Free Nationwide Dispatch</span>
-            <span aria-hidden="true" className="hidden sm:inline text-slate-300">
-              ·
-            </span>
-            <span className="hidden sm:inline">NAFDAC-Registered Herbal Formulas</span>
-            <span aria-hidden="true" className="text-slate-300">
-              ·
-            </span>
-            <button
-              type="button"
-              onClick={() => handleAdvisorWhatsApp('Ad Trust Banner Specialist')}
-              className="font-medium text-[#047857] hover:text-[#065F46] underline underline-offset-4 cursor-pointer whitespace-nowrap tabular-nums"
-            >
-              Chat / Call Specialist: {CONFIG.company.phone}
-            </button>
+          {/* Architectural 3-Column Doorstep Assurance Ledger — Zero Broken Dots, 'Pay ₦0 Upfront' Desktop-Only */}
+          <div className="mt-6 sm:mt-8 pt-4 sm:pt-5 border-t border-white/14 grid grid-cols-3 gap-2.5 sm:gap-8 divide-x divide-white/14">
+            <div className="pr-1 sm:pr-4">
+              <div className="text-[13px] phablet:text-[14px] sm:text-[15.5px] font-semibold text-[#FAF9F5] leading-snug">
+                <span className="hidden lg:inline">Pay ₦0 Upfront — </span>
+                <span>Pay on Delivery</span>
+              </div>
+              <div className="text-[12px] sm:text-[13.5px] text-[#B8CEC3] leading-snug mt-0.5">
+                Inspect seals before paying
+              </div>
+            </div>
+
+            <div className="pl-2.5 sm:pl-8 pr-1 sm:pr-4">
+              <div className="text-[13px] phablet:text-[14px] sm:text-[15.5px] font-semibold text-[#FAF9F5] leading-snug">
+                <span className="sm:hidden">Free Dispatch</span>
+                <span className="hidden sm:inline">Free Nationwide Delivery</span>
+              </div>
+              <div className="text-[12px] sm:text-[13.5px] text-[#B8CEC3] leading-snug mt-0.5 tabular-nums">
+                24–48 hrs to all 36 states
+              </div>
+            </div>
+
+            <div className="pl-2.5 sm:pl-8">
+              <div className="text-[13px] phablet:text-[14px] sm:text-[15.5px] font-semibold text-[#FAF9F5] leading-snug">
+                <span className="phablet:hidden">NAFDAC Reg.</span>
+                <span className="hidden phablet:inline">NAFDAC Certified</span>
+              </div>
+              <div className="text-[12px] sm:text-[13.5px] text-[#B8CEC3] leading-snug mt-0.5">
+                Genuine GHT herbal packs
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -931,18 +1013,18 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
       {/* 3. Above-the-Fold Unified Wellness Pack Catalog — Horizontal Touch Selection + Soft Adult Cards */}
       <section
         id="ad-bundles"
-        className="pt-4 sm:pt-5 lg:pt-10 pb-14 sm:pb-20 lg:pb-24 bg-[#FAFBF9] scroll-mt-20"
+        className="pt-5 sm:pt-6 lg:pt-11 pb-14 sm:pb-20 lg:pb-24 bg-[#FAFBF9] scroll-mt-20"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-5 sm:space-y-6 lg:space-y-8">
           {/* Desktop-Only Section Heading — Removed from Mobile & Tablet View Only */}
-          <div className="hidden lg:block max-w-3xl space-y-2">
-            <h2 className="text-3xl font-semibold text-[#162820] font-[family-name:var(--font-editorial)] tracking-[-0.01em] leading-[1.24] [text-wrap:balance]">
+          <div className="hidden lg:block max-w-3xl space-y-2.5">
+            <h2 className="text-[2rem] font-semibold text-[#14261E] font-[family-name:var(--font-editorial)] tracking-[-0.012em] leading-[1.24] [text-wrap:balance]">
               Select Your Targeted Herbal Wellness Pack
             </h2>
-            <p className="text-[17px] text-[#33453D] leading-[1.72]">
+            <p className="text-[17.5px] text-[#283B32] leading-[1.74] tracking-[0.005em]">
               Tap any wellness category below—such as{' '}
-              <strong className="font-semibold text-[#162820]">Prostate Care</strong> or{' '}
-              <strong className="font-semibold text-[#162820]">Women&apos;s Wellness</strong>—to
+              <strong className="font-semibold text-[#14261E]">Prostate Care</strong> or{' '}
+              <strong className="font-semibold text-[#14261E]">Women&apos;s Wellness</strong>—to
               filter right to your focus area, choose your bottle pack, and request Pay-on-Delivery
               dispatch.
             </p>
@@ -975,15 +1057,15 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                       }}
                       className={`snap-start min-h-[46px] sm:min-h-[48px] px-4 sm:px-5 py-2.5 rounded-xl border text-[15px] sm:text-[15.5px] whitespace-nowrap shrink-0 transition-all duration-150 cursor-pointer tabular-nums flex items-center gap-2 ${
                         isActive
-                          ? 'bg-[#047857] border-[#047857] text-white font-semibold shadow-2xs'
-                          : 'bg-white border-[#CBD8D1] text-[#22352C] font-medium hover:border-[#047857] hover:bg-[#F4F9F6]'
+                          ? 'bg-[#0E261D] border-[#0E261D] text-white font-semibold shadow-2xs'
+                          : 'bg-white border-[#CBD8D1] text-[#1E3128] font-medium hover:border-[#047857] hover:bg-[#F4F9F6]'
                       }`}
                     >
                       <span>{tab.label}</span>
                       {count > 0 && (
                         <span
                           className={`text-xs sm:text-[13px] ${
-                            isActive ? 'text-emerald-100' : 'text-[#5C7066]'
+                            isActive ? 'text-[#95E4B9]' : 'text-[#52675D]'
                           }`}
                         >
                           ({count})
@@ -995,49 +1077,49 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
               </div>
             </div>
 
-            {/* Steady Unboxed Status & Reset Row — Soft & Calm Reading Line */}
-            {!showSkeletonState && hasExactCategoryMatch && (
-              <div className="min-h-[28px] flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[14.5px] sm:text-[15.5px] text-[#3A4D44] leading-relaxed">
-                {activeFilter === 'all' ? (
+            {/* Unboxed Status & Reset Row — 'Showing all X authentic wellness packs...' Hidden on Mobile & Tablet Only */}
+            {!showSkeletonState &&
+              hasExactCategoryMatch &&
+              (activeFilter === 'all' ? (
+                <div className="hidden lg:flex min-h-[28px] items-center text-[15.5px] text-[#354940] leading-relaxed">
                   <span>
                     Showing all{' '}
-                    <strong className="font-semibold text-[#162820] tabular-nums">
+                    <strong className="font-semibold text-[#14261E] tabular-nums">
                       {allBundles.length}
                     </strong>{' '}
                     authentic wellness packs · Inspect intact factory seals at your doorstep before
                     paying
                   </span>
-                ) : (
-                  <>
-                    <span>
-                      Showing{' '}
-                      <strong className="font-semibold text-[#162820] tabular-nums">
-                        {activeFilter === 'singles' ? products.length : bundlesToDisplay.length}
-                      </strong>{' '}
-                      {activeFilter === 'singles'
-                        ? 'individual herbal bottles'
-                        : bundlesToDisplay.length === 1
-                          ? 'wellness pack'
-                          : 'wellness packs'}{' '}
-                      for{' '}
-                      <strong className="font-semibold text-[#047857]">
-                        {SYMPTOM_TABS.find((t) => t.id === activeFilter)?.label}
-                      </strong>
-                    </span>
-                    <span aria-hidden="true" className="text-slate-300">
-                      —
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => handleSelectCategory('all')}
-                      className="font-semibold text-[#047857] hover:text-[#065F46] underline underline-offset-4 cursor-pointer whitespace-nowrap"
-                    >
-                      Show All Wellness Packs
-                    </button>
-                  </>
-                )}
-              </div>
-            )}
+                </div>
+              ) : (
+                <div className="min-h-[28px] flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[15px] sm:text-[16px] text-[#283B32] leading-relaxed">
+                  <span>
+                    Showing{' '}
+                    <strong className="font-semibold text-[#14261E] tabular-nums">
+                      {activeFilter === 'singles' ? products.length : bundlesToDisplay.length}
+                    </strong>{' '}
+                    {activeFilter === 'singles'
+                      ? 'individual herbal bottles'
+                      : bundlesToDisplay.length === 1
+                        ? 'wellness pack'
+                        : 'wellness packs'}{' '}
+                    for{' '}
+                    <strong className="font-semibold text-[#047857]">
+                      {SYMPTOM_TABS.find((t) => t.id === activeFilter)?.label}
+                    </strong>
+                  </span>
+                  <span aria-hidden="true" className="text-slate-300">
+                    —
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => handleSelectCategory('all')}
+                    className="font-semibold text-[#047857] hover:text-[#065F46] underline underline-offset-4 cursor-pointer whitespace-nowrap"
+                  >
+                    Show All Wellness Packs
+                  </button>
+                </div>
+              ))}
           </div>
 
           {!hasExactCategoryMatch && !showSkeletonState && (
@@ -1104,7 +1186,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                     <div
                       className={`${theme.headerBgClass} px-5 sm:px-7 py-4 sm:py-5 border-b border-slate-200/65 space-y-1.5`}
                     >
-                      <div className="flex flex-wrap items-center justify-between gap-2 text-[13px] sm:text-sm">
+                      <div className="flex flex-wrap items-center justify-between gap-2 text-[13.5px] sm:text-sm">
                         <div className="flex flex-wrap items-center gap-2">
                           <span className={`font-semibold tabular-nums ${theme.accentTextClass}`}>
                             Package {indexDisplay}
@@ -1117,19 +1199,19 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                           </span>
                         </div>
 
-                        <div className="text-[#52655C] font-normal tabular-nums text-xs sm:text-[13px]">
+                        <div className="text-[#4A5E54] font-medium tabular-nums text-xs sm:text-[13px]">
                           {pkg.package_code ? `${pkg.package_code} · ` : ''}
                           NAFDAC Registered
                         </div>
                       </div>
 
                       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 pt-0.5">
-                        <h3 className="text-[1.42rem] sm:text-[1.65rem] lg:text-[1.75rem] font-semibold text-[#162820] font-[family-name:var(--font-editorial)] leading-[1.24] tracking-[-0.01em] [text-wrap:balance]">
+                        <h3 className="text-[1.46rem] sm:text-[1.68rem] lg:text-[1.8rem] font-semibold text-[#14261E] font-[family-name:var(--font-editorial)] leading-[1.24] tracking-[-0.012em] [text-wrap:balance]">
                           {pkg.name}
                         </h3>
 
                         <div className="tabular-nums text-left sm:text-right shrink-0">
-                          <span className="text-xl sm:text-2xl font-bold text-[#162820]">
+                          <span className="text-xl sm:text-2xl font-bold text-[#14261E]">
                             ₦{pricing.currentPrice.toLocaleString()}
                           </span>
                           {pricing.savings > 0 && (
@@ -1159,23 +1241,23 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                         {pkg.description && pkg.description.trim().length > 0 && (
                           <ExpandableDescription
                             text={pkg.description}
-                            maxChars={155}
-                            className="text-[16px] sm:text-[16.5px] lg:text-[17px] text-[#33453D] leading-[1.72] font-normal tracking-[0.005em]"
+                            maxChars={160}
+                            className="text-[16.5px] sm:text-[17px] lg:text-[17.5px] text-[#263930] leading-[1.74] font-normal tracking-[0.006em]"
                           />
                         )}
 
                         {visibleBenefits.length > 0 && (
-                          <div className="space-y-2.5 pt-0.5">
-                            <h4 className="text-[14.5px] sm:text-[15.5px] font-semibold text-[#162820]">
+                          <div className="space-y-3 pt-0.5">
+                            <h4 className="text-[15px] sm:text-[16px] font-semibold text-[#14261E]">
                               Key Wellness Benefits:
                             </h4>
                             <ul className="grid grid-cols-1 xl:grid-cols-2 gap-x-5 gap-y-2.5">
                               {visibleBenefits.map((benefit, bIdx) => (
                                 <li
                                   key={bIdx}
-                                  className="flex items-start gap-2.5 text-[15.5px] sm:text-[16px] text-[#2F4239] leading-[1.66] font-normal"
+                                  className="flex items-start gap-2.5 text-[16px] sm:text-[16.5px] text-[#263930] leading-[1.68] font-normal"
                                 >
-                                  <CheckCircle2 className="w-[17px] h-[17px] text-[#057A55] shrink-0 mt-1" />
+                                  <CheckCircle2 className="w-[18px] h-[18px] text-[#057A55] shrink-0 mt-1" />
                                   <span>{benefit}</span>
                                 </li>
                               ))}
@@ -1190,7 +1272,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                                     [pkg.id]: !isBenefitsExpanded,
                                   }))
                                 }
-                                className="text-[14.5px] sm:text-[15px] font-semibold text-[#047857] hover:underline underline-offset-4 pt-1 cursor-pointer"
+                                className="text-[15px] sm:text-[15.5px] font-semibold text-[#047857] hover:underline underline-offset-4 pt-1 cursor-pointer"
                               >
                                 {isBenefitsExpanded
                                   ? 'Show fewer benefits'
@@ -1203,10 +1285,10 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                         {pkg.options && pkg.options.length > 0 && (
                           <div className="space-y-2.5 pt-4 border-t border-slate-200/75">
                             <div className="flex items-center justify-between gap-2">
-                              <span className="text-[14.5px] sm:text-[15px] font-semibold text-[#162820]">
+                              <span className="text-[15px] sm:text-[15.5px] font-semibold text-[#14261E]">
                                 Choose Your Bottle Pack:
                               </span>
-                              <span className="text-xs sm:text-[13px] font-normal text-[#566A60]">
+                              <span className="text-xs sm:text-[13.5px] font-normal text-[#4F6359]">
                                 Tap to select size
                               </span>
                             </div>
@@ -1272,8 +1354,8 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                         )}
 
                         {pricing.includedList.length > 0 && (
-                          <p className="text-[15px] sm:text-[15.5px] text-[#33453D] leading-[1.68] pt-0.5">
-                            <strong className="font-semibold text-[#162820]">
+                          <p className="text-[15.5px] sm:text-[16px] text-[#263930] leading-[1.7] pt-0.5">
+                            <strong className="font-semibold text-[#14261E]">
                               Included in Pack:{' '}
                             </strong>
                             {pricing.includedList.join(' · ')}
@@ -1368,18 +1450,18 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
 
                     <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between space-y-5">
                       <div className="space-y-2.5">
-                        <div className="text-xs sm:text-[13px] text-[#047857] font-medium">
+                        <div className="text-[13px] sm:text-[13.5px] text-[#047857] font-medium">
                           Single Herbal Supplement
                           {prod.nafdac_no ? ` · NAFDAC ${prod.nafdac_no}` : ''}
                         </div>
-                        <h3 className="text-[1.3rem] sm:text-[1.4rem] font-semibold text-[#162820] font-[family-name:var(--font-editorial)] leading-[1.26]">
+                        <h3 className="text-[1.35rem] sm:text-[1.45rem] font-semibold text-[#14261E] font-[family-name:var(--font-editorial)] leading-[1.26]">
                           {prod.name}
                         </h3>
                         {prod.short_desc && (
                           <ExpandableDescription
                             text={prod.short_desc}
-                            maxChars={135}
-                            className="text-[15.5px] sm:text-[16px] text-[#33453D] leading-[1.7] font-normal"
+                            maxChars={140}
+                            className="text-[16px] sm:text-[16.5px] text-[#263930] leading-[1.72] font-normal"
                           />
                         )}
 
@@ -1527,54 +1609,54 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-14 sm:space-y-16">
           <div className="space-y-8 sm:space-y-10">
-            <div className="max-w-2xl space-y-2">
-              <p className="text-sm font-medium text-[#047857]">
+            <div className="max-w-2xl space-y-2.5">
+              <p className="text-[14px] sm:text-[15px] font-medium text-[#047857] tracking-[0.01em]">
                 Peace-of-Mind Doorstep Fulfillment
               </p>
-              <h2 className="text-[1.75rem] sm:text-4xl font-semibold text-[#162820] font-[family-name:var(--font-editorial)] tracking-[-0.01em] leading-[1.24] [text-wrap:balance]">
+              <h2 className="text-[1.8rem] sm:text-4xl font-semibold text-[#14261E] font-[family-name:var(--font-editorial)] tracking-[-0.012em] leading-[1.22] [text-wrap:balance]">
                 How Nationwide Pay-on-Delivery Works
               </h2>
-              <p className="text-[16px] sm:text-[17.5px] text-[#33453D] leading-[1.72]">
-                Designed for complete comfort and confidence—you inspect your sealed supplements in
-                person at your doorstep before paying.
+              <p className="text-[16.5px] sm:text-[18px] text-[#263930] leading-[1.74]">
+                Designed for complete comfort and confidence—you inspect your factory-sealed
+                supplements in person at your doorstep before making payment.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-7 sm:gap-8 pt-4 border-t border-[#E4EBE7]">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-7 sm:gap-9 pt-5 border-t border-[#E4EBE7]">
               <div className="space-y-2.5 pt-2">
-                <span className="text-sm sm:text-[15px] font-semibold text-[#047857] tabular-nums">
+                <span className="text-[14px] sm:text-[15px] font-semibold text-[#047857] tabular-nums">
                   01. Request Dispatch
                 </span>
-                <h3 className="text-xl sm:text-2xl font-semibold text-[#162820] font-[family-name:var(--font-editorial)] leading-snug">
+                <h3 className="text-[1.32rem] sm:text-2xl font-semibold text-[#14261E] font-[family-name:var(--font-editorial)] leading-snug">
                   Select Your Wellness Pack
                 </h3>
-                <p className="text-[16px] sm:text-[16.5px] text-[#33453D] leading-[1.72]">
+                <p className="text-[16.5px] sm:text-[17px] text-[#263930] leading-[1.74]">
                   Choose your preferred multi-bottle pack and enter your phone number, state, and
                   street address. No card or online payment is required.
                 </p>
               </div>
 
               <div className="space-y-2.5 pt-2">
-                <span className="text-sm sm:text-[15px] font-semibold text-[#047857] tabular-nums">
+                <span className="text-[14px] sm:text-[15px] font-semibold text-[#047857] tabular-nums">
                   02. Rider Scheduling
                 </span>
-                <h3 className="text-xl sm:text-2xl font-semibold text-[#162820] font-[family-name:var(--font-editorial)] leading-snug">
+                <h3 className="text-[1.32rem] sm:text-2xl font-semibold text-[#14261E] font-[family-name:var(--font-editorial)] leading-snug">
                   Personal Phone Confirmation
                 </h3>
-                <p className="text-[16px] sm:text-[16.5px] text-[#33453D] leading-[1.72]">
+                <p className="text-[16.5px] sm:text-[17px] text-[#263930] leading-[1.74]">
                   Our regional fulfillment desk calls or messages you on WhatsApp to confirm your
                   convenient delivery window within 24–48 hours.
                 </p>
               </div>
 
               <div className="space-y-2.5 pt-2">
-                <span className="text-sm sm:text-[15px] font-semibold text-[#047857] tabular-nums">
+                <span className="text-[14px] sm:text-[15px] font-semibold text-[#047857] tabular-nums">
                   03. Doorstep Verification
                 </span>
-                <h3 className="text-xl sm:text-2xl font-semibold text-[#162820] font-[family-name:var(--font-editorial)] leading-snug">
+                <h3 className="text-[1.32rem] sm:text-2xl font-semibold text-[#14261E] font-[family-name:var(--font-editorial)] leading-snug">
                   Inspect Intact Seals &amp; Pay
                 </h3>
-                <p className="text-[16px] sm:text-[16.5px] text-[#33453D] leading-[1.72]">
+                <p className="text-[16.5px] sm:text-[17px] text-[#263930] leading-[1.74]">
                   Verify intact factory seals, NAFDAC numbers, and expiry dates at your door, then
                   pay the rider via Bank Transfer, POS, or Cash.
                 </p>
@@ -1584,11 +1666,11 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
 
           {/* Verified Adult Customer Experiences */}
           <div id="ad-reviews" className="pt-12 border-t border-[#E4EBE7] space-y-8 sm:space-y-10 scroll-mt-20">
-            <div className="max-w-2xl space-y-2">
-              <p className="text-sm font-medium text-[#047857]">
+            <div className="max-w-2xl space-y-2.5">
+              <p className="text-[14px] sm:text-[15px] font-medium text-[#047857] tracking-[0.01em]">
                 Verified Doorstep Buyers
               </p>
-              <h2 className="text-[1.75rem] sm:text-4xl font-semibold text-[#162820] font-[family-name:var(--font-editorial)] tracking-[-0.01em] leading-[1.24]">
+              <h2 className="text-[1.8rem] sm:text-4xl font-semibold text-[#14261E] font-[family-name:var(--font-editorial)] tracking-[-0.012em] leading-[1.22] [text-wrap:balance]">
                 Trusted by Adults &amp; Families Nationwide
               </h2>
             </div>
@@ -1608,19 +1690,19 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                         <Star key={sIdx} className="w-4 h-4 fill-current" />
                       ))}
                     </div>
-                    <p className="text-[16px] sm:text-[16.5px] text-[#33453D] leading-[1.74] font-normal">
+                    <p className="text-[16.5px] sm:text-[17px] text-[#24372E] leading-[1.76] font-normal">
                       &ldquo;{story.quote}&rdquo;
                     </p>
                   </div>
 
                   <footer className="pt-4 border-t border-[#DCE5E0]">
-                    <div className="font-semibold text-[16px] sm:text-[17px] text-[#162820]">
+                    <div className="font-semibold text-[16.5px] sm:text-[17.5px] text-[#14261E] font-[family-name:var(--font-editorial)]">
                       {story.name}
                     </div>
-                    <div className="text-sm text-[#54685E] mt-0.5">
+                    <div className="text-[14.5px] text-[#4C6056] mt-0.5">
                       {story.role} · {story.location}
                     </div>
-                    <div className="text-xs sm:text-sm font-medium text-[#047857] mt-1">
+                    <div className="text-[13.5px] sm:text-sm font-medium text-[#047857] mt-1">
                       {story.packName}
                     </div>
                   </footer>
@@ -1630,7 +1712,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
 
             {/* Clean High-Legibility FAQ Accordion */}
             <div className="max-w-3xl mx-auto pt-4 sm:pt-6 space-y-5">
-              <h3 className="text-[1.5rem] sm:text-3xl font-semibold text-[#162820] font-[family-name:var(--font-editorial)] text-center leading-snug">
+              <h3 className="text-[1.6rem] sm:text-3xl font-semibold text-[#14261E] font-[family-name:var(--font-editorial)] text-center leading-snug [text-wrap:balance]">
                 Questions Before Placing Your Order
               </h3>
               <div className="divide-y divide-[#E4EBE7] border-y border-[#E4EBE7]">
@@ -1644,17 +1726,17 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                         aria-expanded={isOpen}
                         className="w-full py-4 sm:py-5 text-left flex items-center justify-between gap-4 cursor-pointer"
                       >
-                        <span className="text-[16px] sm:text-[17.5px] font-semibold text-[#162820] leading-snug">
+                        <span className="text-[16.5px] sm:text-[18px] font-semibold text-[#14261E] leading-snug">
                           {faq.question}
                         </span>
                         <ChevronDown
-                          className={`w-5 h-5 text-[#54685E] shrink-0 transition-transform duration-200 ${
+                          className={`w-5 h-5 text-[#4C6056] shrink-0 transition-transform duration-200 ${
                             isOpen ? 'rotate-180' : ''
                           }`}
                         />
                       </button>
                       {isOpen && (
-                        <div className="pb-5 text-[16px] sm:text-[16.5px] text-[#33453D] leading-[1.74] font-normal">
+                        <div className="pb-5 text-[16.5px] sm:text-[17px] text-[#263930] leading-[1.76] font-normal">
                           {faq.answer}
                         </div>
                       )}
@@ -1673,14 +1755,14 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
         className="py-14 sm:py-20 bg-[#F2F5F3] border-t border-[#DCE5E0] scroll-mt-20"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-10">
-          <div className="max-w-2xl space-y-2">
-            <p className="text-sm font-medium text-[#047857]">
+          <div className="max-w-2xl space-y-2.5">
+            <p className="text-[14px] sm:text-[15px] font-medium text-[#047857] tracking-[0.01em]">
               1-Step Doorstep Dispatch Form
             </p>
-            <h2 className="text-[1.75rem] sm:text-4xl font-semibold text-[#162820] font-[family-name:var(--font-editorial)] tracking-[-0.01em] leading-[1.24] [text-wrap:balance]">
+            <h2 className="text-[1.8rem] sm:text-4xl font-semibold text-[#14261E] font-[family-name:var(--font-editorial)] tracking-[-0.012em] leading-[1.22] [text-wrap:balance]">
               Complete Your Pay-on-Delivery Order
             </h2>
-            <p className="text-[16px] sm:text-[17.5px] text-[#33453D] leading-[1.72]">
+            <p className="text-[16.5px] sm:text-[18px] text-[#263930] leading-[1.74]">
               Enter your delivery address below. Our regional hub dispatches directly to your home
               or office with free nationwide doorstep delivery.
             </p>
@@ -1757,41 +1839,72 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
         </div>
       </section>
 
-      {/* 6. Quiet Policy-Compliant Footer */}
-      <footer className="bg-[#0F1F18] text-slate-300 py-14">
+      {/* 6. Quiet Policy-Compliant Footer — Official Brand Logo & Name Lockup */}
+      <footer className="bg-[#0E261D] text-slate-200 py-14 sm:py-16 border-t border-[#1D3E31]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-            <div className="space-y-3">
-              <div className="font-bold text-xl text-white font-[family-name:var(--font-editorial)]">
-                {CONFIG.company.name} {CONFIG.company.subtitle}
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                {brandLogoSrc && !logoLoadFailed ? (
+                  <div className="bg-white px-2.5 py-1.5 rounded-xl shrink-0">
+                    <img
+                      src={brandLogoSrc}
+                      alt={CONFIG.company.name}
+                      referrerPolicy="no-referrer"
+                      onError={() => setLogoLoadFailed(true)}
+                      className="h-9 w-auto object-contain"
+                    />
+                  </div>
+                ) : (
+                  <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-[#95E4B9] shrink-0">
+                    <ShieldCheck className="w-5 h-5" />
+                  </div>
+                )}
+
+                <div>
+                  <div className="font-semibold text-lg sm:text-xl text-white font-[family-name:var(--font-editorial)] leading-tight">
+                    {CONFIG.company.name}
+                  </div>
+                  {CONFIG.company.subtitle && (
+                    <div className="text-xs font-medium text-[#95E4B9] tracking-[0.04em] mt-0.5">
+                      {CONFIG.company.subtitle}
+                    </div>
+                  )}
+                </div>
               </div>
-              <p className="text-sm text-slate-400 leading-relaxed">
+
+              <p className="text-[15.5px] text-[#C8DDD2] leading-[1.7] tracking-[0.008em]">
                 Authorized Nigerian distributor of NAFDAC-registered GHT herbal and nutritional
                 dietary supplements with nationwide doorstep fulfillment.
               </p>
             </div>
 
-            <div className="space-y-2.5 text-sm">
-              <div className="font-bold text-white">Fulfillment Hub &amp; Support</div>
-              <div className="flex items-start gap-2.5 text-slate-400">
-                <MapPin className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+            <div className="space-y-3 text-[15.5px]">
+              <div className="font-semibold text-white text-base">Fulfillment Hub &amp; Support</div>
+              <div className="flex items-start gap-2.5 text-[#C8DDD2] leading-relaxed">
+                <MapPin className="w-4 h-4 text-[#95E4B9] shrink-0 mt-1" />
                 <span>{CONFIG.company.address}</span>
               </div>
-              <div className="flex items-center gap-2.5 text-slate-400">
-                <Phone className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>{CONFIG.company.phone}</span>
+              <div className="flex items-center gap-2.5 text-[#C8DDD2]">
+                <Phone className="w-4 h-4 text-[#95E4B9] shrink-0" />
+                <a
+                  href={`tel:${CONFIG.company.phone.replace(/\s+/g, '')}`}
+                  className="hover:text-white tabular-nums"
+                >
+                  {CONFIG.company.phone}
+                </a>
               </div>
-              <div className="flex items-center gap-2.5 text-slate-400">
-                <Mail className="w-4 h-4 text-emerald-400 shrink-0" />
+              <div className="flex items-center gap-2.5 text-[#C8DDD2]">
+                <Mail className="w-4 h-4 text-[#95E4B9] shrink-0" />
                 <a href={`mailto:${CONFIG.company.email}`} className="hover:text-white">
                   {CONFIG.company.email}
                 </a>
               </div>
             </div>
 
-            <div className="space-y-2.5 text-sm">
-              <div className="font-bold text-white">Policies &amp; Compliance</div>
-              <ul className="space-y-2 text-slate-400">
+            <div className="space-y-3 text-[15.5px]">
+              <div className="font-semibold text-white text-base">Policies &amp; Compliance</div>
+              <ul className="space-y-2.5 text-[#C8DDD2]">
                 <li>
                   <a
                     href="/return-policy"
@@ -1832,13 +1945,13 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
             </div>
           </div>
 
-          <div className="pt-8 border-t border-white/10 space-y-3 text-sm text-slate-300 leading-relaxed">
+          <div className="pt-8 border-t border-white/14 space-y-3 text-[15px] text-[#DCE8E1] leading-[1.7] tracking-[0.008em]">
             <p>
               <strong className="text-white font-semibold">Health Disclaimer:</strong> These
               products are dietary supplements intended for general wellness support and do not
               replace professional medical advice or treatments.
             </p>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs sm:text-[13px] text-[#9AB5A8]">
               © {new Date().getFullYear()} {CONFIG.company.name} {CONFIG.company.subtitle}. All
               Rights Reserved.
             </p>

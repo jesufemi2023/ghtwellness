@@ -197,14 +197,14 @@ export function resolveAdIntent(searchString?: string): AdIntentConfig {
   if (/prostate|prostbeta|urinar|p001/.test(rawQuery)) {
     return {
       category: 'prostate',
-      kicker: "NAFDAC Registered Men's Herbal Nutrition · Nationwide Pay on Delivery",
-      headline: "Plant-Based Nutritional Support for Men's Prostate Comfort & Restful Nights",
+      kicker: "Authorized GHT Healthcare Distribution · Men's Prostate Wellness",
+      headline: "Targeted Botanical Support for Men's Prostate Comfort & Uninterrupted Rest",
       subheadline:
-        'Authentic multi-bottle GHT herbal wellness packs featuring Prostbeta, Longzit, and Ganoderma to support healthy urinary flow and daily male comfort. Delivered in 24–48 hours—inspect intact seals before you pay.',
+        'Genuine NAFDAC-registered herbal formulations crafted to support healthy urinary flow, bladder ease, and restful nights—delivered sealed to your doorstep so you inspect before paying.',
       pageTitle: "Men's Prostate Wellness Packs – Pay on Delivery | SD GHT Health Care",
       metaDescription:
         "Order NAFDAC-registered GHT herbal prostate wellness packs with Free 24–48hr Nationwide Delivery across Nigeria. Inspect seals upon arrival before payment.",
-      ctaLabel: 'Select Prostate Wellness Pack',
+      ctaLabel: 'Explore Prostate Packs',
       matchedKeyword: rawQuery,
       requestedPackageCode: pkgParam || 'P001',
     };
@@ -213,14 +213,14 @@ export function resolveAdIntent(searchString?: string): AdIntentConfig {
   if (/arthrit|joint|knee|rheumat|waist|back|calcium|panicept|mobility|p004/.test(rawQuery)) {
     return {
       category: 'joints',
-      kicker: 'NAFDAC Registered Bone & Joint Support · Nationwide Pay on Delivery',
-      headline: 'Targeted Herbal & Calcium Nutrition for Joint Comfort & Daily Mobility',
+      kicker: 'Authorized GHT Healthcare Distribution · Bone & Joint Mobility',
+      headline: 'Concentrated Herbal & Calcium Nutrition for Supple Joints & Effortless Mobility',
       subheadline:
-        'Support flexible knees, waist comfort, and bone strength with authentic NAFDAC-registered GHT wellness packs. Dispatched to your doorstep in 24–48 hours—inspect intact seals before you pay.',
+        'Support comfortable knees, waist strength, and everyday flexibility with genuine NAFDAC-registered GHT wellness packs—delivered free nationwide with doorstep seal inspection before payment.',
       pageTitle: 'Joint Comfort & Mobility Wellness Packs – Pay on Delivery | SD GHT Health Care',
       metaDescription:
         'Shop NAFDAC-registered GHT joint comfort and calcium wellness packs. Free 24–48hr delivery across Nigeria with Pay on Delivery.',
-      ctaLabel: 'Select Joint Mobility Pack',
+      ctaLabel: 'Explore Joint & Bone Packs',
       matchedKeyword: rawQuery,
       requestedPackageCode: pkgParam || 'P004',
     };
@@ -229,14 +229,14 @@ export function resolveAdIntent(searchString?: string): AdIntentConfig {
   if (/fibroid|female|women|menstru|ovulat|gynec|p009/.test(rawQuery)) {
     return {
       category: 'womens',
-      kicker: "NAFDAC Registered Women's Wellness · Nationwide Pay on Delivery",
-      headline: "Gentle Herbal Nutritional Support for Women's Hormonal & Reproductive Wellness",
+      kicker: "Authorized GHT Healthcare Distribution · Women's Holistic Wellness",
+      headline: "Gentle Botanical Nutrition for Women's Hormonal Balance & Reproductive Care",
       subheadline:
-        'Plant-based GHT nutritional wellness packs crafted to support feminine balance and holistic daily well-being. Free 24–48hr doorstep delivery across Nigeria—pay upon inspection.',
+        'Pure NAFDAC-registered plant formulations thoughtfully paired to support cycle harmony and feminine vitality—dispatched discreetly to your door with payment only upon inspection.',
       pageTitle: "Women's Herbal Wellness Packs – Pay on Delivery | SD GHT Health Care",
       metaDescription:
         "Order NAFDAC-registered GHT women's herbal wellness packs with Free 24–48hr Nationwide Pay on Delivery.",
-      ctaLabel: "Select Women's Wellness Pack",
+      ctaLabel: "Explore Women's Packs",
       matchedKeyword: rawQuery,
       requestedPackageCode: pkgParam || 'P009',
     };
@@ -245,14 +245,14 @@ export function resolveAdIntent(searchString?: string): AdIntentConfig {
   if (/vitality|stamina|erection|endurance|reodoe|vigor|\bmen\b|\bmens\b|\bmale\b|mens_|male_|p002/.test(rawQuery)) {
     return {
       category: 'vitality',
-      kicker: "NAFDAC Registered Men's Stamina Formulas · Discreet Doorstep Dispatch",
-      headline: "Natural Botanical Support for Men's Stamina, Energy & Confidence",
+      kicker: "Authorized GHT Healthcare Distribution · Men's Stamina & Vitality",
+      headline: "Restorative Herbal Nutrition for Men's Stamina, Circulation & Quiet Confidence",
       subheadline:
-        'Multi-bottle GHT herbal combo packs formulated with Reodoe, Zinc, and Vigor Max to support male energy, circulation, and physical endurance. Discreet 24–48hr delivery—pay only upon inspection.',
+        'Synergistic NAFDAC-registered botanical packs formulated to support male energy, physical endurance, and lasting vitality—delivered in discreet sealed packaging with Pay on Delivery.',
       pageTitle: "Men's Stamina & Vitality Wellness Packs – Pay on Delivery | SD GHT Health Care",
       metaDescription:
         "Authentic NAFDAC-registered GHT men's vitality combo packs with discreet 24–48hr nationwide delivery and Pay on Delivery.",
-      ctaLabel: "Select Men's Vitality Pack",
+      ctaLabel: "Explore Men's Vitality Packs",
       matchedKeyword: rawQuery,
       requestedPackageCode: pkgParam || 'P002',
     };
@@ -261,14 +261,14 @@ export function resolveAdIntent(searchString?: string): AdIntentConfig {
   if (/sugar|diabet|glucose|metabolic|dialese|p003/.test(rawQuery)) {
     return {
       category: 'sugar',
-      kicker: 'NAFDAC Registered Metabolic Support · Nationwide Pay on Delivery',
-      headline: 'Daily Herbal Support for Healthy Blood Glucose Balance & Steady Vitality',
+      kicker: 'Authorized GHT Healthcare Distribution · Metabolic & Glucose Support',
+      headline: 'Balanced Botanical Nutrition for Steady Glucose Metabolism & Daily Energy',
       subheadline:
-        'Botanical dietary wellness packs designed to support metabolic balance, nerve comfort, and daily energy alongside a balanced diet. Free 24–48hr nationwide dispatch—pay on delivery.',
+        'Carefully selected NAFDAC-registered herbal formulations supporting healthy metabolic balance, nerve comfort, and sustained vitality—inspect your factory-sealed bottles upon delivery before paying.',
       pageTitle: 'Metabolic & Sugar Balance Wellness Packs – Pay on Delivery | SD GHT Health Care',
       metaDescription:
         'Order NAFDAC-registered GHT metabolic and sugar balance herbal wellness packs. Free 24–48hr delivery across Nigeria with Pay on Delivery.',
-      ctaLabel: 'Select Sugar Balance Pack',
+      ctaLabel: 'Explore Sugar Balance Packs',
       matchedKeyword: rawQuery,
       requestedPackageCode: pkgParam || 'P003',
     };
@@ -277,14 +277,14 @@ export function resolveAdIntent(searchString?: string): AdIntentConfig {
   if (/blood\s*pressure|\bbp\b|hypertension|cardio|heart|circulation|hyperfree/.test(rawQuery)) {
     return {
       category: 'cardio',
-      kicker: 'NAFDAC Registered Cardiovascular Nutrition · Nationwide Pay on Delivery',
-      headline: 'Botanical Wellness Support for Healthy Circulation & Cardiovascular Calm',
+      kicker: 'Authorized GHT Healthcare Distribution · Cardiovascular Wellness',
+      headline: 'Plant-Based Nutritional Support for Healthy Circulation & Vascular Calm',
       subheadline:
-        'Authentic GHT plant-based wellness packs formulated to support vascular wellness, healthy circulation, and daily vitality. Delivered in 24–48 hours—inspect seals before paying.',
+        'Genuine NAFDAC-registered GHT botanical packs formulated to support cardiovascular balance and steady daily vitality—delivered free across Nigeria with Pay on Delivery.',
       pageTitle: 'Cardiovascular & Circulation Wellness Packs – Pay on Delivery | SD GHT Health Care',
       metaDescription:
         'Shop NAFDAC-registered GHT cardiovascular and circulation herbal wellness packs with Free Nationwide Pay on Delivery.',
-      ctaLabel: 'Select Circulation Wellness Pack',
+      ctaLabel: 'Explore Circulation Packs',
       matchedKeyword: rawQuery,
       requestedPackageCode: pkgParam || undefined,
     };
@@ -293,14 +293,14 @@ export function resolveAdIntent(searchString?: string): AdIntentConfig {
   if (/fertility|hormon|reproductive/.test(rawQuery)) {
     return {
       category: 'womens',
-      kicker: "NAFDAC Registered Women's Wellness · Nationwide Pay on Delivery",
-      headline: "Gentle Herbal Nutritional Support for Women's Hormonal & Reproductive Wellness",
+      kicker: "Authorized GHT Healthcare Distribution · Women's Holistic Wellness",
+      headline: "Gentle Botanical Nutrition for Women's Hormonal Balance & Reproductive Care",
       subheadline:
-        'Plant-based GHT nutritional wellness packs crafted to support feminine balance and holistic daily well-being. Free 24–48hr doorstep delivery across Nigeria—pay upon inspection.',
+        'Pure NAFDAC-registered plant formulations thoughtfully paired to support cycle harmony and feminine vitality—dispatched discreetly to your door with payment only upon inspection.',
       pageTitle: "Women's Herbal Wellness Packs – Pay on Delivery | SD GHT Health Care",
       metaDescription:
         "Order NAFDAC-registered GHT women's herbal wellness packs with Free 24–48hr Nationwide Pay on Delivery.",
-      ctaLabel: "Select Women's Wellness Pack",
+      ctaLabel: "Explore Women's Packs",
       matchedKeyword: rawQuery,
       requestedPackageCode: pkgParam || 'P009',
     };
@@ -308,14 +308,14 @@ export function resolveAdIntent(searchString?: string): AdIntentConfig {
 
   return {
     category: 'all',
-    kicker: 'NAFDAC Registered Herbal Supplements · Free 24–48hr Nationwide Dispatch',
-    headline: 'Authentic Herbal Wellness Packs for Vitality, Joint Comfort & Daily Health',
+    kicker: 'Official Nigerian Distribution · NAFDAC-Certified Botanicals',
+    headline: 'Pure Herbal Formulations for Lasting Vitality, Joint Comfort & Daily Strength',
     subheadline:
-      'Choose your NAFDAC-registered GHT multi-bottle wellness pack with discounted bundle savings. Delivered directly to your home or office across all 36 states & FCT—inspect intact factory seals before you pay.',
+      'Every multi-bottle GHT wellness pack is factory-sealed, NAFDAC-registered, and delivered free to your home or office—so you can inspect your supplements in person before making payment.',
     pageTitle: 'Official GHT Herbal Wellness Packs – Nationwide Pay on Delivery | SD GHT Health Care',
     metaDescription:
       'Shop authentic NAFDAC-registered GHT herbal wellness packs and value bundles. Free 24–48hr delivery across Nigeria with zero upfront risk—Pay on Delivery.',
-    ctaLabel: 'Choose Your Wellness Pack',
+    ctaLabel: 'Explore Wellness Packs',
     requestedPackageCode: pkgParam || undefined,
   };
 }
