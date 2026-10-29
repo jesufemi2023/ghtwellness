@@ -226,7 +226,7 @@ export function resolveAdIntent(searchString?: string): AdIntentConfig {
     };
   }
 
-  if (/\bfibroid|\bfemale\b|\bwomen\b|\bwomen's\b|\bmenstru|\bovulat|\bp009\b/.test(rawQuery)) {
+  if (/fibroid|female|women|menstru|ovulat|gynec|p009/.test(rawQuery)) {
     return {
       category: 'womens',
       kicker: "NAFDAC Registered Women's Wellness · Nationwide Pay on Delivery",
@@ -242,7 +242,7 @@ export function resolveAdIntent(searchString?: string): AdIntentConfig {
     };
   }
 
-  if (/\bvitality\b|\bstamina\b|\berection\b|\bendurance\b|\breodoe\b|\bvigor\b|\bmen\b|\bmale\b|\bp002\b/.test(rawQuery)) {
+  if (/vitality|stamina|erection|endurance|reodoe|vigor|\bmen\b|\bmens\b|\bmale\b|mens_|male_|p002/.test(rawQuery)) {
     return {
       category: 'vitality',
       kicker: "NAFDAC Registered Men's Stamina Formulas · Discreet Doorstep Dispatch",
@@ -274,7 +274,7 @@ export function resolveAdIntent(searchString?: string): AdIntentConfig {
     };
   }
 
-  if (/blood\s*pressure|bp|hypertension|cardio|heart|circulation|hyperfree/.test(rawQuery)) {
+  if (/blood\s*pressure|\bbp\b|hypertension|cardio|heart|circulation|hyperfree/.test(rawQuery)) {
     return {
       category: 'cardio',
       kicker: 'NAFDAC Registered Cardiovascular Nutrition · Nationwide Pay on Delivery',

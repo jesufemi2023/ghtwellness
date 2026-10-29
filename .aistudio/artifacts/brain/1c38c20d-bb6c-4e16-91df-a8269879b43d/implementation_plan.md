@@ -1,148 +1,96 @@
-# Google Ads High-Conversion Landing Page (`/ad`)
+# Unified Above-the-Fold Wellness Catalog & Navigation (`/ad`)
 
-Redesign and re-architect the `/ad` landing funnel into a fast, Google Ads policy-compliant, clinical-grade conversion engine engineered specifically to turn paid search clicks into completed Pay-on-Delivery (POD) supplement package orders and qualified WhatsApp consultations.
+Replacing the top **"Quick Jump"** bar with **"Select Your Targeted Herbal Wellness Pack"** is a strong conversion move—**provided we also replace the separate single-product spotlight box with a compact Trust & Pay-on-Delivery headline banner** so the page doesn't show all products first and then repeat one product underneath. This revised plan brings your category buttons and oversized product package cards directly to the first screen right beneath a clear NAFDAC & Pay-on-Delivery assurance header.
+
+---
 
 ## User Review & Critical Decisions
 
 > [!IMPORTANT]
-> Please review the confirmed architectural and design decisions below. Click **Proceed** to begin implementation, or share any adjustments you would like made to the layout, copy strategy, or checkout fields.
+> **Professional UX Verdict on Moving "Select Your Targeted Herbal Wellness Pack" to the Top:**
+> - **Why your idea works well**: Adult visitors arriving from Google Ads immediately see every health category (*Prostate Care, Women's Wellness, Men's Vitality, Joints & Mobility, Sugar Balance*) alongside large, attention-commanding product photos—so nobody leaves thinking you only sell one supplement.
+> - **The one trap we must avoid ("Upside-Down Page")**: If we moved the catalog into Quick Jump's slot *above* the current giant single-product Hero box and kept both, shoppers would browse your entire catalog first and then scroll down into a giant "welcome" box repeating a bottle they already saw.
+> - **How we solve it cleanly**: We pair a **compact, high-trust Pay-on-Delivery headline banner** at the top with **"Select Your Targeted Herbal Wellness Pack" immediately underneath on the first screen**, retiring both the duplicate Quick Jump strip and the redundant single-product box.
 
-- **Confirmed Visual Theme**: Clean clinical white and emerald medical authority theme (`#FFFFFF` / `#F8FAFC` surfaces, high-contrast `#0F172A` typography, disciplined `#059669` emerald CTAs) optimized for legibility and trust among adult and senior buyers (ages 45–75+).
-- **Confirmed Campaign Structure**: Dynamic URL symptom/keyword matching (adapting the hero headline and spotlighted treatment when URL parameters like `?condition=prostate` or `?utm_term=...` are present) paired with instant interactive symptom filter tabs for general `/ad` visitors.
-- **Confirmed Checkout Workflow**: Dual 1-step Express Pay-on-Delivery (POD) checkout — an instant single-screen modal triggered from any package card **plus** an embedded inline Express Order Form near the bottom of the page.
-- **Confirmed Page Chrome & Policy Posture**: Distraction-free dedicated ad header and policy-compliant footer (hiding the main website navigation menu, search bar, blog links, and developer portfolio badges on `/ad` to eliminate paid-click exit leaks).
-
-> [!NOTE]
-> **Google Ads Healthcare Copy Compliance**: To protect your ad account from "Unapproved Pharmaceuticals / Miracle Cure" disapprovals and maximize Landing Page Experience Quality Score, `/ad` will replace absolute cure/healed claims with authoritative, NAFDAC-backed clinical support phrasing and include mandatory supplement disclaimers, return policy access, and corporate contact details in the footer.
+- **Updated Default Layout (Option A — Catalog-First, Refined Version of Your Idea)**: Top Header $\rightarrow$ Compact Trust & Pay-on-Delivery Banner $\rightarrow$ **"Select Your Targeted Herbal Wellness Pack"** (category buttons + large scaled-up package cards immediately visible above the fold) $\rightarrow$ How Delivery Works, Customer Reviews & Express Order Form.
+- **Alternative Layout (Option B — Keep Single-Product Hero First)**: Simply delete the Quick Jump bar, keep the giant single-product spotlight box at the top, and leave **"Select Your Targeted Herbal Wellness Pack"** below it. *(Tell me in chat if you prefer Option B instead; otherwise click **Proceed** to build Option A.)*
 
 ---
 
 ## 1. Overview & Core Concept
 
-- **What It Does**: Serves as a dedicated, zero-distraction direct-response storefront at `/ad` that dynamically aligns its headline and featured packages with the visitor's Google Search intent, clearly breaks down multi-bottle treatment courses and their exact included herbal formulas, removes risk via Nationwide Pay-on-Delivery, and captures orders in a single frictionless step.
-- **Target Audience / Persona**: Nigerian adults, seniors (45–75+), and family caregivers actively searching on Google for natural, NAFDAC-registered herbal support for chronic wellness concerns (prostate health, joint/arthritis mobility, men's vitality, blood sugar balance, blood pressure, and organ detox) primarily on mobile devices.
+- **What It Does**: Eliminates duplicate category bars and brings **"Select Your Targeted Herbal Wellness Pack"** straight to the top of the `/ad` landing page beneath a concise, reassuring Pay-on-Delivery & NAFDAC authenticity header.
+- **Target Audience / Persona**: Adult and senior Nigerian shoppers arriving from Google Search Ads on smartphones and desktops who want large, clear text, unmistakable product imagery, and immediate proof that they only pay when their order arrives.
 - **Key Value**:
-  - **Higher Google Ads Quality Score & Lower CPC**: Tight message match between search ad keywords and the landing page hero, fast above-the-fold rendering, and transparent supplement disclosures.
-  - **Higher Conversion Rate**: Eliminates multi-page browsing distractions and collapses a 3-step drawer into a single-screen Express POD form with large, senior-friendly inputs.
-  - **End-to-End Attribution**: Captures `gclid` and `utm_*` parameters and fires exact Google Ads conversion events (`view_item_list`, `begin_checkout`, `purchase`, and `contact`).
+  - **Immediate Relevance for Every Visitor**: Whether a shopper needs *Prostate Care*, *Women's Wellness*, or *Sugar Balance*, they see their exact category and oversized bottle imagery right away without scrolling past another condition's featured box.
+  - **Automatic Google Ad Campaign Matching**: Links such as `/ad?condition=prostate` or `/ad?condition=women` still automatically pre-select that category tab and adapt the top headline on arrival, while keeping one-tap access to all other packs right in view.
+  - **Zero Page-Jump Confusion**: With one unified product showcase instead of two competing product sections, tapping any category smoothly updates the cards right in front of the customer.
 
 ---
 
 ## 2. User Experience & Visual Design
 
-### Key User Flows (Proposition → Mechanism → Proof → Conversion)
-
-1. **Arrival & Dynamic Intent Alignment (0–3 Seconds)**:
-   - Visitor lands on `/ad` (or `/ad?condition=prostate`, `/ad?pkg=P001`, `/ad?utm_term=arthritis`).
-   - Sees a clean, single-row **Distraction-Free Clinic Header**: Brand Wordmark (`SD GHT Health Care`) · 4 smooth-scroll section anchors (`Treatments`, `How Delivery Works`, `Patient Stories`, `Quick Order`) · 1 direct action button (`WhatsApp Advisor`).
-   - **Dynamic Split Hero**: Displays a tailored headline matching the URL symptom (or the flagship multi-condition wellness proposition when no parameter is passed), NAFDAC registration trust proof, Free 24–48hr Nationwide Pay-on-Delivery assurance, and a single dominant primary CTA (`Select Your Treatment Plan`) alongside a spotlight preview of the top-matched package.
-2. **Symptom Filtering & Package Course Selection**:
-   - Directly below the hero, an interactive **Symptom Filter Bar** (`All Packages`, `Prostate Care`, `Arthritis & Joints`, `Men's Vitality`, `Blood Sugar`, `Cardio & BP`) filters treatment packages without page reloads.
-   - Each **Clinical Package Card** presents:
-     - High-clarity product kit visual on a clean neutral backdrop (with resilient CSS/SVG clinical fallback if an image is slow on mobile data).
-     - Clear condition title, concise clinical summary, and top 3 targeted symptoms/benefits.
-     - **Interactive Bottle Course Selector** (e.g., `2 Bottles`, `3 Bottles · Recommended`, `4+ Bottles`) that accurately calculates option-level discounts (`opt.discount`), displays tabular Naira pricing (`₦`), and lists the **exact included product names** (e.g., `Prostbeta · Longzit · Ganoderma`) cleanly with zero `1x (3)` clutter.
-     - Primary CTA: **`Order Now — Pay on Delivery`** (opens the 1-Step Express POD Modal pre-filled with that exact package and bottle course) + secondary quiet action (`View Full Clinical Breakdown` modal or `Ask on WhatsApp`).
-3. **Proof & Risk Reversal**:
-   - **3-Step Pay-on-Delivery Assurance Strip**: `01. Place Order Online (₦0 Upfront)` → `02. Fast 24–48hr Doorstep Dispatch Nationwide` → `03. Inspect Package Before Paying Cash or Transfer`.
-   - **Verified Patient Outcomes & Senior FAQ**: Attributable Nigerian patient stories paired adjacent to treatment claims, followed by clear accordion answers on NAFDAC safety, dosage guidance inside every box, and POD inspection rights.
-4. **1-Step Express POD Conversion (Modal + Inline Bottom Form)**:
-   - Whether triggered via a card's **Order Now** button (Express Modal) or scrolled to directly at the bottom of the page (**Inline Express Order Form**), the buyer completes everything on one clean screen:
-     - Selected Package & Bottle Course switcher + Quantity stepper + Live Total Due on Delivery (`₦0` shipping).
-     - `Full Name`, `Active Phone / WhatsApp Number` (validated for Nigerian mobile format), `Full Delivery Street Address & State`, `Nearest Landmark (Optional)`, `Delivery Day` (`Today`, `Tomorrow`, `Choose Date`), and `Payment Method` (`Pay on Delivery` default, or `Bank Transfer` with instant account copy & optional receipt upload).
-   - Submitting posts directly to the backend order pipeline, dispatches instant Telegram + Email alerts (including Google Ads campaign/keyword source if present), fires the Google Ads `purchase` conversion event with exact NGN value, and transitions to the Order Confirmation / Thank-You view with 1-tap WhatsApp priority confirmation.
-
-### Visual Identity & Theme
-
-- **Aesthetic Direction**: *Clinical Pharmacy & Trusted Herbal Authority* — calm, structured, high-trust medical clarity designed for effortless reading on bright mobile screens.
-- **Color Palette & 60-30-10 Distribution**:
-  - **60% Dominant Neutral Canvas**: Crisp White (`#FFFFFF`) and Clinical Off-White (`#F8FAFC`) section alternation.
-  - **30% Structural Surfaces & Ink**: Deep Slate (`#0F172A`) for headlines and prices, Muted Slate (`#475569`) for body copy, and Hairline Slate (`#E2E8F0`) for single-elevation card borders.
-  - **10% High-Intent Accent**: Clinical Emerald (`#059669` default, `#047857` hover, `#ECFDF5` subtle selected tint) strictly reserved for primary Order CTAs, selected bottle tabs, and verified NAFDAC/POD trust indicators. Warm Amber (`#B45309` on `#FFFBEB`) used sparingly only for savings/rebate callouts.
-- **Typography & Hierarchy**:
-  - **Display Headlines**: `Plus Jakarta Sans` (`600`/`700`, tight tracking, `clamp(2rem, 3.8vw, 3.25rem)`, `text-wrap: balance`).
-  - **Body & Form Inputs**: `DM Sans` (`400`/`600`, minimum `16px` on inputs to prevent iOS auto-zoom and aid senior legibility, `1.6` line-height).
-  - **Prices & Bottle Counts**: `tabular-nums` alignment on all Naira figures (`₦59,500`) and rebates.
-- **Overlay & Mobile Sticky Discipline**:
-  - Total sticky height on mobile stays strictly **under 15% of viewport height**: a compact `56px` top bar and a clean `60px` mobile sticky bottom bar (appearing only after scrolling past the hero, showing the selected/featured price + `Quick Order (POD)` jump button). Zero entry popups.
+- **Key User Flows**:
+  1. **Targeted Google Ad Arrival (e.g., Prostate Care or Women's Wellness Ad)**:
+     - Customer lands on `/ad?condition=prostate` and sees the clean top bar, a concise **Prostate Care · Pay ₦0 Online — Pay on Delivery** trust header, and the **Select Your Targeted Herbal Wellness Pack** section already open to **Prostate Care** with large, scaled-up product cards and multi-bottle tier pricing.
+     - If they also want to check something for a spouse or family member, the other category buttons (*Women's Wellness*, *Joints & Mobility*, *Sugar Balance*, *All Wellness Packs*) sit right above the cards.
+  2. **General Ad Arrival (`/ad`)**:
+     - Customer lands on **All Wellness Packs** with a clear trust promise at the top and every health-goal button immediately visible on the first screen.
+     - Selecting a 1-Bottle, 2-Bottle, or 3-Bottle option on any card highlights the configured admin price and opens the Pay-on-Delivery order modal (or pre-fills the Express Order form below) in one tap.
+- **Visual Identity & Theme**:
+  - *Aesthetic Direction*: Clean clinical apothecary and editorial wellness—authoritative, warm, and effortless for adult eyes to read.
+  - *Color Palette & Mood*: 60% crisp clinical light canvas (`#FAFBF9` / `#FFFFFF`), 30% soft sage-tinted structural surfaces (`#F2F5F3`, subtle `#DCE5E0` borders, deep `#0F1F18` ink), and 10% medical emerald (`#047857`) reserved strictly for active category tabs and primary Pay-on-Delivery buttons.
+  - *Typography & Hierarchy*: Balanced editorial display headline in the compact top banner, paired with generous `16px–18px` readable adult body copy and aligned tabular numerals on all Naira prices and multi-bottle savings.
+  - *Component Styling & Layout*:
+    - **Strict 3-Zone Top Bar**: Brand wordmark | 4 clean section links (*Wellness Packs · How Delivery Works · Reviews · Order Form*) | 1 primary *Order on Delivery* button.
+    - **Compact Above-the-Fold Trust Banner**: Slim header stating the campaign headline and core buyer assurances (*24–48h Nationwide Delivery · Pay ₦0 Upfront · 100% Authentic NAFDAC-Registered Formulas · Pharmacist Support*) as clean, unboxed text.
+    - **Oversized Adult Package Cards as Centerpiece**: Each card leads with a prominent, high-clarity studio product image (`65%–70%` visual prominence), concise truncated admin description with an optional *"Read more"*, clear multi-bottle tier buttons with discounted admin prices, and a full-width **Order on Delivery** button.
+- **Interactive Feedback & Motion**:
+  - Instant (`≤ 150ms`) category filtering in place with zero unexpected page scrolling, paired with a helpful status line (*"Showing X wellness packs for Prostate Care — Show All Wellness Packs"*).
+  - Lightweight mobile sticky bottom bar (`≤ 15%` screen height) always reflects the package currently selected by the customer for effortless one-thumb ordering.
 
 ---
 
 ## 3. Key Product Decisions & Trade-Offs
 
-- **Decision 1: Single-Screen 1-Step Express POD Checkout vs. Multi-Step Wizard**
-  - *Chosen Approach*: Consolidate package/option selection, customer contact, delivery address, and POD confirmation into a single scannable 1-step form (available both as an instant modal when clicking any package and inline at the bottom of `/ad`).
-  - *Why*: Paid search mobile traffic drops off 25–40% per extra wizard step. Keeping Pay-on-Delivery selected by default lets a buyer complete an order in under 35 seconds.
-  - *Alternatives Considered*: Keeping the 3-step drawer — rejected for `/ad` because hidden steps create uncertainty about upfront payment requirements.
-- **Decision 2: Dynamic URL Intent Matching + Client-Side Symptom Tabs**
-  - *Chosen Approach*: Read URL query parameters (`condition`, `symptom`, `pkg`, `utm_term`, `kw`) on load to dynamically customize the hero headline and pin matching packages first, while keeping all other packages accessible via 1-tap symptom filter tabs.
-  - *Why*: Allows running multiple tightly targeted Google Ads ad groups (e.g., Prostate Ad Group → `/ad?condition=prostate`, Arthritis Ad Group → `/ad?condition=arthritis`) against one unified `/ad` URL structure without maintaining 10 separate pages.
-  - *Alternatives Considered*: Separate static routes per illness — harder to maintain and prevents cross-selling to patients with multiple age-related concerns (e.g., blood sugar + joint stiffness).
-- **Decision 3: Google Ads Healthcare Policy Safe-Framing & Dedicated Chrome**
-  - *Chosen Approach*: Hide global site navigation and developer showcase widgets when `/ad` is active, use NAFDAC-compliant wellness support language, and include inline modal/drawer access to Return Policy & Supplement Disclaimers so visitors can verify policies without leaving `/ad`.
-  - *Why*: Prevents both ad disapprovals by Google's automated healthcare policy reviewers and paid-click leakage into non-converting pages.
+- **Decision 1: Combine a Compact Trust Banner with Immediate Category & Product Selection**
+  - *Chosen Approach*: Replace both the old **Quick Jump** bar and the oversized single-product Hero box with a slim **Trust & Pay-on-Delivery Headline Banner** followed immediately by **Select Your Targeted Herbal Wellness Pack**.
+  - *Why*: Cold visitors from Google Ads still need 2 seconds of reassurance (*Genuine NAFDAC-Registered · Pay Only on Delivery*) before looking at prices, while elevating the catalog immediately underneath puts your big product cards and category buttons front and center without duplicating anything down the page.
+  - *Alternatives Considered*:
+    - *Putting the catalog above the existing giant single-product Hero*: Rejected because customers would browse all products first and then scroll into a giant box repeating one product underneath ("upside-down page").
+    - *Removing all trust headlines above the catalog*: Rejected because showing raw price cards with zero headline or Pay-on-Delivery assurance reduces trust for first-time adult buyers from Google Ads.
+- **Decision 2 (Plain-English Summary): Keep Page Position Steady When Customers Switch Categories**
+  - *Chosen Approach*: Tapping any health category button (*Prostate Care*, *Women's Wellness*, etc.) updates **only** the package cards right in front of the customer's eyes and updates the bottom quick-order bar to match—never resizing or swapping content above where they are reading.
+  - *Why*: When content *above* a reader changes height, the screen suddenly jumps up or down and makes older shoppers lose their place. By having **one single product catalog** right below the slim trust banner, switching categories feels calm, predictable, and instant.
 
 ---
 
 ## 4. Technical Architecture & Data Strategy *(Technical Reference)*
 
-### Architecture & Component Diagram
+- **Page Flow Comparison Diagram**:
 
 ```text
-┌──────────────────────────────────────────────────────────────────────────────┐
-│                     Google Ads Visitor  (/ad?condition=...&gclid=...)        │
-└───────────────────────────────────────┬──────────────────────────────────────┘
-                                        │
-                                        ▼
-┌──────────────────────────────────────────────────────────────────────────────┐
-│                  Root App Shell  (Ad Funnel Isolation Mode)                  │
-│  • Suppresses global site nav, global footer, and floating portfolio badge   │
-│  • Captures & persists gclid / utm_* attribution in session storage          │
-│  • Syncs dynamic document <title> & meta description to matched symptom      │
-└───────────────────────────────────────┬──────────────────────────────────────┘
-                                        │
-                                        ▼
-┌──────────────────────────────────────────────────────────────────────────────┐
-│                       Dedicated Ad Landing Funnel View                       │
-├───────────────────────┬───────────────────────────┬──────────────────────────┤
-│  1. Ad Top Bar &      │  2. Symptom Filter &      │  3. Proof,POD Steps,     │
-│     Dynamic Split     │     Clinical Package      │     FAQ & Policy         │
-│     Hero              │     Grid                  │     Compliance Footer    │
-│  • Intent-matched H1  │  • Segmented symptom tabs │  • 3-step POD timeline   │
-│  • NAFDAC + POD proof │  • Accurate opt.discount  │  • Attributable reviews  │
-│  • Spotlight package  │  • Clean included items   │  • Inline policy viewer  │
-└───────────┬───────────┴─────────────┬─────────────┴────────────┬─────────────┘
-            │                         │                          │
-            └─────────────────────────┼──────────────────────────┘
-                                      ▼
-┌──────────────────────────────────────────────────────────────────────────────┐
-│           Unified 1-Step Express POD Checkout Engine (Modal + Inline)        │
-│  • Package & Bottle Course selector + Quantity stepper + Tabular NGN total   │
-│  • Validated fields: Name, NG Phone, Address/State, Delivery Day, POD/Bank   │
-└───────────────────┬────────────────────────────────────┬─────────────────────┘
-                    │                                    │
-                    ▼                                    ▼
-┌───────────────────────────────────────┐  ┌───────────────────────────────────┐
-│   Backend Order & Dispatch Pipeline   │  │   Google Tag & Conversion Layer   │
-│  • POST /api/orders (Supabase + RLS)  │  │  • view_item_list / select_item   │
-│  • Clean SKU & included product list  │  │  • begin_checkout (with value)    │
-│  • Telegram & SMTP instant alerts     │  │  • purchase (NGN value + tx ID)   │
-│    with UTM/GCLID campaign metadata   │  │  • contact (WhatsApp lead click)  │
-└───────────────────────────────────────┘  └───────────────────────────────────┘
+CURRENT LAYOUT (Duplicate Bars)          TRAP TO AVOID (Upside-Down)          RECOMMENDED LAYOUT (Clean & Direct)
+┌──────────────────────────────┐         ┌──────────────────────────────┐     ┌────────────────────────────────────┐
+│ 1. Top Header                │         │ 1. Top Header                │     │ 1. Clean 3-Zone Top Header         │
+├──────────────────────────────┤         ├──────────────────────────────┤     ├────────────────────────────────────┤
+│ 2. ❌ Quick Jump Categories  │──┐      │ 2. Wellness Pack Catalog     │     │ 2. Compact Trust & POD Banner      │
+├──────────────────────────────┤  │ Same │    (All Categories & Cards)  │     │    • Ad-Matched Headline           │
+│ 3. Giant 1-Product Hero Box  │  │ Tabs ├──────────────────────────────┤     │    • NAFDAC · ₦0 Upfront · 24–48h  │
+├──────────────────────────────┤  │      │ 3. ❌ Giant 1-Product Hero   │     ├────────────────────────────────────┤
+│ 4. ❌ Wellness Pack Catalog  │◀─┘      │    (Repeats a bottle after   │     │ 3. ✅ Select Your Targeted Herbal  │
+│    (Same Categories Again!)  │         │     buyer already browsed!)  │     │    Wellness Pack (Above the Fold!) │
+└──────────────────────────────┘         └──────────────────────────────┘     │    • Single Large Category Bar     │
+                                                                              │    • Big Attention-Grabbing Cards  │
+                                                                              │    • Admin Multi-Bottle Discounts  │
+                                                                              ├────────────────────────────────────┤
+                                                                              │ 4. Delivery Steps · Reviews · Form │
+                                                                              └────────────────────────────────────┘
 ```
 
-### Data Model & State
-
-- **Ad Attribution Store (`sessionStorage`)**: Captures `gclid`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_term`, and `condition` on initial landing so attribution persists even if the user scrolls, filters tabs, or switches options before ordering.
-- **Dynamic Intent Matcher**: Maps URL keywords (`prostate`, `arthritis`, `joint`, `diabetes`, `sugar`, `erection`, `vitality`, `fertility`, `fibroid`, `bp`, `hypertension`, or specific `package_code` like `P001`) to curated, Google-compliant hero copy and auto-selects the matching symptom filter tab.
-- **Selected Checkout State**: Tracks `{ selectedPackage, selectedOptionIndex, quantity, checkoutMode: 'modal' | 'inline', customerForm, validationErrors, submissionStatus }`, computing effective unit and total prices accurately from `option.price * (1 - (option.discount || 0) / 100)` or fallback `package.price * (1 - (package.discount || 0) / 100)`.
-
-### Interactive Component & State Mapping
-
-- **Symptom Filter Tabs**: Clicking a tab updates `activeCategory`, filtering combined packages and combos in real time with a zero-empty-state fallback (if a niche tab has no exact match, displays all recommended packages with a clear notice).
-- **Package Course Option Buttons**: Clicking `2 Bottles`, `3 Bottles`, or `4+ Bottles` on any card updates that card's selected option index, recalculates the displayed Naira price and savings percentage, updates the clean included-products list, and passes that exact index into the Express POD Checkout when `Order Now` is clicked.
-- **Express 1-Step Checkout Validation & Submission**:
-  - Validates non-empty customer name, valid 10–14 digit phone number, and street/state delivery address with inline field-level error messages (never silent failures or browser `window.alert`).
-  - Supports both `Pay on Delivery` (default, 1-click submit) and `Bank Transfer` (reveals copyable corporate account number + optional receipt upload via `/api/upload-receipt`).
-  - On success: fires `trackOrderComplete` with exact NGN value and order reference, then redirects cleanly to `/thank-you` (or renders an instant confirmation receipt with 1-tap WhatsApp order confirmation).
-- **Inline Policy Modal**: Clicking `Return & Refund Policy` or `Medical Disclaimer` in the `/ad` footer opens a clean overlay modal so visitors (and Google Ads reviewers) can inspect full policies without navigating away from `/ad`.
+- **Data & Pricing Integrity**:
+  - **Live Backend Connection Preserved**: Continues loading all active packages, single bottles, configured Naira prices, multi-bottle tier discounts, health benefits, descriptions, and product images directly from your configured admin database without touching the main store workflow.
+  - **URL Campaign Detection**: Reads incoming Google Ads link parameters (`condition`, `symptom`, or search keywords) on page load to customize the compact top banner headline and pre-select the matching category tab automatically.
+- **Interactive Controls & Checkout Synchronization**:
+  - **Category Filter Bar**: Large, high-contrast adult touch buttons (`48px–52px` tall) with item counts filter the package grid instantly, support *Single Bottles* switching, and provide a one-tap *"Show All Wellness Packs"* reset.
+  - **Express Order & Sticky Bar Sync**: Selecting a category or choosing a 1-, 2-, or 3-bottle tier on a package card automatically updates the bottom Express Pay-on-Delivery order form and mobile sticky bar so the customer's chosen pack and discounted admin price carry straight into checkout.
