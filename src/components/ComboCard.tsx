@@ -5,7 +5,7 @@ import { PackageData, Product } from "../types";
 import { CONFIG } from "../config";
 import { PackageQuickView } from "./PackageQuickView";
 import { getOptimizedImageUrl } from "../utils/cloudinary";
-import { buildWhatsAppUrl } from "../utils/whatsapp";
+import { buildWhatsAppUrl, useCompanyWhatsApp } from "../utils/whatsapp";
 
 interface ComboCardProps {
   data: PackageData;
@@ -18,6 +18,7 @@ export const ComboCard: React.FC<ComboCardProps> = ({ data, onOrder, onProductCl
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
   const [showFullBenefits, setShowFullBenefits] = useState(false);
   const [carouselIndex, setCarouselIndex] = useState(0);
+  const { whatsappTarget } = useCompanyWhatsApp();
 
   const handleQuickView = () => {
     if (onQuickView) {
@@ -205,7 +206,7 @@ export const ComboCard: React.FC<ComboCardProps> = ({ data, onOrder, onProductCl
             <div className="flex items-center gap-4">
               <a
                 href={buildWhatsAppUrl(
-                  CONFIG.whatsapp.number,
+                  whatsappTarget,
                   `Hello SD GHT Health Care, I am interested in the ${data.name} master kit. Could you please provide more information on how I can place an order?`
                 )}
                 target="_blank"

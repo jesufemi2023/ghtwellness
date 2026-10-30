@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { Product, PackageData } from '../types';
 import { CONFIG } from '../config';
-import { buildWhatsAppUrl } from '../utils/whatsapp';
+import { buildWhatsAppUrl, useCompanyWhatsApp } from '../utils/whatsapp';
 import {
   SymptomCategory,
   captureAndPersistAdAttribution,
@@ -551,6 +551,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
   onOrderSuccess,
 }) => {
   const adIntent = useMemo(() => resolveAdIntent(), []);
+  const { whatsappTarget, contactPhone } = useCompanyWhatsApp();
 
   const allBundles = useMemo(() => {
     const map = new Map<string, PackageData>();
@@ -787,7 +788,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
     const message = customSubject
       ? `Hello ${CONFIG.company.name}, I am visiting your Wellness Packs page and would like guidance on ${customSubject}.`
       : `Hello ${CONFIG.company.name}, I would like guidance on choosing the right GHT herbal wellness pack with Pay on Delivery.`;
-    return buildWhatsAppUrl(CONFIG.whatsapp.number, message);
+    return buildWhatsAppUrl(whatsappTarget, message);
   };
 
   const recordAdvisorWhatsAppClick = (contextLabel: string) => {
@@ -975,11 +976,11 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
               </a>
 
               <a
-                href={`tel:${CONFIG.company.phone.replace(/\s+/g, '')}`}
+                href={`tel:${contactPhone.replace(/\s+/g, '')}`}
                 className="inline-flex items-center gap-1.5 text-[14.5px] sm:text-[15.5px] text-[#C8DDD2] hover:text-white transition-colors py-1 sm:pl-1 tabular-nums whitespace-nowrap"
               >
                 <Phone className="w-4 h-4 text-[#95E4B9] shrink-0" />
-                <span>Call {CONFIG.company.phone}</span>
+                <span>Call {contactPhone}</span>
               </a>
             </div>
           </div>
@@ -1819,7 +1820,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                       </div>
                       <div className="flex items-center gap-2.5">
                         <Clock className="w-4 h-4 text-[#047857] shrink-0" />
-                        <span>Specialist Line: {CONFIG.company.phone}</span>
+                        <span>Specialist Line: {contactPhone}</span>
                       </div>
                     </div>
                   </div>
@@ -1898,10 +1899,10 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
               <div className="flex items-center gap-2.5 text-[#C8DDD2]">
                 <Phone className="w-4 h-4 text-[#95E4B9] shrink-0" />
                 <a
-                  href={`tel:${CONFIG.company.phone.replace(/\s+/g, '')}`}
+                  href={`tel:${contactPhone.replace(/\s+/g, '')}`}
                   className="hover:text-white tabular-nums"
                 >
-                  {CONFIG.company.phone}
+                  {contactPhone}
                 </a>
               </div>
               <div className="flex items-center gap-2.5 text-[#C8DDD2]">

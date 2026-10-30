@@ -1,14 +1,15 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { CONFIG } from '../config';
-import { buildWhatsAppUrl } from '../utils/whatsapp';
+import { buildWhatsAppUrl, useCompanyWhatsApp } from '../utils/whatsapp';
 
 export function WhatsAppButton() {
-  const { number, defaultMessage } = CONFIG.whatsapp;
+  const { defaultMessage } = CONFIG.whatsapp;
+  const { whatsappTarget } = useCompanyWhatsApp();
 
-  if (!number) return null;
+  if (!whatsappTarget) return null;
 
-  const whatsappHref = buildWhatsAppUrl(number, defaultMessage);
+  const whatsappHref = buildWhatsAppUrl(whatsappTarget, defaultMessage);
 
   return (
     <motion.a

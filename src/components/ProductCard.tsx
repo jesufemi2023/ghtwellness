@@ -3,7 +3,7 @@ import { Star, ShieldCheck, ChevronRight, CheckCircle2, Globe, Leaf, Activity, A
 import { CONFIG } from '../config';
 import { Product } from '../types';
 import { getOptimizedImageUrl } from '../utils/cloudinary';
-import { buildWhatsAppUrl } from '../utils/whatsapp';
+import { buildWhatsAppUrl, useCompanyWhatsApp } from '../utils/whatsapp';
 
 interface ProductCardProps {
   product: Product;
@@ -13,6 +13,7 @@ interface ProductCardProps {
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, onOrder }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const { whatsappTarget } = useCompanyWhatsApp();
 
   return (
     <div 
@@ -196,7 +197,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
           <div className="flex items-center gap-2">
             <a
               href={buildWhatsAppUrl(
-                CONFIG.whatsapp.number,
+                whatsappTarget,
                 `Hello SD GHT Health Care, I am interested in ${product.name}. Could you please provide more information on how I can place an order?`
               )}
               target="_blank"

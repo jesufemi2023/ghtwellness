@@ -41,6 +41,8 @@ import { BlogAdmin } from "./blog/BlogAdmin";
 import { getOptimizedImageUrl } from "../utils/cloudinary";
 import { formatProductNameWithBottles, formatOptionProductList } from "../utils/bottleFormatter";
 import { CacheService } from "../utils/cache";
+import { CONFIG } from "../config";
+import { buildWhatsAppUrl, updateCachedWhatsAppSettings } from "../utils/whatsapp";
 
 interface AdminDashboardProps {
   adminPassword: string;
@@ -1254,6 +1256,8 @@ const QuickAction = ({ icon: Icon, label }: any) => (
 
 const SettingsAdminView = ({ adminPassword }: { adminPassword: string }) => {
   const [settings, setSettings] = useState<any>({
+    whatsapp_number: "",
+    contact_phone: "",
     bank_name: "",
     account_number: "",
     account_name: "",
@@ -1307,6 +1311,10 @@ const SettingsAdminView = ({ adminPassword }: { adminPassword: string }) => {
           } else {
             localStorage.removeItem("google_conversion_label_cache");
           }
+          updateCachedWhatsAppSettings(
+            settings.whatsapp_number ? String(settings.whatsapp_number) : "",
+            settings.contact_phone ? String(settings.contact_phone) : ""
+          );
         }
         setMessage("Settings saved successfully!");
         setTimeout(() => setMessage(""), 3000);
@@ -1328,6 +1336,60 @@ const SettingsAdminView = ({ adminPassword }: { adminPassword: string }) => {
     <div className="max-w-2xl mx-auto space-y-8">
       <div className="bg-white rounded-3xl border border-slate-200 p-8 shadow-sm space-y-8">
         <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-xl font-black text-slate-900 tracking-tight">WhatsApp &amp; Phone Support Line</h3>
+            <p className="text-xs text-slate-500 font-medium mt-0.5">
+              Updates all &ldquo;Chat with us&rdquo; buttons across iPhone, Android &amp; Desktop immediately without redeploying Vercel.
+            </p>
+          </div>
+          <LinkIcon className="text-emerald-500 shrink-0" size={24} />
+        </div>
+
+        <div className="space-y-5">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between gap-2 ml-1">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                Active WhatsApp Number OR Business Short Link
+              </label>
+              <a
+                href={buildWhatsAppUrl(
+                  settings.whatsapp_number || CONFIG.whatsapp.number,
+                  "Hello, testing our live WhatsApp support link."
+                )}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[10px] font-black text-emerald-700 hover:text-emerald-800 underline uppercase tracking-wider"
+              >
+                Test Link ↗
+              </a>
+            </div>
+            <input
+              type="text"
+              value={settings.whatsapp_number || ""}
+              onChange={e => setSettings({ ...settings, whatsapp_number: e.target.value })}
+              className="w-full h-14 bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 font-bold text-slate-900 focus:border-emerald-500 outline-none transition-all font-mono text-sm"
+              placeholder={`Default env: ${CONFIG.whatsapp.number} (or paste https://wa.me/message/...)`}
+            />
+            <p className="text-[11px] text-slate-500 font-medium leading-relaxed pl-1">
+              Enter an active WhatsApp phone number (e.g. <code className="font-bold text-slate-700">07060734773</code>) <strong>OR</strong> paste your official WhatsApp Business Short Link (<code className="font-bold text-slate-700">https://wa.me/message/...</code> from WhatsApp Business → Settings → Business Tools → Short Link). Leave blank to use Vercel <code className="font-bold text-slate-700">VITE_WHATSAPP_NUMBER</code>.
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
+              Display Call Phone Number (Optional Override)
+            </label>
+            <input
+              type="text"
+              value={settings.contact_phone || ""}
+              onChange={e => setSettings({ ...settings, contact_phone: e.target.value })}
+              className="w-full h-14 bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 font-bold text-slate-900 focus:border-emerald-500 outline-none transition-all"
+              placeholder={`Default env: ${CONFIG.company.phone}`}
+            />
+          </div>
+        </div>
+
+        <div className="border-t border-slate-100 pt-8 flex items-center justify-between">
           <h3 className="text-xl font-black text-slate-900 tracking-tight">Bank Transfer Details</h3>
           <Settings className="text-slate-300" size={24} />
         </div>

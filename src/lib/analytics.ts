@@ -12,10 +12,14 @@ import {
   trackGoogleTagEvent,
   trackGoogleAdsConversion
 } from "./googleTag";
+import { initWhatsAppSettings } from "../utils/whatsapp";
 
 const MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
 
 export const initGA = () => {
+  // Synchronize live WhatsApp & Contact Phone settings from /api/settings
+  initWhatsAppSettings();
+
   // Initialize Google Analytics
   if (MEASUREMENT_ID && MEASUREMENT_ID !== "G-XXXXXXXXXX") {
     ReactGA.initialize(MEASUREMENT_ID);

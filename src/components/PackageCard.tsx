@@ -4,7 +4,7 @@ import { CONFIG } from '../config';
 import { PackageQuickView } from './PackageQuickView';
 import { PackageData, Product } from '../types';
 import { getOptimizedImageUrl } from '../utils/cloudinary';
-import { buildWhatsAppUrl } from '../utils/whatsapp';
+import { buildWhatsAppUrl, useCompanyWhatsApp } from '../utils/whatsapp';
 
 interface PackageCardProps {
   data: PackageData;
@@ -18,6 +18,7 @@ export const PackageCard: React.FC<PackageCardProps> = ({ data, allPackages, onO
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [isExpanded, setIsExpanded] = useState(false);
+  const { whatsappTarget } = useCompanyWhatsApp();
   const discountedPrice = data.price * (1 - (data.discount / 100));
 
   const handleQuickView = () => {
@@ -207,7 +208,7 @@ export const PackageCard: React.FC<PackageCardProps> = ({ data, allPackages, onO
             <div className="flex items-center gap-2">
               <a
                 href={buildWhatsAppUrl(
-                  CONFIG.whatsapp.number,
+                  whatsappTarget,
                   `Hello SD GHT Health Care, I am interested in the ${data.name} package. Could you please provide more information on how I can place an order?`
                 )}
                 target="_blank"
