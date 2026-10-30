@@ -3,7 +3,7 @@ import { Star, ShieldCheck, ChevronRight, CheckCircle2, Globe, Leaf, Activity, A
 import { CONFIG } from '../config';
 import { Product } from '../types';
 import { getOptimizedImageUrl } from '../utils/cloudinary';
-import { openWhatsAppLink } from '../utils/whatsapp';
+import { buildWhatsAppUrl } from '../utils/whatsapp';
 
 interface ProductCardProps {
   product: Product;
@@ -194,17 +194,19 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
         {/* Action Buttons - Refined Size */}
         <div className="pt-0.5 flex flex-col gap-2">
           <div className="flex items-center gap-2">
-            <button 
-              onClick={(e) => {
-                e.stopPropagation();
-                const message = `Hello SD GHT Health Care, I am interested in ${product.name}. Could you please provide more information on how I can place an order?`;
-                openWhatsAppLink(CONFIG.whatsapp.number, message);
-              }}
+            <a
+              href={buildWhatsAppUrl(
+                CONFIG.whatsapp.number,
+                `Hello SD GHT Health Care, I am interested in ${product.name}. Could you please provide more information on how I can place an order?`
+              )}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
               className="flex-1 bg-white border border-slate-200 text-slate-600 py-2 md:py-2.5 rounded-lg md:rounded-xl font-black text-[10px] md:text-xs hover:bg-slate-50 transition-all flex items-center justify-center gap-1.5 uppercase tracking-widest"
             >
               <Phone size={14} className="text-emerald-600" />
               Chat with us
-            </button>
+            </a>
             <button 
               onClick={(e) => {
                 e.stopPropagation();

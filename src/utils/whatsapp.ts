@@ -6,28 +6,38 @@ import { CONFIG } from "../config";
  * Optimized specifically for Nigerian numbers (+234) and standard international formatting.
  */
 export const cleanWhatsAppNumber = (phoneNumber?: string): string => {
-  if (!phoneNumber) return "2347060734773";
-  
-  // 1. Remove all non-digits
-  let digits = phoneNumber.replace(/\D/g, "");
+  const fallbackRaw = CONFIG?.whatsapp?.number || "2347060734773";
+  const source = (phoneNumber || fallbackRaw).trim();
 
-  // If number is a placeholder or too short, fallback to business number
+  // If multiple numbers were accidentally entered (comma/slash/pipe separated), take the primary one
+  const primarySegment = source.split(/[,/|]/)[0] || source;
+
+  // 1. Remove all non-digits (strips +, spaces, quotes, hyphens, parentheses, invisible chars)
+  let digits = primarySegment.replace(/\D/g, "");
+
+  // If number is a placeholder or too short, fallback to configured business number
   if (!digits || digits.includes("123456789") || digits.length < 8) {
-    return CONFIG?.whatsapp?.number ? CONFIG.whatsapp.number.replace(/\D/g, "") : "2347060734773";
+    const cleanFallback = fallbackRaw.split(/[,/|]/)[0].replace(/\D/g, "");
+    digits = cleanFallback && cleanFallback.length >= 8 ? cleanFallback : "2347060734773";
   }
 
   // 2. Handle Nigerian number edge cases
-  // Nigeria country code: 234. Local numbers always start with 0 (e.g. 07060734773).
-  // A very common mistake is entering "+234 (0) 706 073 4773" or "23407060734773".
-  // WhatsApp will fail with "link could not be opened" if there is a '0' right after '234'.
-  if (digits.startsWith("2340")) {
+  // Remove leading international '00' prefix if entered as 00234...
+  if (digits.startsWith("00")) {
+    digits = digits.substring(2);
+  }
+
+  // Common mistake: "+234 (0) 904 775 2410" -> "23409047752410"
+  if (digits.startsWith("2340") && digits.length === 14) {
+    digits = "234" + digits.substring(4);
+  } else if (digits.startsWith("2340")) {
     digits = "234" + digits.substring(4);
   }
-  // If user entered a local Nigerian number like "07060734773" (11 digits, starts with 0)
+  // Local Nigerian 11-digit number like "09047752410" -> "2349047752410"
   else if (digits.startsWith("0") && digits.length === 11) {
     digits = "234" + digits.substring(1);
   }
-  // If user entered local number without leading 0 or country code (10 digits, starts with 7, 8, or 9)
+  // Local Nigerian 10-digit number without leading 0 like "9047752410" -> "2349047752410"
   else if (digits.length === 10 && /^[789]/.test(digits)) {
     digits = "234" + digits;
   }
@@ -36,64 +46,63 @@ export const cleanWhatsAppNumber = (phoneNumber?: string): string => {
 };
 
 /**
- * Opens a WhatsApp link in a way that is highly compatible with all browsers and devices,
- * especially iOS (iPhone Safari), and handles iframe constraints seamlessly.
- * 
- * Key optimizations for iPhone/iOS:
- * 1. Uses 'https://wa.me' with cleaned E.164 phone numbers to guarantee native
- *    iOS Universal Links registration and direct WhatsApp app opening.
- * 2. Protects against placeholder/dummy numbers that trigger the iOS WhatsApp error
- *    "This link could not be opened. Check the link and try again."
- * 3. Handles iframe contexts and popup blocker bypassing.
+ * Strict RFC 3986 percent-encoding so characters like apostrophes ('), parentheses (),
+ * and exclamation marks (!) never corrupt mobile iOS/Android WhatsApp deep-link parsers.
+ */
+export const encodeWhatsAppText = (message?: string): string => {
+  if (!message) return "";
+  return encodeURIComponent(message).replace(
+    /[!'()*]/g,
+    (char) => `%${char.charCodeAt(0).toString(16).toUpperCase()}`
+  );
+};
+
+/**
+ * Builds the canonical api.whatsapp.com Click-to-Chat URL (matching the exact endpoint
+ * used by Desktop/Laptop redirects) to avoid iOS 17/18 & mobile WebView `wa.me` Universal Link bugs.
+ */
+export const buildWhatsAppUrl = (phoneNumber?: string, message?: string): string => {
+  const cleanPhone = cleanWhatsAppNumber(phoneNumber || CONFIG?.whatsapp?.number);
+  const encodedText = encodeWhatsAppText(message);
+  if (!encodedText) {
+    return `https://api.whatsapp.com/send/?phone=${cleanPhone}&type=phone_number&app_absent=0`;
+  }
+  return `https://api.whatsapp.com/send/?phone=${cleanPhone}&text=${encodedText}&type=phone_number&app_absent=0`;
+};
+
+/**
+ * Programmatic WhatsApp navigation helper for dynamic forms/modals where a static <a> tag isn't used.
+ * Avoids window.open and uses direct location navigation on mobile browsers outside iframes.
  */
 export const openWhatsAppLink = (phoneNumber: string, message: string) => {
   if (typeof window === "undefined") return;
 
-  // Clean the phone number (using robust international cleaning rules + fallback)
-  const cleanPhone = cleanWhatsAppNumber(phoneNumber || CONFIG?.whatsapp?.number);
-  
-  // Use wa.me for modern, reliable WhatsApp Click-to-Chat that handles Universal Links perfectly on iOS
-  const encodedText = encodeURIComponent(message || "");
-  const url = `https://wa.me/${cleanPhone}?text=${encodedText}`;
-
-  console.log(`[WhatsApp Utility] Initiating redirection for cleaned number ${cleanPhone}: ${url}`);
-
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-
-  // If running inside an iframe
+  const url = buildWhatsAppUrl(phoneNumber, message);
   const inIframe = window.self !== window.top;
+  const isMobile =
+    /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+  if (isMobile && !inIframe) {
+    window.location.assign(url);
+    return;
+  }
 
   try {
     const anchor = document.createElement("a");
     anchor.href = url;
-    // For iOS outside iframe, target="_blank" triggers the Universal Link prompt cleanly
-    anchor.target = inIframe ? "_top" : "_blank";
+    anchor.target = "_blank";
     anchor.rel = "noopener noreferrer";
-    
-    // Append to body, click, and remove
     document.body.appendChild(anchor);
     anchor.click();
-    
     setTimeout(() => {
       try {
         document.body.removeChild(anchor);
-      } catch (e) {
+      } catch {
         // Ignored
       }
     }, 200);
-  } catch (error) {
-    console.error("[WhatsApp Utility] Anchor click failed, falling back:", error);
-    try {
-      if (inIframe) {
-        window.top!.location.href = url;
-      } else if (isIOS) {
-        window.location.href = url;
-      } else {
-        window.open(url, "_blank", "noopener,noreferrer");
-      }
-    } catch (e2) {
-      window.location.href = url;
-    }
+  } catch {
+    window.location.assign(url);
   }
 };

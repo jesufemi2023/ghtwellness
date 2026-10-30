@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { Product, PackageData } from '../types';
 import { CONFIG } from '../config';
-import { openWhatsAppLink } from '../utils/whatsapp';
+import { buildWhatsAppUrl } from '../utils/whatsapp';
 import {
   SymptomCategory,
   captureAndPersistAdAttribution,
@@ -783,12 +783,19 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
     });
   };
 
-  const handleAdvisorWhatsApp = (contextLabel: string, customSubject?: string) => {
-    trackWhatsAppClick(contextLabel);
+  const getAdvisorWhatsAppHref = (customSubject?: string): string => {
     const message = customSubject
       ? `Hello ${CONFIG.company.name}, I am visiting your Wellness Packs page and would like guidance on ${customSubject}.`
       : `Hello ${CONFIG.company.name}, I would like guidance on choosing the right GHT herbal wellness pack with Pay on Delivery.`;
-    openWhatsAppLink(CONFIG.whatsapp.number, message);
+    return buildWhatsAppUrl(CONFIG.whatsapp.number, message);
+  };
+
+  const recordAdvisorWhatsAppClick = (contextLabel: string) => {
+    try {
+      trackWhatsAppClick(contextLabel);
+    } catch {
+      // Never block native WhatsApp link navigation if analytics fails
+    }
   };
 
   const defaultBundleOptIdx = defaultBundle ? getPkgOptionIdx(defaultBundle) : 0;
@@ -956,14 +963,16 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                 <ArrowDown className="w-4 h-4 text-[#047857] shrink-0" />
               </button>
 
-              <button
-                type="button"
-                onClick={() => handleAdvisorWhatsApp('Ad Hero Specialist')}
+              <a
+                href={getAdvisorWhatsAppHref()}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => recordAdvisorWhatsAppClick('Ad Hero Specialist')}
                 className="min-h-[48px] sm:min-h-[52px] px-4 sm:px-5 py-2.5 rounded-xl border border-white/25 bg-white/[0.07] hover:bg-white/[0.14] text-[#FAF9F5] text-[15px] sm:text-[16px] font-medium transition-colors inline-flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer"
               >
                 <MessageCircle className="w-[18px] h-[18px] text-[#95E4B9] shrink-0" />
                 <span>Speak with a Specialist</span>
-              </button>
+              </a>
 
               <a
                 href={`tel:${CONFIG.company.phone.replace(/\s+/g, '')}`}
@@ -1128,19 +1137,18 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                 Showing all available multi-bottle wellness packs below. Need personal guidance for
                 your specific wellness goal? Chat directly with our specialist.
               </p>
-              <button
-                type="button"
-                onClick={() =>
-                  handleAdvisorWhatsApp(
-                    'Ad Category Fallback',
-                    SYMPTOM_TABS.find((t) => t.id === activeFilter)?.label
-                  )
-                }
+              <a
+                href={getAdvisorWhatsAppHref(
+                  SYMPTOM_TABS.find((t) => t.id === activeFilter)?.label
+                )}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => recordAdvisorWhatsAppClick('Ad Category Fallback')}
                 className="min-h-[48px] px-5 py-2.5 rounded-xl bg-[#047857] hover:bg-[#065F46] text-white text-[15px] sm:text-base font-semibold whitespace-nowrap shrink-0 cursor-pointer flex items-center justify-center gap-2"
               >
                 <MessageCircle className="w-4 h-4 shrink-0" />
                 <span>Chat with us</span>
-              </button>
+              </a>
             </div>
           )}
 
@@ -1403,19 +1411,20 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                             <span>Order on Delivery</span>
                           </button>
 
-                          <button
-                            type="button"
+                          <a
+                            href={getAdvisorWhatsAppHref(
+                              `${pkg.name}${pricing.activeOption ? ` (${pricing.activeOption.bottles})` : ''}`
+                            )}
+                            target="_blank"
+                            rel="noopener noreferrer"
                             onClick={() =>
-                              handleAdvisorWhatsApp(
-                                `Ad Package Card Chat: ${pkg.name}`,
-                                `${pkg.name}${pricing.activeOption ? ` (${pricing.activeOption.bottles})` : ''}`
-                              )
+                              recordAdvisorWhatsAppClick(`Ad Package Card Chat: ${pkg.name}`)
                             }
                             className="sm:col-span-2 md:col-span-1 xl:col-span-2 min-h-[50px] sm:min-h-[54px] px-4 py-3 rounded-2xl border border-[#BBD6C8] bg-[#F4FAF7] hover:bg-[#E7F4ED] text-[#065F46] font-semibold text-[15.5px] sm:text-[16px] transition-colors flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer"
                           >
                             <MessageCircle className="w-[18px] h-[18px] shrink-0" />
                             <span>Chat with us</span>
-                          </button>
+                          </a>
                         </div>
                       </div>
                     </div>
@@ -1565,19 +1574,20 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                             <span>Order on Delivery</span>
                           </button>
 
-                          <button
-                            type="button"
+                          <a
+                            href={getAdvisorWhatsAppHref(
+                              `${prod.name}${pricing.activeOption ? ` (${pricing.activeOption.bottles})` : ''}`
+                            )}
+                            target="_blank"
+                            rel="noopener noreferrer"
                             onClick={() =>
-                              handleAdvisorWhatsApp(
-                                `Ad Single Bottle Card Chat: ${prod.name}`,
-                                `${prod.name}${pricing.activeOption ? ` (${pricing.activeOption.bottles})` : ''}`
-                              )
+                              recordAdvisorWhatsAppClick(`Ad Single Bottle Card Chat: ${prod.name}`)
                             }
                             className="w-full min-h-[48px] px-4 py-2.5 rounded-xl border border-[#BBD6C8] bg-[#F4FAF7] hover:bg-[#E7F4ED] text-[#065F46] font-semibold text-[15.5px] transition-colors flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer"
                           >
                             <MessageCircle className="w-[18px] h-[18px] shrink-0" />
                             <span>Chat with us</span>
-                          </button>
+                          </a>
                         </div>
                       </div>
                     </div>
@@ -1983,17 +1993,19 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
               </div>
             </div>
             <div className="flex items-center gap-2 shrink-0">
-              <button
-                type="button"
+              <a
+                href={getAdvisorWhatsAppHref(mobileBarItem.name)}
+                target="_blank"
+                rel="noopener noreferrer"
                 onClick={() =>
-                  handleAdvisorWhatsApp(`Ad Sticky Bar Chat: ${mobileBarItem.name}`, mobileBarItem.name)
+                  recordAdvisorWhatsAppClick(`Ad Sticky Bar Chat: ${mobileBarItem.name}`)
                 }
                 aria-label="Chat with us on WhatsApp"
                 className="min-h-[42px] px-3 py-2 rounded-xl border border-[#BBD6C8] bg-[#F4FAF7] hover:bg-[#E7F4ED] text-[#065F46] font-semibold text-xs sm:text-sm flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer"
               >
                 <MessageCircle className="w-4 h-4 shrink-0" />
                 <span className="hidden phablet:inline">Chat with us</span>
-              </button>
+              </a>
               <button
                 type="button"
                 onClick={() =>
@@ -2138,19 +2150,20 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                   >
                     Order Now — Pay on Delivery
                   </button>
-                  <button
-                    type="button"
+                  <a
+                    href={getAdvisorWhatsAppHref(detailModalItem.item.name)}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     onClick={() =>
-                      handleAdvisorWhatsApp(
-                        `Ad Detail Modal Chat: ${detailModalItem.item.name}`,
-                        detailModalItem.item.name
+                      recordAdvisorWhatsAppClick(
+                        `Ad Detail Modal Chat: ${detailModalItem.item.name}`
                       )
                     }
                     className="w-full min-h-[48px] px-4 py-2.5 rounded-xl border border-[#BBD6C8] bg-[#F4FAF7] hover:bg-[#E7F4ED] text-[#065F46] text-[15.5px] font-semibold flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
                   >
                     <MessageCircle className="w-[18px] h-[18px] shrink-0" />
                     <span>Chat with us</span>
-                  </button>
+                  </a>
                   <button
                     type="button"
                     onClick={() => setDetailModalItem(null)}

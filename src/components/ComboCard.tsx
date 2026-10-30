@@ -5,7 +5,7 @@ import { PackageData, Product } from "../types";
 import { CONFIG } from "../config";
 import { PackageQuickView } from "./PackageQuickView";
 import { getOptimizedImageUrl } from "../utils/cloudinary";
-import { openWhatsAppLink } from "../utils/whatsapp";
+import { buildWhatsAppUrl } from "../utils/whatsapp";
 
 interface ComboCardProps {
   data: PackageData;
@@ -203,17 +203,19 @@ export const ComboCard: React.FC<ComboCardProps> = ({ data, onOrder, onProductCl
           {/* CTA Section - Amazon Style */}
           <div className="mt-6 pt-6 border-t-2 border-slate-100 space-y-4">
             <div className="flex items-center gap-4">
-              <button 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  const message = `Hello SD GHT Health Care, I am interested in the ${data.name} master kit. Could you please provide more information on how I can place an order?`;
-                  openWhatsAppLink(CONFIG.whatsapp.number, message);
-                }}
+              <a
+                href={buildWhatsAppUrl(
+                  CONFIG.whatsapp.number,
+                  `Hello SD GHT Health Care, I am interested in the ${data.name} master kit. Could you please provide more information on how I can place an order?`
+                )}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
                 className="flex-1 bg-white border-2 border-slate-200 text-slate-600 h-16 rounded-2xl font-black text-sm hover:bg-slate-50 transition-all flex items-center justify-center gap-3 uppercase tracking-widest"
               >
                 <Phone size={24} className="text-emerald-600" />
                 Chat with us
-              </button>
+              </a>
               <button 
                 onClick={(e) => {
                   e.stopPropagation();
