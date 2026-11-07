@@ -300,24 +300,68 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
     reader.readAsDataURL(file);
   };
 
+  const [validationModal, setValidationModal] = useState<{
+    isOpen: boolean;
+    errors: string[];
+    firstFieldId: string | null;
+  }>({
+    isOpen: false,
+    errors: [],
+    firstFieldId: null,
+  });
+
   const validateFields = (): boolean => {
     const errors: Record<string, string> = {};
+    const errorList: string[] = [];
+    let firstId: string | null = null;
+
     if (fullName.trim().length < 2) {
-      errors.fullName = 'Please enter your full name so our dispatch rider can identify you.';
+      errors.fullName = 'Please enter your full name (at least 2 letters) so our dispatch rider can identify you.';
+      errorList.push('Recipient Full Name is required');
+      if (!firstId) firstId = `${mode}-full-name`;
     }
     const cleanDigits = phoneNumber.replace(/\D/g, '');
     if (cleanDigits.length < 10 || cleanDigits.length > 15) {
       errors.phoneNumber =
-        'Enter a valid 10 or 11-digit phone or WhatsApp number (e.g. 0803 123 4567).';
+        'Enter a valid 10 or 11-digit phone or WhatsApp number (e.g. 0803 123 4567 or 0904 775 2410).';
+      errorList.push('Active Phone / WhatsApp Number must be 10 or 11 digits');
+      if (!firstId) firstId = `${mode}-phone`;
     }
     if (!deliveryState) {
       errors.deliveryState = 'Please select your delivery state.';
+      errorList.push('Delivery State must be selected');
+      if (!firstId) firstId = `${mode}-state`;
     }
     if (streetAddress.trim().length < 5) {
-      errors.streetAddress = 'Please enter your house or office street address.';
+      errors.streetAddress = 'Please enter your full street address (e.g. House 14, Adeleke Street, Ikeja).';
+      errorList.push('House or Office Delivery Address is incomplete (minimum 5 characters)');
+      if (!firstId) firstId = `${mode}-address`;
     }
+
     setFieldErrors(errors);
-    return Object.keys(errors).length === 0;
+
+    if (errorList.length > 0) {
+      setValidationModal({
+        isOpen: true,
+        errors: errorList,
+        firstFieldId: firstId,
+      });
+
+      // Smooth scroll to the first field that needs attention
+      if (firstId) {
+        setTimeout(() => {
+          const el = document.getElementById(firstId!);
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            el.focus();
+          }
+        }, 150);
+      }
+      return false;
+    }
+
+    setValidationModal({ isOpen: false, errors: [], firstFieldId: null });
+    return true;
   };
 
   const handleSubmitOrder = async (e: React.FormEvent) => {
@@ -722,14 +766,14 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
       </div>
 
       {/* Customer Delivery Inputs */}
-      <div className="p-5 sm:p-7 space-y-5 bg-white">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+      <div className="p-5 sm:p-7 space-y-6 bg-white">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           <div>
             <label
               htmlFor={`${mode}-full-name`}
-              className="block text-[15px] sm:text-base font-semibold text-[#0F1F18] mb-1.5"
+              className="block text-[16px] sm:text-[17.5px] font-bold text-[#0F1F18] mb-2 tracking-tight"
             >
-              Recipient Full Name <span className="text-red-600">*</span>
+              Recipient Full Name <span className="text-red-600 font-extrabold">*</span>
             </label>
             <input
               id={`${mode}-full-name`}
@@ -741,21 +785,26 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
                 setFullName(e.target.value);
                 if (fieldErrors.fullName) setFieldErrors((prev) => ({ ...prev, fullName: '' }));
               }}
-              className={`w-full min-h-[54px] px-4 py-3 text-base text-[#0F1F18] bg-white border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#047857] ${
-                fieldErrors.fullName ? 'border-red-500' : 'border-[#CBD5CF]'
+              className={`w-full min-h-[56px] sm:min-h-[60px] px-4 sm:px-5 py-3.5 text-[16.5px] sm:text-[17.5px] text-[#0F1F18] bg-white border-2 rounded-xl transition-all duration-150 focus:outline-none ${
+                fieldErrors.fullName
+                  ? 'border-red-500 bg-red-50/40 ring-4 ring-red-500/20 shadow-xs'
+                  : 'border-[#CBD5CF] focus:border-[#047857] focus:ring-4 focus:ring-[#047857]/15'
               }`}
             />
             {fieldErrors.fullName && (
-              <p className="mt-1.5 text-sm font-medium text-red-600">{fieldErrors.fullName}</p>
+              <p className="mt-2 text-[14px] sm:text-[15px] font-bold text-red-600 flex items-center gap-1.5 leading-snug">
+                <AlertCircle className="w-4 h-4 shrink-0 stroke-[2.5]" />
+                <span>{fieldErrors.fullName}</span>
+              </p>
             )}
           </div>
 
           <div>
             <label
               htmlFor={`${mode}-phone`}
-              className="block text-[15px] sm:text-base font-semibold text-[#0F1F18] mb-1.5"
+              className="block text-[16px] sm:text-[17.5px] font-bold text-[#0F1F18] mb-2 tracking-tight"
             >
-              Active Phone / WhatsApp Number <span className="text-red-600">*</span>
+              Active Phone / WhatsApp Number <span className="text-red-600 font-extrabold">*</span>
             </label>
             <input
               id={`${mode}-phone`}
@@ -769,29 +818,34 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
                 if (fieldErrors.phoneNumber)
                   setFieldErrors((prev) => ({ ...prev, phoneNumber: '' }));
               }}
-              className={`w-full min-h-[54px] px-4 py-3 text-base text-[#0F1F18] bg-white border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#047857] ${
-                fieldErrors.phoneNumber ? 'border-red-500' : 'border-[#CBD5CF]'
+              className={`w-full min-h-[56px] sm:min-h-[60px] px-4 sm:px-5 py-3.5 text-[16.5px] sm:text-[17.5px] text-[#0F1F18] bg-white border-2 rounded-xl transition-all duration-150 focus:outline-none tabular-nums ${
+                fieldErrors.phoneNumber
+                  ? 'border-red-500 bg-red-50/40 ring-4 ring-red-500/20 shadow-xs'
+                  : 'border-[#CBD5CF] focus:border-[#047857] focus:ring-4 focus:ring-[#047857]/15'
               }`}
             />
             {fieldErrors.phoneNumber && (
-              <p className="mt-1.5 text-sm font-medium text-red-600">{fieldErrors.phoneNumber}</p>
+              <p className="mt-2 text-[14px] sm:text-[15px] font-bold text-red-600 flex items-center gap-1.5 leading-snug">
+                <AlertCircle className="w-4 h-4 shrink-0 stroke-[2.5]" />
+                <span>{fieldErrors.phoneNumber}</span>
+              </p>
             )}
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
           <div>
             <label
               htmlFor={`${mode}-state`}
-              className="block text-[15px] sm:text-base font-semibold text-[#0F1F18] mb-1.5"
+              className="block text-[16px] sm:text-[17.5px] font-bold text-[#0F1F18] mb-2 tracking-tight"
             >
-              Delivery State <span className="text-red-600">*</span>
+              Delivery State <span className="text-red-600 font-extrabold">*</span>
             </label>
             <select
               id={`${mode}-state`}
               value={deliveryState}
               onChange={(e) => setDeliveryState(e.target.value)}
-              className="w-full min-h-[54px] px-4 py-3 text-base text-[#0F1F18] bg-white border border-[#CBD5CF] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#047857]"
+              className="w-full min-h-[56px] sm:min-h-[60px] px-4 sm:px-5 py-3.5 text-[16.5px] sm:text-[17.5px] font-semibold text-[#0F1F18] bg-white border-2 border-[#CBD5CF] rounded-xl focus:outline-none focus:border-[#047857] focus:ring-4 focus:ring-[#047857]/15"
             >
               {NIGERIAN_STATES.map((st) => (
                 <option key={st} value={st}>
@@ -804,9 +858,9 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
           <div className="sm:col-span-2">
             <label
               htmlFor={`${mode}-address`}
-              className="block text-[15px] sm:text-base font-semibold text-[#0F1F18] mb-1.5"
+              className="block text-[16px] sm:text-[17.5px] font-bold text-[#0F1F18] mb-2 tracking-tight"
             >
-              House or Office Delivery Address <span className="text-red-600">*</span>
+              House or Office Delivery Address <span className="text-red-600 font-extrabold">*</span>
             </label>
             <input
               id={`${mode}-address`}
@@ -819,12 +873,17 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
                 if (fieldErrors.streetAddress)
                   setFieldErrors((prev) => ({ ...prev, streetAddress: '' }));
               }}
-              className={`w-full min-h-[54px] px-4 py-3 text-base text-[#0F1F18] bg-white border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#047857] ${
-                fieldErrors.streetAddress ? 'border-red-500' : 'border-[#CBD5CF]'
+              className={`w-full min-h-[56px] sm:min-h-[60px] px-4 sm:px-5 py-3.5 text-[16.5px] sm:text-[17.5px] text-[#0F1F18] bg-white border-2 rounded-xl transition-all duration-150 focus:outline-none ${
+                fieldErrors.streetAddress
+                  ? 'border-red-500 bg-red-50/40 ring-4 ring-red-500/20 shadow-xs'
+                  : 'border-[#CBD5CF] focus:border-[#047857] focus:ring-4 focus:ring-[#047857]/15'
               }`}
             />
             {fieldErrors.streetAddress && (
-              <p className="mt-1.5 text-sm font-medium text-red-600">{fieldErrors.streetAddress}</p>
+              <p className="mt-2 text-[14px] sm:text-[15px] font-bold text-red-600 flex items-center gap-1.5 leading-snug">
+                <AlertCircle className="w-4 h-4 shrink-0 stroke-[2.5]" />
+                <span>{fieldErrors.streetAddress}</span>
+              </p>
             )}
           </div>
         </div>
@@ -1027,6 +1086,43 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
           </div>
         </div>
 
+        {/* Immediate In-Form Error Awareness Alert */}
+        {Object.keys(fieldErrors).length > 0 && (
+          <div
+            id="order-form-error-alert"
+            role="alert"
+            aria-live="assertive"
+            className="p-4 sm:p-5 rounded-2xl bg-amber-50 border-2 border-amber-500 text-amber-950 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md"
+          >
+            <div className="flex items-start gap-3">
+              <div className="w-9 h-9 rounded-full bg-amber-500 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-xs">
+                <AlertCircle className="w-5 h-5 stroke-[2.5]" />
+              </div>
+              <div className="space-y-0.5">
+                <div className="font-bold text-base sm:text-[17px] text-amber-950">
+                  Please complete the highlighted {Object.keys(fieldErrors).length > 1 ? `${Object.keys(fieldErrors).length} required fields` : 'required field'}
+                </div>
+                <div className="text-sm sm:text-[14.5px] text-amber-900 leading-snug">
+                  Your order cannot be dispatched until your delivery details are verified. Check the red boxes above.
+                </div>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                const first = document.querySelector('.border-red-500') as HTMLElement;
+                if (first) {
+                  first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  first.focus();
+                }
+              }}
+              className="self-start sm:self-center px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs sm:text-sm font-bold whitespace-nowrap cursor-pointer transition-colors shadow-xs"
+            >
+              Fix Missing Details ↑
+            </button>
+          </div>
+        )}
+
         {submitError && (
           <div className="p-4 rounded-xl bg-red-50 border border-red-200 flex items-start gap-2.5 text-sm text-red-800">
             <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
@@ -1038,7 +1134,7 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full min-h-[56px] px-6 py-4 rounded-xl bg-[#047857] hover:bg-[#065F46] disabled:opacity-60 text-white font-semibold text-base sm:text-[17px] transition-colors flex items-center justify-center gap-2.5 cursor-pointer tabular-nums"
+            className="w-full min-h-[58px] sm:min-h-[62px] px-6 py-4 rounded-xl bg-[#047857] hover:bg-[#065F46] disabled:opacity-60 text-white font-bold text-[17px] sm:text-[19px] tracking-wide transition-colors flex items-center justify-center gap-2.5 cursor-pointer tabular-nums shadow-md"
           >
             {isSubmitting ? (
               <>
@@ -1047,7 +1143,7 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
               </>
             ) : (
               <>
-                <ShieldCheck className="w-5 h-5 shrink-0" />
+                <ShieldCheck className="w-6 h-6 shrink-0" />
                 <span>
                   {paymentMethod === 'pod'
                     ? `Confirm Order — Pay ₦${totalPrice.toLocaleString()} on Delivery`
@@ -1078,48 +1174,114 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
     </form>
   );
 
+  const validationModalElement = validationModal.isOpen && (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="form-validation-title"
+      className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xs animate-in fade-in duration-200"
+    >
+      <div
+        className="fixed inset-0"
+        onClick={() => setValidationModal((prev) => ({ ...prev, isOpen: false }))}
+        aria-hidden="true"
+      />
+      <div className="relative z-10 w-full max-w-md bg-white rounded-3xl p-6 sm:p-7 shadow-2xl border-2 border-red-300 space-y-5 text-center">
+        <div className="w-16 h-16 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center mx-auto shadow-inner">
+          <AlertCircle className="w-9 h-9 stroke-[2.5] animate-pulse" />
+        </div>
+
+        <div className="space-y-2">
+          <h4
+            id="form-validation-title"
+            className="text-2xl sm:text-[26px] font-bold text-slate-900 font-[family-name:var(--font-editorial)] tracking-tight"
+          >
+            Delivery Details Missing
+          </h4>
+          <p className="text-[16px] sm:text-[17px] text-slate-600 leading-relaxed">
+            Please fill in the required delivery fields below before our dispatch desk can schedule your doorstep parcel:
+          </p>
+        </div>
+
+        <div className="p-4 sm:p-5 rounded-2xl bg-red-50/90 border border-red-200 text-left space-y-3">
+          {validationModal.errors.map((err, idx) => (
+            <div key={idx} className="flex items-start gap-2.5 text-[15px] sm:text-[16px] font-semibold text-red-950 leading-snug">
+              <span className="w-2.5 h-2.5 rounded-full bg-red-500 shrink-0 mt-1.5" />
+              <span>{err}</span>
+            </div>
+          ))}
+        </div>
+
+        <div className="pt-2">
+          <button
+            type="button"
+            onClick={() => {
+              setValidationModal((prev) => ({ ...prev, isOpen: false }));
+              if (validationModal.firstFieldId) {
+                const el = document.getElementById(validationModal.firstFieldId);
+                if (el) {
+                  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  el.focus();
+                }
+              }
+            }}
+            className="w-full min-h-[54px] px-6 py-3.5 rounded-xl bg-[#047857] hover:bg-[#065F46] text-white font-bold text-[17px] sm:text-[18px] shadow-lg transition-colors cursor-pointer"
+          >
+            Okay, Let Me Fill It
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
   if (mode === 'inline') {
     return (
-      <div className="bg-white border border-[#DDE5E0] rounded-2xl overflow-hidden font-[family-name:var(--font-soft-body)] antialiased">
-        {formBody}
-      </div>
+      <>
+        <div className="bg-white border border-[#DDE5E0] rounded-2xl overflow-hidden font-[family-name:var(--font-soft-body)] antialiased shadow-sm">
+          {formBody}
+        </div>
+        {validationModalElement}
+      </>
     );
   }
 
   return (
-    <div
-      className="fixed inset-0 z-[160] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-950/65 backdrop-blur-xs font-[family-name:var(--font-soft-body)] antialiased"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="express-pod-modal-title"
-    >
-      <div className="fixed inset-0" onClick={onClose} aria-hidden="true" />
-      <div className="relative z-10 w-full max-w-2xl max-h-[92vh] bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl border border-[#DDE5E0] flex flex-col overflow-hidden">
-        <div className="px-5 sm:px-6 py-4 bg-white border-b border-[#E4EBE7] flex items-center justify-between gap-3 shrink-0">
-          <div>
-            <h3
-              id="express-pod-modal-title"
-              className="text-lg sm:text-xl font-semibold text-[#162820] font-[family-name:var(--font-editorial)]"
-            >
-              Express Doorstep Order
-            </h3>
-            <p className="text-xs sm:text-sm text-[#54685E]">
-              No online payment required · Inspect intact seals before paying
-            </p>
+    <>
+      <div
+        className="fixed inset-0 z-[160] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-950/65 backdrop-blur-xs font-[family-name:var(--font-soft-body)] antialiased"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="express-pod-modal-title"
+      >
+        <div className="fixed inset-0" onClick={onClose} aria-hidden="true" />
+        <div className="relative z-10 w-full max-w-2xl max-h-[92vh] bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl border border-[#DDE5E0] flex flex-col overflow-hidden">
+          <div className="px-5 sm:px-6 py-4 bg-white border-b border-[#E4EBE7] flex items-center justify-between gap-3 shrink-0">
+            <div>
+              <h3
+                id="express-pod-modal-title"
+                className="text-lg sm:text-xl font-semibold text-[#162820] font-[family-name:var(--font-editorial)]"
+              >
+                Express Doorstep Order
+              </h3>
+              <p className="text-xs sm:text-sm text-[#54685E]">
+                No online payment required · Inspect intact seals before paying
+              </p>
+            </div>
+            {onClose && (
+              <button
+                type="button"
+                onClick={onClose}
+                aria-label="Close express checkout"
+                className="p-2.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            )}
           </div>
-          {onClose && (
-            <button
-              type="button"
-              onClick={onClose}
-              aria-label="Close express checkout"
-              className="p-2.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          )}
+          <div className="overflow-y-auto">{formBody}</div>
         </div>
-        <div className="overflow-y-auto">{formBody}</div>
       </div>
-    </div>
+      {validationModalElement}
+    </>
   );
 };

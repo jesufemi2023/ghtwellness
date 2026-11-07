@@ -939,26 +939,26 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(95%_120%_at_90%_0%,rgba(16,185,129,0.18)_0%,rgba(14,38,29,0)_60%),radial-gradient(65%_90%_at_5%_100%,rgba(217,185,120,0.09)_0%,rgba(14,38,29,0)_55%)]"
         />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-9 lg:py-12">
-          <div className="max-w-3xl space-y-3 sm:space-y-4">
-            <p className="text-[13px] sm:text-[14px] font-medium text-[#95E4B9] tracking-[0.02em] leading-snug">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-7 sm:py-10 lg:py-14">
+          <div className="max-w-3xl space-y-3.5 sm:space-y-4.5">
+            <p className="text-[14px] sm:text-[15.5px] font-semibold text-[#95E4B9] tracking-[0.02em] leading-snug">
               {adIntent.kicker}
             </p>
 
-            <h1 className="text-[1.6rem] phablet:text-[1.82rem] sm:text-[2.3rem] lg:text-[2.8rem] font-semibold text-[#FAF9F5] tracking-[-0.015em] leading-[1.2] [text-wrap:balance] font-[family-name:var(--font-editorial)]">
+            <h1 className="text-[1.85rem] phablet:text-[2.1rem] sm:text-[2.6rem] lg:text-[3.15rem] font-semibold text-[#FAF9F5] tracking-[-0.015em] leading-[1.18] [text-wrap:balance] font-[family-name:var(--font-editorial)]">
               {adIntent.headline}
             </h1>
 
-            <p className="text-[15.5px] sm:text-[17px] lg:text-[18px] text-[#DCE8E1] leading-[1.68] tracking-[0.01em] max-w-2xl font-normal">
+            <p className="text-[17px] sm:text-[19px] lg:text-[20px] text-[#E1EBE5] leading-[1.72] tracking-[0.01em] max-w-2xl font-normal">
               {adIntent.subheadline}
             </p>
 
             {/* Primary Exploration CTA + Direct Specialist Advisory */}
-            <div className="pt-1.5 flex flex-wrap items-center gap-3 sm:gap-3.5">
+            <div className="pt-2 flex flex-wrap items-center gap-3.5 sm:gap-4">
               <button
                 type="button"
                 onClick={() => scrollToSection('ad-bundles')}
-                className="min-h-[48px] sm:min-h-[52px] px-5 sm:px-6 py-2.5 rounded-xl bg-[#F5FAF7] hover:bg-white text-[#0E261D] text-[15px] sm:text-[16px] font-semibold transition-colors inline-flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer shadow-xs"
+                className="min-h-[52px] sm:min-h-[56px] px-6 sm:px-7 py-3 rounded-xl bg-[#F5FAF7] hover:bg-white text-[#0E261D] text-[16px] sm:text-[17px] font-bold transition-all inline-flex items-center justify-center gap-2.5 whitespace-nowrap cursor-pointer shadow-sm hover:shadow-md"
               >
                 <span>{adIntent.ctaLabel}</span>
                 <ArrowDown className="w-4 h-4 text-[#047857] shrink-0" />
@@ -969,15 +969,15 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => recordAdvisorWhatsAppClick('Ad Hero Specialist')}
-                className="min-h-[48px] sm:min-h-[52px] px-4 sm:px-5 py-2.5 rounded-xl border border-white/25 bg-white/[0.07] hover:bg-white/[0.14] text-[#FAF9F5] text-[15px] sm:text-[16px] font-medium transition-colors inline-flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer"
+                className="min-h-[52px] sm:min-h-[56px] px-5 sm:px-6 py-3 rounded-xl border border-white/30 bg-white/[0.08] hover:bg-white/[0.16] text-[#FAF9F5] text-[16px] sm:text-[17px] font-medium transition-colors inline-flex items-center justify-center gap-2.5 whitespace-nowrap cursor-pointer"
               >
-                <MessageCircle className="w-[18px] h-[18px] text-[#95E4B9] shrink-0" />
+                <MessageCircle className="w-5 h-5 text-[#95E4B9] shrink-0" />
                 <span>Speak with a Specialist</span>
               </a>
 
               <a
                 href={`tel:${contactPhone.replace(/\s+/g, '')}`}
-                className="inline-flex items-center gap-1.5 text-[14.5px] sm:text-[15.5px] text-[#C8DDD2] hover:text-white transition-colors py-1 sm:pl-1 tabular-nums whitespace-nowrap"
+                className="inline-flex items-center gap-2 text-[15.5px] sm:text-[16.5px] font-medium text-[#C8DDD2] hover:text-white transition-colors py-1.5 sm:pl-1 tabular-nums whitespace-nowrap"
               >
                 <Phone className="w-4 h-4 text-[#95E4B9] shrink-0" />
                 <span>Call {contactPhone}</span>
@@ -986,33 +986,33 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
           </div>
 
           {/* Architectural 3-Column Doorstep Assurance Ledger — Zero Broken Dots, 'Pay ₦0 Upfront' Desktop-Only */}
-          <div className="mt-6 sm:mt-8 pt-4 sm:pt-5 border-t border-white/14 grid grid-cols-3 gap-2.5 sm:gap-8 divide-x divide-white/14">
-            <div className="pr-1 sm:pr-4">
-              <div className="text-[13px] phablet:text-[14px] sm:text-[15.5px] font-semibold text-[#FAF9F5] leading-snug">
+          <div className="mt-8 sm:mt-10 pt-5 sm:pt-6 border-t border-white/14 grid grid-cols-3 gap-3 sm:gap-8 divide-x divide-white/14">
+            <div className="pr-1.5 sm:pr-4">
+              <div className="text-[14px] phablet:text-[15.5px] sm:text-[17px] font-bold text-[#FAF9F5] leading-snug">
                 <span className="hidden lg:inline">Pay ₦0 Upfront — </span>
                 <span>Pay on Delivery</span>
               </div>
-              <div className="text-[12px] sm:text-[13.5px] text-[#B8CEC3] leading-snug mt-0.5">
+              <div className="text-[13px] sm:text-[14.5px] text-[#C2D6CC] leading-snug mt-1">
                 Inspect seals before paying
               </div>
             </div>
 
-            <div className="pl-2.5 sm:pl-8 pr-1 sm:pr-4">
-              <div className="text-[13px] phablet:text-[14px] sm:text-[15.5px] font-semibold text-[#FAF9F5] leading-snug">
+            <div className="pl-3 sm:pl-8 pr-1.5 sm:pr-4">
+              <div className="text-[14px] phablet:text-[15.5px] sm:text-[17px] font-bold text-[#FAF9F5] leading-snug">
                 <span className="sm:hidden">Free Dispatch</span>
                 <span className="hidden sm:inline">Free Nationwide Delivery</span>
               </div>
-              <div className="text-[12px] sm:text-[13.5px] text-[#B8CEC3] leading-snug mt-0.5 tabular-nums">
+              <div className="text-[13px] sm:text-[14.5px] text-[#C2D6CC] leading-snug mt-1 tabular-nums">
                 24–48 hrs to all 36 states
               </div>
             </div>
 
-            <div className="pl-2.5 sm:pl-8">
-              <div className="text-[13px] phablet:text-[14px] sm:text-[15.5px] font-semibold text-[#FAF9F5] leading-snug">
+            <div className="pl-3 sm:pl-8">
+              <div className="text-[14px] phablet:text-[15.5px] sm:text-[17px] font-bold text-[#FAF9F5] leading-snug">
                 <span className="phablet:hidden">NAFDAC Reg.</span>
                 <span className="hidden phablet:inline">NAFDAC Certified</span>
               </div>
-              <div className="text-[12px] sm:text-[13.5px] text-[#B8CEC3] leading-snug mt-0.5">
+              <div className="text-[13px] sm:text-[14.5px] text-[#C2D6CC] leading-snug mt-1">
                 Genuine GHT herbal packs
               </div>
             </div>
@@ -1215,16 +1215,16 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                       </div>
 
                       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 pt-0.5">
-                        <h3 className="text-[1.46rem] sm:text-[1.68rem] lg:text-[1.8rem] font-semibold text-[#14261E] font-[family-name:var(--font-editorial)] leading-[1.24] tracking-[-0.012em] [text-wrap:balance]">
+                        <h3 className="text-[1.55rem] sm:text-[1.78rem] lg:text-[1.95rem] font-semibold text-[#14261E] font-[family-name:var(--font-editorial)] leading-[1.22] tracking-[-0.012em] [text-wrap:balance]">
                           {pkg.name}
                         </h3>
 
                         <div className="tabular-nums text-left sm:text-right shrink-0">
-                          <span className="text-xl sm:text-2xl font-bold text-[#14261E]">
+                          <span className="text-2xl sm:text-3xl font-bold text-[#14261E]">
                             ₦{pricing.currentPrice.toLocaleString()}
                           </span>
                           {pricing.savings > 0 && (
-                            <span className="ml-2 text-xs sm:text-sm text-slate-400 line-through">
+                            <span className="ml-2.5 text-sm sm:text-base text-slate-400 line-through">
                               ₦{pricing.retailPrice.toLocaleString()}
                             </span>
                           )}
@@ -1251,22 +1251,22 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                           <ExpandableDescription
                             text={pkg.description}
                             maxChars={160}
-                            className="text-[16.5px] sm:text-[17px] lg:text-[17.5px] text-[#263930] leading-[1.74] font-normal tracking-[0.006em]"
+                            className="text-[17px] sm:text-[17.5px] lg:text-[18px] text-[#263930] leading-[1.76] font-normal tracking-[0.006em]"
                           />
                         )}
 
                         {visibleBenefits.length > 0 && (
                           <div className="space-y-3 pt-0.5">
-                            <h4 className="text-[15px] sm:text-[16px] font-semibold text-[#14261E]">
+                            <h4 className="text-[16px] sm:text-[17px] font-semibold text-[#14261E]">
                               Key Wellness Benefits:
                             </h4>
-                            <ul className="grid grid-cols-1 xl:grid-cols-2 gap-x-5 gap-y-2.5">
+                            <ul className="grid grid-cols-1 xl:grid-cols-2 gap-x-5 gap-y-3">
                               {visibleBenefits.map((benefit, bIdx) => (
                                 <li
                                   key={bIdx}
-                                  className="flex items-start gap-2.5 text-[16px] sm:text-[16.5px] text-[#263930] leading-[1.68] font-normal"
+                                  className="flex items-start gap-2.5 text-[16.5px] sm:text-[17.5px] text-[#263930] leading-[1.7] font-normal"
                                 >
-                                  <CheckCircle2 className="w-[18px] h-[18px] text-[#057A55] shrink-0 mt-1" />
+                                  <CheckCircle2 className="w-5 h-5 text-[#057A55] shrink-0 mt-0.5" />
                                   <span>{benefit}</span>
                                 </li>
                               ))}
@@ -1281,7 +1281,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                                     [pkg.id]: !isBenefitsExpanded,
                                   }))
                                 }
-                                className="text-[15px] sm:text-[15.5px] font-semibold text-[#047857] hover:underline underline-offset-4 pt-1 cursor-pointer"
+                                className="text-[15.5px] sm:text-[16px] font-semibold text-[#047857] hover:underline underline-offset-4 pt-1 cursor-pointer"
                               >
                                 {isBenefitsExpanded
                                   ? 'Show fewer benefits'
@@ -1294,15 +1294,15 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                         {pkg.options && pkg.options.length > 0 && (
                           <div className="space-y-2.5 pt-4 border-t border-slate-200/75">
                             <div className="flex items-center justify-between gap-2">
-                              <span className="text-[15px] sm:text-[15.5px] font-semibold text-[#14261E]">
+                              <span className="text-[16px] sm:text-[17px] font-semibold text-[#14261E]">
                                 Choose Your Bottle Pack:
                               </span>
-                              <span className="text-xs sm:text-[13.5px] font-normal text-[#4F6359]">
+                              <span className="text-[13.5px] sm:text-[14.5px] font-normal text-[#4F6359]">
                                 Tap to select size
                               </span>
                             </div>
 
-                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-2 xl:grid-cols-3 gap-2.5">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-2 xl:grid-cols-3 gap-3">
                               {pkg.options.map((opt, oIdx) => {
                                 const isSel = oIdx === selectedIdx;
                                 const optPriceInfo = resolveSingleOptionPricing(
@@ -1329,28 +1329,28 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                                         optPriceInfo.sellingPrice
                                       );
                                     }}
-                                    className={`min-h-[68px] p-3 sm:p-3.5 rounded-2xl border text-left transition-colors cursor-pointer tabular-nums ${
+                                    className={`min-h-[72px] sm:min-h-[76px] p-3.5 sm:p-4 rounded-2xl border text-left transition-colors cursor-pointer tabular-nums ${
                                       isSel
-                                        ? 'border-[#047857] bg-[#F2F9F5] ring-1 ring-[#047857]'
+                                        ? 'border-[#047857] bg-[#F2F9F5] ring-2 ring-[#047857]'
                                         : 'border-[#D8E2DC] bg-[#FAFBF9] hover:bg-white hover:border-[#94ACA0]'
                                     }`}
                                   >
                                     <div className="flex items-center justify-between gap-1">
-                                      <span className="text-[13px] sm:text-sm font-semibold text-[#162820] whitespace-nowrap">
+                                      <span className="text-[14px] sm:text-[15px] font-semibold text-[#162820] whitespace-nowrap">
                                         {optPriceInfo.label}
                                       </span>
                                       {optPriceInfo.discountPercent > 0 && (
-                                        <span className="text-[11px] font-semibold text-[#047857]">
+                                        <span className="text-xs font-semibold text-[#047857]">
                                           -{optPriceInfo.discountPercent}%
                                         </span>
                                       )}
                                     </div>
                                     <div className="mt-1 space-y-0.5">
-                                      <div className="text-[15px] sm:text-base font-bold text-[#047857]">
+                                      <div className="text-[16px] sm:text-[17.5px] font-bold text-[#047857]">
                                         ₦{optPriceInfo.sellingPrice.toLocaleString()}
                                       </div>
                                       {optPriceInfo.savings > 0 && (
-                                        <div className="text-[11px] text-slate-400 line-through">
+                                        <div className="text-xs text-slate-400 line-through">
                                           ₦{optPriceInfo.originalPrice.toLocaleString()}
                                         </div>
                                       )}
@@ -1363,7 +1363,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                         )}
 
                         {pricing.includedList.length > 0 && (
-                          <p className="text-[15.5px] sm:text-[16px] text-[#263930] leading-[1.7] pt-0.5">
+                          <p className="text-[16px] sm:text-[17px] text-[#263930] leading-[1.7] pt-0.5">
                             <strong className="font-semibold text-[#14261E]">
                               Included in Pack:{' '}
                             </strong>
@@ -1377,16 +1377,16 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                         <div className="flex flex-wrap items-baseline justify-between gap-3 tabular-nums">
                           <div>
                             <div className="flex items-baseline gap-2.5 flex-wrap">
-                              <span className="text-[1.65rem] sm:text-[1.85rem] font-bold text-[#162820] tracking-tight">
+                              <span className="text-[1.8rem] sm:text-[2.05rem] font-bold text-[#162820] tracking-tight">
                                 ₦{pricing.currentPrice.toLocaleString()}
                               </span>
                               {pricing.savings > 0 && (
-                                <span className="text-sm sm:text-base text-slate-400 line-through">
+                                <span className="text-base sm:text-lg text-slate-400 line-through">
                                   ₦{pricing.retailPrice.toLocaleString()}
                                 </span>
                               )}
                             </div>
-                            <div className="text-[13px] sm:text-sm text-[#047857] font-medium mt-0.5">
+                            <div className="text-[13.5px] sm:text-[14.5px] text-[#047857] font-medium mt-0.5">
                               {pricing.savings > 0
                                 ? `Save ₦${pricing.savings.toLocaleString()} (${pricing.discount}% Off) · Free Doorstep Delivery`
                                 : 'Free Nationwide Delivery · Pay on Delivery'}
@@ -1396,17 +1396,17 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                           <button
                             type="button"
                             onClick={() => setDetailModalItem({ item: pkg, type: 'package' })}
-                            className="text-sm font-medium text-[#475A50] hover:text-[#047857] underline underline-offset-4 cursor-pointer whitespace-nowrap"
+                            className="text-[14.5px] sm:text-[15.5px] font-medium text-[#475A50] hover:text-[#047857] underline underline-offset-4 cursor-pointer whitespace-nowrap"
                           >
                             Full Details
                           </button>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-5 md:grid-cols-1 xl:grid-cols-5 gap-2.5">
+                        <div className="grid grid-cols-1 sm:grid-cols-5 md:grid-cols-1 xl:grid-cols-5 gap-3">
                           <button
                             type="button"
                             onClick={() => openExpressCheckout(pkg, 'package', selectedIdx)}
-                            className="sm:col-span-3 md:col-span-1 xl:col-span-3 min-h-[52px] sm:min-h-[54px] px-5 py-3.5 rounded-2xl bg-[#047857] hover:bg-[#065F46] text-white font-semibold text-[16px] sm:text-[17px] transition-colors flex items-center justify-center gap-2.5 whitespace-nowrap cursor-pointer shadow-2xs"
+                            className="sm:col-span-3 md:col-span-1 xl:col-span-3 min-h-[56px] sm:min-h-[58px] px-5 py-3.5 rounded-2xl bg-[#047857] hover:bg-[#065F46] text-white font-bold text-[17px] sm:text-[18px] transition-colors flex items-center justify-center gap-2.5 whitespace-nowrap cursor-pointer shadow-sm"
                           >
                             <ShoppingBag className="w-5 h-5 shrink-0" />
                             <span>Order on Delivery</span>
@@ -1421,9 +1421,9 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                             onClick={() =>
                               recordAdvisorWhatsAppClick(`Ad Package Card Chat: ${pkg.name}`)
                             }
-                            className="sm:col-span-2 md:col-span-1 xl:col-span-2 min-h-[50px] sm:min-h-[54px] px-4 py-3 rounded-2xl border border-[#BBD6C8] bg-[#F4FAF7] hover:bg-[#E7F4ED] text-[#065F46] font-semibold text-[15.5px] sm:text-[16px] transition-colors flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer"
+                            className="sm:col-span-2 md:col-span-1 xl:col-span-2 min-h-[54px] sm:min-h-[58px] px-4 py-3 rounded-2xl border border-[#BBD6C8] bg-[#F4FAF7] hover:bg-[#E7F4ED] text-[#065F46] font-bold text-[16px] sm:text-[17px] transition-colors flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer"
                           >
-                            <MessageCircle className="w-[18px] h-[18px] shrink-0" />
+                            <MessageCircle className="w-5 h-5 shrink-0" />
                             <span>Chat with us</span>
                           </a>
                         </div>
