@@ -15,6 +15,8 @@ import {
   ZoomIn,
   MessageCircle,
   ArrowDown,
+  Sparkles,
+  Flame,
 } from 'lucide-react';
 import { Product, PackageData } from '../types';
 import { CONFIG } from '../config';
@@ -62,8 +64,8 @@ type FilterTabId = SymptomCategory | 'singles';
 const SYMPTOM_TABS: Array<{ id: FilterTabId; label: string }> = [
   { id: 'all', label: 'All Wellness Packs' },
   { id: 'prostate', label: 'Prostate Care' },
+  { id: 'vitality', label: "Men's Performance & Stamina" },
   { id: 'womens', label: "Women's Wellness" },
-  { id: 'vitality', label: "Men's Vitality" },
   { id: 'joints', label: 'Joints & Mobility' },
   { id: 'sugar', label: 'Sugar Balance' },
   { id: 'cardio', label: 'Cardio & Circulation' },
@@ -90,7 +92,7 @@ const SOFT_BOTANICAL_THEMES: Record<string, PackageVisualTheme> = {
     softSurfaceClass: 'bg-[#F6FAF8]',
   },
   vitality: {
-    categoryLabel: "Men's Stamina & Vitality",
+    categoryLabel: "Men's Performance & Stamina",
     headerBgClass: 'bg-[#FBF4E7]',
     studioGradientClass:
       'bg-[radial-gradient(circle_at_50%_45%,#ffffff_0%,#ffffff_52%,#f6ede0_100%)]',
@@ -557,10 +559,52 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
     const map = new Map<string, PackageData>();
     for (const pkg of [...packages, ...combos]) {
       if (pkg && pkg.id && !map.has(pkg.id)) {
-        map.set(pkg.id, pkg);
+        let normalized = { ...pkg };
+        const codeUpper = (pkg.package_code || '').trim().toUpperCase();
+        const nameLower = (pkg.name || '').toLowerCase();
+
+        // Standardize compliant focus names
+        if (codeUpper === 'P001' || nameLower.includes('prostate')) {
+          normalized.name = 'Natural Prostate Care Formula';
+          normalized.package_code = pkg.package_code || 'P001';
+        } else if (
+          codeUpper === 'P002' ||
+          nameLower.includes('performance') ||
+          nameLower.includes('stamina') ||
+          nameLower.includes('weak erection') ||
+          nameLower.includes('premature ejaculation') ||
+          nameLower.includes('reodoe')
+        ) {
+          normalized.name = 'Male Performance & Stamina';
+          normalized.package_code = pkg.package_code || 'P002';
+        }
+
+        map.set(pkg.id, normalized);
       }
     }
-    return Array.from(map.values());
+
+    const rawList = Array.from(map.values());
+
+    // Priority rank order:
+    // 1. Natural Prostate Care Formula
+    // 2. Male Performance & Stamina
+    // 3. All other wellness bundles
+    return rawList.sort((a, b) => {
+      const getRank = (p: PackageData): number => {
+        const code = (p.package_code || '').trim().toUpperCase();
+        const name = (p.name || '').toLowerCase();
+        if (code === 'P001' || name.includes('prostate')) return 1;
+        if (
+          code === 'P002' ||
+          name.includes('performance') ||
+          name.includes('stamina') ||
+          name.includes('weak erection')
+        )
+          return 2;
+        return 3;
+      };
+      return getRank(a) - getRank(b);
+    });
   }, [packages, combos]);
 
   const [activeFilter, setActiveFilter] = useState<FilterTabId>(adIntent.category);
@@ -1032,11 +1076,8 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
               Select Your Targeted Herbal Wellness Pack
             </h2>
             <p className="text-[17.5px] text-[#283B32] leading-[1.74] tracking-[0.005em]">
-              Tap any wellness category below—such as{' '}
-              <strong className="font-semibold text-[#14261E]">Prostate Care</strong> or{' '}
-              <strong className="font-semibold text-[#14261E]">Women&apos;s Wellness</strong>—to
-              filter right to your focus area, choose your bottle pack, and request Pay-on-Delivery
-              dispatch.
+              Featuring our two center-of-focus formulas—<strong className="font-semibold text-[#14261E]">Natural Prostate Care Formula</strong> and{' '}
+              <strong className="font-semibold text-[#14261E]">Male Performance &amp; Stamina</strong>—or tap any category below to filter to your wellness focus and request Pay-on-Delivery dispatch.
             </p>
           </div>
 
@@ -1179,6 +1220,15 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                 const galleryEntries = getPackageGalleryEntries(pkg);
                 const theme = resolvePackageVisualTheme(pkg, cardIndex);
                 const indexDisplay = String(cardIndex + 1).padStart(2, '0');
+                const isProstateFocus =
+                  (pkg.package_code || '').trim().toUpperCase() === 'P001' ||
+                  (pkg.name || '').toLowerCase().includes('prostate');
+                const isPerformanceFocus =
+                  (pkg.package_code || '').trim().toUpperCase() === 'P002' ||
+                  (pkg.name || '').toLowerCase().includes('performance') ||
+                  (pkg.name || '').toLowerCase().includes('stamina') ||
+                  (pkg.name || '').toLowerCase().includes('weak erection');
+                const isCenterOfFocus = isProstateFocus || isPerformanceFocus;
                 const benefits = Array.isArray(pkg.health_benefits)
                   ? pkg.health_benefits.filter((b) => b && b.trim().length > 0)
                   : [];
@@ -1189,23 +1239,47 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                 return (
                   <article
                     key={pkg.id}
-                    className={`bg-white rounded-[26px] sm:rounded-[28px] border ${theme.cardBorderClass} shadow-[0_12px_34px_-16px_rgba(15,31,24,0.07)] hover:-translate-y-0.5 hover:shadow-[0_18px_42px_-16px_rgba(15,31,24,0.12)] transition-all duration-200 flex flex-col overflow-hidden`}
+                    className={`bg-white rounded-[26px] sm:rounded-[28px] border transition-all duration-200 flex flex-col overflow-hidden ${
+                      isCenterOfFocus
+                        ? 'border-[#047857]/50 ring-2 ring-[#047857]/20 shadow-[0_18px_44px_-16px_rgba(4,120,87,0.18)] hover:-translate-y-1 hover:shadow-[0_24px_50px_-16px_rgba(4,120,87,0.26)]'
+                        : `${theme.cardBorderClass} shadow-[0_12px_34px_-16px_rgba(15,31,24,0.07)] hover:-translate-y-0.5 hover:shadow-[0_18px_42px_-16px_rgba(15,31,24,0.12)]`
+                    }`}
                   >
                     {/* Top Package Identity Header — Soft Tinted Clarity for Adult Differentiation */}
                     <div
-                      className={`${theme.headerBgClass} px-5 sm:px-7 py-4 sm:py-5 border-b border-slate-200/65 space-y-1.5`}
+                      className={`${
+                        isProstateFocus
+                          ? 'bg-gradient-to-r from-[#EEF6F1] via-[#F5FAF7] to-[#EEF6F1]'
+                          : isPerformanceFocus
+                            ? 'bg-gradient-to-r from-[#FBF4E7] via-[#FFF9F0] to-[#FBF4E7]'
+                            : theme.headerBgClass
+                      } px-5 sm:px-7 py-4 sm:py-5 border-b border-slate-200/65 space-y-2`}
                     >
                       <div className="flex flex-wrap items-center justify-between gap-2 text-[13.5px] sm:text-sm">
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className={`font-semibold tabular-nums ${theme.accentTextClass}`}>
-                            Package {indexDisplay}
-                          </span>
-                          <span aria-hidden="true" className="text-slate-400">
-                            ·
-                          </span>
-                          <span className={`font-medium ${theme.accentTextClass}`}>
-                            {theme.categoryLabel}
-                          </span>
+                          {isProstateFocus ? (
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#047857] text-white text-[12px] sm:text-[13px] font-bold tracking-tight shadow-2xs">
+                              <Sparkles className="w-3.5 h-3.5 shrink-0" />
+                              Primary Focus · Package 01
+                            </span>
+                          ) : isPerformanceFocus ? (
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#0E3E2E] text-[#95E4B9] border border-[#1D634B] text-[12px] sm:text-[13px] font-bold tracking-tight shadow-2xs">
+                              <Flame className="w-3.5 h-3.5 text-[#95E4B9] shrink-0" />
+                              Core Focus · Package 02
+                            </span>
+                          ) : (
+                            <>
+                              <span className={`font-semibold tabular-nums ${theme.accentTextClass}`}>
+                                Package {indexDisplay}
+                              </span>
+                              <span aria-hidden="true" className="text-slate-400">
+                                ·
+                              </span>
+                              <span className={`font-medium ${theme.accentTextClass}`}>
+                                {theme.categoryLabel}
+                              </span>
+                            </>
+                          )}
                         </div>
 
                         <div className="text-[#4A5E54] font-medium tabular-nums text-xs sm:text-[13px]">
