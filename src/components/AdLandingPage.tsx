@@ -338,33 +338,33 @@ const StudioProductStage: React.FC<StudioProductStageProps> = ({
               e.stopPropagation();
               onInspect();
             }}
-            className="absolute top-3.5 right-3.5 z-10 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/95 hover:bg-white text-[#0F1E17] border border-slate-200 text-xs font-semibold shadow-xs transition-colors cursor-pointer whitespace-nowrap"
+            className="absolute top-4 right-4 z-10 inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/95 hover:bg-white text-[#0F1E17] border border-[#CBDAD2] text-xs sm:text-sm font-bold shadow-sm transition-all cursor-pointer whitespace-nowrap"
           >
-            <ZoomIn className="w-3.5 h-3.5 text-[#065F46]" />
-            <span>Enlarge</span>
+            <ZoomIn className="w-4 h-4 text-[#065F46]" />
+            <span>Tap to Zoom / Read Label</span>
           </button>
         )}
       </div>
 
       {hasMultipleEntries && (
         <div
-          className="w-full bg-[#FAFBF9] border-t border-slate-200/80 overflow-x-auto no-scrollbar py-2.5 px-4"
+          className="w-full bg-[#FAFBF9] border-t border-slate-200/80 overflow-x-auto no-scrollbar py-3 px-4"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="flex items-center gap-2 w-max sm:mx-auto">
+          <div className="flex items-center gap-2.5 w-max sm:mx-auto">
             {entries.map((entry, idx) => {
               const isSelected = idx === safeIdx;
-              const thumbSrc = getOptimizedImageUrl(entry.url, 180) || entry.url;
+              const thumbSrc = getOptimizedImageUrl(entry.url, 240) || entry.url;
               return (
                 <button
                   key={idx}
                   type="button"
                   onClick={() => setActiveIdx(idx)}
                   title={entry.label}
-                  className={`min-h-[40px] flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
+                  className={`min-h-[44px] flex items-center gap-2 px-3.5 py-2 rounded-xl border text-xs sm:text-sm font-bold transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
                     isSelected
-                      ? 'bg-white border-[#065F46] text-[#065F46] ring-1 ring-[#065F46] shadow-2xs'
-                      : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-600'
+                      ? 'bg-white border-[#065F46] text-[#065F46] ring-2 ring-[#065F46]/30 shadow-xs'
+                      : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-700'
                   }`}
                 >
                   <img
@@ -373,7 +373,7 @@ const StudioProductStage: React.FC<StudioProductStageProps> = ({
                     loading="eager"
                     decoding="async"
                     referrerPolicy="no-referrer"
-                    className="w-5 h-5 object-contain shrink-0"
+                    className="w-6 h-6 object-contain shrink-0"
                   />
                   <span>{entry.label}</span>
                 </button>
@@ -404,6 +404,7 @@ interface PackageCardProps {
   whatsappTarget: string;
   kickerText?: string;
   priorityBadge?: string;
+  nafdacLabel?: string;
 }
 
 const ClinicalPackageCard: React.FC<PackageCardProps> = ({
@@ -418,13 +419,10 @@ const ClinicalPackageCard: React.FC<PackageCardProps> = ({
   whatsappTarget,
   kickerText,
   priorityBadge,
+  nafdacLabel,
 }) => {
   const pricing = computePackagePricing(pkg, selectedIdx);
   const galleryEntries = getPackageGalleryEntries(pkg);
-
-  const isProstate =
-    (pkg.package_code || '').trim().toUpperCase() === 'P001' ||
-    (pkg.name || '').toLowerCase().includes('prostate');
 
   const benefits = Array.isArray(pkg.health_benefits)
     ? pkg.health_benefits.filter((b) => b && b.trim().length > 0)
@@ -434,44 +432,46 @@ const ClinicalPackageCard: React.FC<PackageCardProps> = ({
 
   const getWhatsAppHref = () => {
     const activeLabel = pricing.activeOption ? ` (${pricing.activeOption.bottles})` : '';
-    const msg = `Hello ${CONFIG.company.name}, I would like to order ${pkg.name}${activeLabel} on Pay on Delivery.`;
+    const msg = `Hello ${CONFIG.company.name}, I would like to order ${pkg.name}${activeLabel} with Pay on Delivery.`;
     return buildWhatsAppUrl(whatsappTarget, msg);
   };
 
   return (
     <article
       id={`package-card-${pkg.package_code || cardIndex}`}
-      className="bg-white rounded-2xl sm:rounded-3xl border border-[#DCE4E0] shadow-[0_12px_36px_-12px_rgba(15,31,24,0.08)] flex flex-col overflow-hidden transition-all duration-200 hover:border-[#065F46]/60"
+      className="bg-white rounded-3xl border border-[#DCE4E0] shadow-[0_12px_40px_-16px_rgba(15,31,24,0.08)] hover:shadow-[0_20px_50px_-20px_rgba(6,95,70,0.12)] hover:border-[#065F46]/50 transition-all duration-300 flex flex-col overflow-hidden"
     >
-      {/* Top Clinical Identity Header */}
+      {/* Top Clinical Protocol Identity Header */}
       <div className="px-6 sm:px-8 pt-6 sm:pt-7 pb-5 border-b border-slate-100 bg-[#FCFDFD]">
-        <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-medium text-[#52685D] uppercase tracking-wider">
+        <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-bold text-[#52685D] uppercase tracking-wider">
           <div className="flex items-center gap-2">
-            <span>{kickerText || `PROTOCOL ${String(cardIndex + 1).padStart(2, '0')}`}</span>
-            <span aria-hidden="true">·</span>
-            <span className="text-[#065F46] font-semibold">
-              {pkg.package_code || 'NAFDAC APPROVED'}
+            <span className="text-[#065F46] font-bold">
+              {kickerText || `PROTOCOL ${String(cardIndex + 1).padStart(2, '0')}`}
+            </span>
+            <span aria-hidden="true" className="text-slate-300">·</span>
+            <span className="text-[#384F43]">
+              {pkg.package_code || 'NAFDAC VERIFIED'}
             </span>
           </div>
 
           {priorityBadge && (
-            <span className="text-[11px] font-bold text-[#065F46] bg-[#E1EFE7] px-2.5 py-0.5 rounded-md uppercase tracking-wider">
+            <span className="text-[11px] font-bold text-[#065F46] bg-[#E1EFE7] px-2.5 py-1 rounded-md uppercase tracking-wider border border-[#065F46]/20">
               {priorityBadge}
             </span>
           )}
         </div>
 
-        <div className="mt-2.5 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
-          <h3 className="text-[1.65rem] sm:text-[1.85rem] font-semibold text-[#0F1E17] font-[family-name:var(--font-editorial)] tracking-[-0.015em] leading-[1.2] [text-wrap:balance]">
+        <div className="mt-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
+          <h3 className="text-2xl sm:text-[1.85rem] lg:text-[2.1rem] font-bold text-[#0F1E17] font-[family-name:var(--font-editorial)] tracking-[-0.015em] leading-[1.2] [text-wrap:balance]">
             {pkg.name}
           </h3>
 
           <div className="tabular-nums text-left sm:text-right shrink-0">
-            <span className="text-2xl sm:text-3xl font-bold text-[#0F1E17]">
+            <span className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0F1E17]">
               ₦{pricing.currentPrice.toLocaleString()}
             </span>
             {pricing.savings > 0 && (
-              <span className="ml-2 text-sm text-slate-400 line-through">
+              <span className="ml-2 text-sm sm:text-base text-slate-400 line-through">
                 ₦{pricing.retailPrice.toLocaleString()}
               </span>
             )}
@@ -479,38 +479,49 @@ const ClinicalPackageCard: React.FC<PackageCardProps> = ({
         </div>
       </div>
 
-      {/* Studio Product Pedestal */}
-      <div className="border-b border-slate-100">
+      {/* Large Studio Product Pedestal with Enlarge & Bottle Inspection */}
+      <div className="border-b border-slate-100 bg-white">
         <StudioProductStage
           entries={galleryEntries}
           alt={pkg.name}
-          heightClassName="h-[300px] sm:h-[350px] lg:h-[380px]"
-          optimizeWidth={1200}
+          heightClassName="h-[400px] sm:h-[480px] lg:h-[520px]"
+          optimizeWidth={1600}
           onInspect={() => onInspectDetail(pkg)}
         />
+
+        {/* Quick-Read Bottle Verification Bar (Tailored for Adults) */}
+        <div className="px-5 sm:px-6 py-3.5 bg-[#F4F8F5] border-t border-[#DCE4E0] flex flex-wrap items-center justify-between gap-2.5">
+          <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-[#065F46]">
+            <CheckCircle2 className="w-4 h-4 text-[#065F46] shrink-0" />
+            <span>{nafdacLabel || 'NAFDAC Certified · Tamper-Evident Seals'}</span>
+          </div>
+          <span className="text-xs sm:text-[13px] text-[#384F43] font-medium">
+            Inspect bottle labels &amp; seals at doorstep before payment
+          </span>
+        </div>
       </div>
 
       {/* Card Content & Interactive Regimen Selector */}
       <div className="p-6 sm:p-8 flex-1 flex flex-col justify-between space-y-6">
         <div className="space-y-5">
           {pkg.description && (
-            <p className="text-[15.5px] sm:text-[16px] text-[#2F4239] leading-[1.72]">
+            <p className="text-base sm:text-[17px] text-[#2F4239] leading-[1.75]">
               {pkg.description}
             </p>
           )}
 
           {visibleBenefits.length > 0 && (
-            <div className="space-y-2.5 pt-2">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-[#52685D]">
+            <div className="space-y-3 pt-2">
+              <h4 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-[#52685D]">
                 Verified Clinical Benefits:
               </h4>
-              <ul className="space-y-2">
+              <ul className="space-y-2.5">
                 {visibleBenefits.map((benefit, bIdx) => (
                   <li
                     key={bIdx}
-                    className="flex items-start gap-2.5 text-[15px] sm:text-[15.5px] text-[#2F4239] leading-[1.65]"
+                    className="flex items-start gap-3 text-base sm:text-[16.5px] text-[#1E3027] font-medium leading-[1.65]"
                   >
-                    <CheckCircle2 className="w-4 h-4 text-[#065F46] shrink-0 mt-1" />
+                    <CheckCircle2 className="w-5 h-5 text-[#065F46] shrink-0 mt-0.5" />
                     <span>{benefit}</span>
                   </li>
                 ))}
@@ -520,7 +531,7 @@ const ClinicalPackageCard: React.FC<PackageCardProps> = ({
                 <button
                   type="button"
                   onClick={() => onToggleBenefits(pkg.id)}
-                  className="text-xs font-semibold text-[#065F46] hover:underline cursor-pointer pt-1"
+                  className="text-xs sm:text-sm font-bold text-[#065F46] hover:underline cursor-pointer pt-1"
                 >
                   {isBenefitsExpanded
                     ? 'Show fewer benefits'
@@ -530,19 +541,19 @@ const ClinicalPackageCard: React.FC<PackageCardProps> = ({
             </div>
           )}
 
-          {/* Tactile Regimen Selector */}
+          {/* Tactile Regimen Selector Sized for Adults */}
           {pkg.options && pkg.options.length > 0 && (
-            <div className="space-y-3 pt-5 border-t border-slate-200/80">
+            <div className="space-y-3.5 pt-5 border-t border-slate-200/80">
               <div className="flex items-center justify-between">
-                <span className="text-[15px] font-semibold text-[#0F1E17]">
+                <span className="text-base sm:text-[17px] font-bold text-[#0F1E17]">
                   Select Treatment Regimen:
                 </span>
-                <span className="text-xs text-[#52685D] font-medium">
+                <span className="text-xs sm:text-sm text-[#065F46] font-bold">
                   Free Nationwide Delivery
                 </span>
               </div>
 
-              <div className="space-y-2.5">
+              <div className="space-y-3">
                 {pkg.options.map((opt, oIdx) => {
                   const isSel = oIdx === selectedIdx;
                   const optPriceInfo = resolveSingleOptionPricing(
@@ -566,13 +577,13 @@ const ClinicalPackageCard: React.FC<PackageCardProps> = ({
                           onSelectOption(pkg, oIdx);
                         }
                       }}
-                      className={`p-3.5 sm:p-4 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-3 text-left ${
+                      className={`p-4 sm:p-5 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-4 text-left ${
                         isSel
-                          ? 'bg-[#F2F8F4] border-[#065F46] ring-1 ring-[#065F46] shadow-xs'
+                          ? 'bg-[#F2F8F4] border-[#065F46] ring-2 ring-[#065F46]/30 shadow-xs'
                           : 'bg-white hover:bg-slate-50/80 border-slate-200/90'
                       }`}
                     >
-                      <div className="flex items-center gap-3 min-w-0">
+                      <div className="flex items-center gap-3.5 min-w-0">
                         <div
                           className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 transition-colors ${
                             isSel ? 'border-[#065F46] bg-[#065F46]' : 'border-slate-300 bg-white'
@@ -582,36 +593,36 @@ const ClinicalPackageCard: React.FC<PackageCardProps> = ({
                         </div>
                         <div className="min-w-0">
                           <div className="flex flex-wrap items-center gap-2">
-                            <span className="font-semibold text-[15px] sm:text-[15.5px] text-[#0F1E17]">
+                            <span className="font-bold text-base sm:text-[17px] text-[#0F1E17]">
                               {optPriceInfo.label}
                             </span>
                             {isRecommended && (
-                              <span className="text-[11px] font-bold uppercase tracking-wider text-[#065F46] bg-[#E1EFE7] px-2 py-0.5 rounded">
+                              <span className="text-[11px] font-bold uppercase tracking-wider text-[#065F46] bg-[#E1EFE7] px-2.5 py-0.5 rounded-md border border-[#065F46]/20">
                                 Recommended
                               </span>
                             )}
                             {optPriceInfo.discountPercent > 0 && !isRecommended && (
-                              <span className="text-[11px] font-semibold text-[#065F46] bg-[#EBF5F0] px-1.5 py-0.5 rounded">
+                              <span className="text-[11px] font-bold text-[#065F46] bg-[#EBF5F0] px-2 py-0.5 rounded-md">
                                 -{optPriceInfo.discountPercent}% Off
                               </span>
                             )}
                           </div>
-                          <p className="text-xs text-[#52685D] mt-0.5">
+                          <p className="text-xs sm:text-sm text-[#52685D] mt-1 font-medium">
                             {isRecommended
                               ? 'Recommended 60-day complete restorative regimen'
                               : optPriceInfo.label.includes('1') || optPriceInfo.label.includes('2')
                                 ? 'Starter nutritional support'
-                                : 'Comprehensive extended care'}
+                                : 'Comprehensive extended care protocol'}
                           </p>
                         </div>
                       </div>
 
                       <div className="text-right shrink-0 tabular-nums">
-                        <div className="text-base sm:text-lg font-bold text-[#0F1E17]">
+                        <div className="text-lg sm:text-xl font-extrabold text-[#0F1E17]">
                           ₦{optPriceInfo.sellingPrice.toLocaleString()}
                         </div>
                         {optPriceInfo.savings > 0 && (
-                          <div className="text-xs text-slate-400 line-through">
+                          <div className="text-xs sm:text-sm text-slate-400 line-through">
                             ₦{optPriceInfo.originalPrice.toLocaleString()}
                           </div>
                         )}
@@ -624,7 +635,7 @@ const ClinicalPackageCard: React.FC<PackageCardProps> = ({
           )}
 
           {pricing.includedList.length > 0 && (
-            <p className="text-xs text-[#52685D] pt-1">
+            <p className="text-xs sm:text-sm text-[#52685D] pt-1 leading-relaxed">
               <strong className="text-[#0F1E17] font-semibold">Included in Regimen: </strong>
               {pricing.includedList.join(' · ')}
             </p>
@@ -636,16 +647,16 @@ const ClinicalPackageCard: React.FC<PackageCardProps> = ({
           <div className="flex flex-wrap items-baseline justify-between gap-3 tabular-nums">
             <div>
               <div className="flex items-baseline gap-2 flex-wrap">
-                <span className="text-2xl sm:text-[1.85rem] font-bold text-[#0F1E17]">
+                <span className="text-2xl sm:text-3xl font-extrabold text-[#0F1E17]">
                   ₦{pricing.currentPrice.toLocaleString()}
                 </span>
                 {pricing.savings > 0 && (
-                  <span className="text-sm text-slate-400 line-through">
+                  <span className="text-sm sm:text-base text-slate-400 line-through">
                     ₦{pricing.retailPrice.toLocaleString()}
                   </span>
                 )}
               </div>
-              <div className="text-xs font-medium text-[#065F46] mt-0.5">
+              <div className="text-xs sm:text-sm font-bold text-[#065F46] mt-0.5">
                 {pricing.savings > 0
                   ? `Save ₦${pricing.savings.toLocaleString()} (${pricing.discount}% Off) · Pay on Delivery`
                   : 'Free Nationwide Delivery · Zero Upfront Payment'}
@@ -655,7 +666,7 @@ const ClinicalPackageCard: React.FC<PackageCardProps> = ({
             <button
               type="button"
               onClick={() => onInspectDetail(pkg)}
-              className="text-xs font-semibold text-[#52685D] hover:text-[#065F46] underline underline-offset-4 cursor-pointer"
+              className="text-xs sm:text-sm font-bold text-[#52685D] hover:text-[#065F46] underline underline-offset-4 cursor-pointer"
             >
               Full Formulation Sheet
             </button>
@@ -665,7 +676,7 @@ const ClinicalPackageCard: React.FC<PackageCardProps> = ({
             <button
               type="button"
               onClick={() => onOpenCheckout(pkg, selectedIdx)}
-              className="sm:col-span-3 min-h-[52px] sm:min-h-[56px] px-5 py-3 rounded-xl bg-[#065F46] hover:bg-[#044E39] text-white font-bold text-base transition-colors flex items-center justify-center gap-2.5 cursor-pointer shadow-sm"
+              className="sm:col-span-3 min-h-[56px] sm:min-h-[60px] px-5 py-3.5 rounded-xl bg-[#065F46] hover:bg-[#044E39] text-white font-bold text-base sm:text-lg transition-colors flex items-center justify-center gap-2.5 cursor-pointer shadow-md"
             >
               <ShoppingBag className="w-5 h-5 shrink-0" />
               <span>Order with Pay on Delivery</span>
@@ -680,10 +691,10 @@ const ClinicalPackageCard: React.FC<PackageCardProps> = ({
                   trackWhatsAppClick(`Ad Card WhatsApp: ${pkg.name}`);
                 } catch {}
               }}
-              className="sm:col-span-2 min-h-[52px] sm:min-h-[56px] px-4 py-3 rounded-xl border border-[#CBDAD2] bg-[#F6FAF8] hover:bg-[#EAF3EF] text-[#065F46] font-semibold text-sm transition-colors flex items-center justify-center gap-2 cursor-pointer"
+              className="sm:col-span-2 min-h-[56px] sm:min-h-[60px] px-4 py-3.5 rounded-xl border border-[#CBDAD2] bg-[#F6FAF8] hover:bg-[#EAF3EF] text-[#065F46] font-bold text-sm sm:text-base transition-colors flex items-center justify-center gap-2 cursor-pointer"
             >
-              <MessageCircle className="w-4 h-4 shrink-0" />
-              <span>Consult on WhatsApp</span>
+              <MessageCircle className="w-5 h-5 shrink-0" />
+              <span>Consult Specialist</span>
             </a>
           </div>
         </div>
@@ -724,6 +735,33 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
         ) {
           normalized.name = 'Male Performance & Stamina';
           normalized.package_code = pkg.package_code || 'P002';
+        } else if (
+          codeUpper === 'P003' ||
+          nameLower.includes('sugar') ||
+          nameLower.includes('diabet') ||
+          nameLower.includes('gluco')
+        ) {
+          normalized.name = 'Natural Blood Sugar Support (Diabetes Care Pack)';
+          normalized.package_code = pkg.package_code || 'P003';
+        } else if (
+          codeUpper === 'P004' ||
+          nameLower.includes('arthri') ||
+          nameLower.includes('joint') ||
+          nameLower.includes('bone')
+        ) {
+          normalized.name = 'Joint Comfort & Arthritis Relief Protocol';
+          normalized.package_code = pkg.package_code || 'P004';
+        } else if (
+          codeUpper === 'P009' ||
+          nameLower.includes('female') ||
+          nameLower.includes('infertilit') ||
+          nameLower.includes('women')
+        ) {
+          normalized.name = 'Women’s Reproductive & Hormonal Protocol';
+          normalized.package_code = pkg.package_code || 'P009';
+        } else if (nameLower.includes('combo')) {
+          normalized.name = 'Complete Male Vitality & Prostate Synergy Combo';
+          normalized.package_code = pkg.package_code || 'COMBO-01';
         }
 
         map.set(pkg.id, normalized);
@@ -732,19 +770,48 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
 
     const rawList = Array.from(map.values());
 
+    // Strict order of importance requested: Prostate first -> Performance -> Diabetes -> Arthritis -> Rest
     return rawList.sort((a, b) => {
       const getRank = (p: PackageData): number => {
         const code = (p.package_code || '').trim().toUpperCase();
         const name = (p.name || '').toLowerCase();
+        // 1. Prostate
         if (code === 'P001' || name.includes('prostate')) return 1;
+        // 2. Male Performance / Stamina
         if (
           code === 'P002' ||
           name.includes('performance') ||
           name.includes('stamina') ||
-          name.includes('weak erection')
+          name.includes('weak erection') ||
+          name.includes('reodoe')
         )
           return 2;
-        return 3;
+        // 3. Diabetes / Blood Sugar
+        if (
+          code === 'P003' ||
+          name.includes('sugar') ||
+          name.includes('diabet') ||
+          name.includes('gluco')
+        )
+          return 3;
+        // 4. Arthritis / Joint Comfort
+        if (
+          code === 'P004' ||
+          name.includes('arthri') ||
+          name.includes('joint') ||
+          name.includes('bone')
+        )
+          return 4;
+        // 5. Female Infertility / Women's Care
+        if (
+          code === 'P009' ||
+          name.includes('female') ||
+          name.includes('infertilit') ||
+          name.includes('women')
+        )
+          return 5;
+        // 6. Others / Combos
+        return 6;
       };
       return getRank(a) - getRank(b);
     });
@@ -777,19 +844,56 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
     );
   }, [allBundles]);
 
-  const otherBundles = useMemo<PackageData[]>(() => {
-    return allBundles.filter((b) => {
-      const isProstate = b.id === prostateBundle?.id;
-      const isPerformance = b.id === performanceBundle?.id;
-      return !isProstate && !isPerformance;
-    });
-  }, [allBundles, prostateBundle, performanceBundle]);
+  const getCardMetadata = (pkg: PackageData, idx: number) => {
+    const code = (pkg.package_code || '').trim().toUpperCase();
+    const name = (pkg.name || '').toLowerCase();
+
+    if (code === 'P001' || name.includes('prostate')) {
+      return {
+        kicker: "PROTOCOL 01 · MEN'S PROSTATE HEALTH & BLADDER COMFORT",
+        priorityBadge: isDedicatedProstate ? 'Primary Focus' : 'Flagship Protocol #1',
+        nafdacLabel: 'NAFDAC Approved · Laboratory Tested Formulation',
+      };
+    }
+    if (code === 'P002' || name.includes('performance') || name.includes('stamina')) {
+      return {
+        kicker: "PROTOCOL 02 · MALE STAMINA, LIBIDO & ENDURANCE",
+        priorityBadge: isDedicatedVitality ? 'Primary Focus' : 'Masculine Synergy #2',
+        nafdacLabel: 'NAFDAC Approved · Clinical Adaptogens & Zinc',
+      };
+    }
+    if (code === 'P003' || name.includes('sugar') || name.includes('diabet')) {
+      return {
+        kicker: 'PROTOCOL 03 · BLOOD SUGAR & DIABETES CARE',
+        priorityBadge: 'Metabolic Balance #3',
+        nafdacLabel: 'NAFDAC Approved · Natural Glycemic Support',
+      };
+    }
+    if (code === 'P004' || name.includes('arthri') || name.includes('joint')) {
+      return {
+        kicker: 'PROTOCOL 04 · JOINT COMFORT & CARTILAGE MOBILITY',
+        priorityBadge: 'Joint Mobility #4',
+        nafdacLabel: 'NAFDAC Approved · Bone & Cartilage Relief',
+      };
+    }
+    if (code === 'P009' || name.includes('female') || name.includes('infertilit') || name.includes('women')) {
+      return {
+        kicker: 'PROTOCOL 05 · FEMALE REPRODUCTIVE & HORMONAL CARE',
+        priorityBadge: "Women's Wellness #5",
+        nafdacLabel: 'NAFDAC Approved · Hormonal Balance Synergy',
+      };
+    }
+    return {
+      kicker: `PROTOCOL ${String(idx + 1).padStart(2, '0')} · TARGETED FORMULATION`,
+      priorityBadge: 'Authorized Pack',
+      nafdacLabel: 'NAFDAC Approved · Tamper-Evident Seals',
+    };
+  };
 
   const [packageOptionMap, setPackageOptionMap] = useState<Record<string, number>>({});
   const [productOptionMap, setProductOptionMap] = useState<Record<string, number>>({});
   const [expandedBenefitsMap, setExpandedBenefitsMap] = useState<Record<string, boolean>>({});
   const [openFaqIdx, setOpenFaqIdx] = useState<number | null>(0);
-  const [showOtherPacks, setShowOtherPacks] = useState(false);
   const [logoLoadFailed, setLogoLoadFailed] = useState(false);
 
   const [expressModalState, setExpressModalState] = useState<{
@@ -1059,34 +1163,34 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
         </div>
       </header>
 
-      {/* 2. Authoritative Clinical Hero Section */}
+      {/* 2. Sleek Authoritative Clinical Hero Section */}
       <section className="relative bg-[#0B1E16] text-[#FAF9F5] border-b border-[#1A3327] overflow-hidden">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(16,185,129,0.14)_0%,transparent_65%),radial-gradient(ellipse_at_bottom_left,rgba(217,185,120,0.08)_0%,transparent_60%)]"
         />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 lg:py-20 space-y-10">
-          <div className="max-w-3xl space-y-4">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10 space-y-6 sm:space-y-8">
+          <div className="max-w-3xl space-y-3.5">
             <div className="flex items-center gap-2 text-xs font-bold text-[#A3E5C1] uppercase tracking-widest">
               <span className="w-2 h-2 rounded-full bg-[#10B981]" />
               <span>{adIntent.kicker}</span>
             </div>
 
-            <h1 className="text-[2.2rem] sm:text-[3rem] lg:text-[3.5rem] font-semibold text-[#FAF9F5] tracking-[-0.02em] leading-[1.14] [text-wrap:balance] font-[family-name:var(--font-editorial)]">
+            <h1 className="text-[2.1rem] sm:text-[2.8rem] lg:text-[3.2rem] font-bold text-[#FAF9F5] tracking-[-0.02em] leading-[1.12] [text-wrap:balance] font-[family-name:var(--font-editorial)]">
               {adIntent.headline}
             </h1>
 
-            <p className="text-[17px] sm:text-[19px] text-[#D8E6DF] leading-[1.72] max-w-2xl font-normal">
+            <p className="text-base sm:text-lg text-[#D8E6DF] leading-[1.65] max-w-2xl font-normal">
               {adIntent.subheadline}
             </p>
 
             {/* Quick Hero Consultation & Jump Actions */}
-            <div className="pt-3 flex flex-wrap items-center gap-4">
+            <div className="pt-2 flex flex-wrap items-center gap-3 sm:gap-4">
               <button
                 type="button"
                 onClick={() => scrollToSection('featured-protocols')}
-                className="min-h-[52px] sm:min-h-[56px] px-6 sm:px-7 rounded-xl bg-[#FAF9F5] hover:bg-white text-[#0B1E16] text-base font-bold transition-all inline-flex items-center justify-center gap-2.5 cursor-pointer shadow-sm"
+                className="min-h-[50px] sm:min-h-[54px] px-6 sm:px-7 rounded-xl bg-[#FAF9F5] hover:bg-white text-[#0B1E16] text-base font-bold transition-all inline-flex items-center justify-center gap-2 cursor-pointer shadow-sm"
               >
                 <span>Select Your Bottle Regimen</span>
                 <ArrowDown className="w-4 h-4 text-[#065F46] shrink-0" />
@@ -1097,7 +1201,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => recordAdvisorWhatsAppClick('Hero WhatsApp Consultation')}
-                className="min-h-[52px] sm:min-h-[56px] px-5 sm:px-6 rounded-xl border border-white/20 bg-white/[0.06] hover:bg-white/[0.12] text-[#FAF9F5] text-sm sm:text-base font-medium transition-colors inline-flex items-center justify-center gap-2 cursor-pointer"
+                className="min-h-[50px] sm:min-h-[54px] px-5 sm:px-6 rounded-xl border border-white/20 bg-white/[0.06] hover:bg-white/[0.12] text-[#FAF9F5] text-sm sm:text-base font-semibold transition-colors inline-flex items-center justify-center gap-2 cursor-pointer"
               >
                 <MessageCircle className="w-5 h-5 text-[#A3E5C1] shrink-0" />
                 <span>Consult with Specialist</span>
@@ -1105,7 +1209,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
 
               <a
                 href={`tel:${contactPhone.replace(/\s+/g, '')}`}
-                className="inline-flex items-center gap-2 text-sm sm:text-[15px] font-medium text-[#C2D8CE] hover:text-white transition-colors py-2 tabular-nums"
+                className="inline-flex items-center gap-2 text-sm sm:text-[15px] font-semibold text-[#C2D8CE] hover:text-white transition-colors py-2 tabular-nums"
               >
                 <Phone className="w-4 h-4 text-[#A3E5C1] shrink-0" />
                 <span>Call {contactPhone}</span>
@@ -1113,8 +1217,8 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
             </div>
           </div>
 
-          {/* Minimalist 4-Pillar Doorstep Assurance Strip */}
-          <div className="pt-8 border-t border-white/12 grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
+          {/* Compact 4-Pillar Doorstep Assurance Strip */}
+          <div className="pt-6 border-t border-white/12 grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
             <div className="space-y-1">
               <div className="flex items-center gap-2 text-sm sm:text-base font-bold text-white">
                 <ShieldCheck className="w-4 h-4 text-[#A3E5C1] shrink-0" />
@@ -1155,127 +1259,73 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
               </p>
             </div>
           </div>
+
+          {/* Quick Condition Navigator for Adult Users */}
+          <div className="pt-5 border-t border-white/10 space-y-2.5">
+            <div className="flex items-center justify-between text-xs font-bold text-[#A3E5C1] uppercase tracking-wider">
+              <span>Quick Jump to Health Condition:</span>
+              <span className="text-[#C2D8CE] normal-case font-normal text-[11.5px] hidden sm:inline">
+                Tap any condition below to jump directly to its bottle regimen
+              </span>
+            </div>
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+              {allBundles.map((pkg, idx) => {
+                const label =
+                  idx === 0
+                    ? '01. Prostate Care'
+                    : idx === 1
+                      ? '02. Male Stamina'
+                      : idx === 2
+                        ? '03. Blood Sugar (Diabetes)'
+                        : idx === 3
+                          ? '04. Joint & Arthritis'
+                          : idx === 4
+                            ? "05. Women's Wellness"
+                            : `06. ${pkg.name.slice(0, 18)}`;
+                return (
+                  <button
+                    key={pkg.id}
+                    type="button"
+                    onClick={() => scrollToSection(`package-card-${pkg.package_code || idx}`)}
+                    className="min-h-[40px] px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-[#FAF9F5] text-xs sm:text-sm font-semibold whitespace-nowrap cursor-pointer transition-colors shrink-0 border border-white/10 flex items-center gap-1.5"
+                  >
+                    <span>{label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* 3. Featured Men's Health Formulations Showcase */}
-      <section id="featured-protocols" className="py-14 sm:py-20 bg-[#FAFBF9] scroll-mt-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 sm:space-y-12">
-          {/* Section Heading */}
-          <div className="max-w-3xl space-y-3">
-            <span className="text-xs font-bold text-[#065F46] uppercase tracking-widest block">
-              Authorized Botanical Formulations
-            </span>
-            <h2 className="text-2xl sm:text-4xl font-semibold text-[#0F1E17] font-[family-name:var(--font-editorial)] tracking-[-0.015em] leading-[1.2] [text-wrap:balance]">
-              {isDedicatedProstate
-                ? 'Targeted Prostate Care Regimen'
-                : isDedicatedVitality
-                  ? 'Targeted Male Stamina & Vitality Regimen'
-                  : 'Targeted Formulations for Adult Men'}
-            </h2>
-            <p className="text-base sm:text-lg text-[#384F43] leading-[1.7]">
-              {isDedicatedProstate
-                ? 'Certified to NAFDAC standards to support uninterrupted nighttime sleep and bladder comfort. Select your preferred bottle count below.'
-                : isDedicatedVitality
-                  ? 'Synergistic herbal adaptogens supporting circulation, masculine endurance, and stamina. Select your bottle pack below.'
-                  : 'Engineered for prostate comfort and masculine stamina. Inspect your factory-sealed bottles at your doorstep before completing payment.'}
-            </p>
+      {/* 3. Featured Health Formulations Showcase (Zero-Delay, Strict Order of Importance) */}
+      <section id="featured-protocols" className="pt-8 pb-16 sm:pb-24 bg-[#FAFBF9] scroll-mt-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+          {/* Direct Presentation of All Packs in Strict Order of Importance */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-stretch">
+            {allBundles.map((pkg, idx) => {
+              const meta = getCardMetadata(pkg, idx);
+              return (
+                <ClinicalPackageCard
+                  key={pkg.id}
+                  pkg={pkg}
+                  cardIndex={idx}
+                  selectedIdx={getPkgOptionIdx(pkg)}
+                  onSelectOption={handleSelectPackageOption}
+                  onOpenCheckout={(p, optIdx) => openExpressCheckout(p, 'package', optIdx)}
+                  onInspectDetail={(p) => setDetailModalItem({ item: p, type: 'package' })}
+                  isBenefitsExpanded={Boolean(expandedBenefitsMap[pkg.id])}
+                  onToggleBenefits={(pkgId) =>
+                    setExpandedBenefitsMap((prev) => ({ ...prev, [pkgId]: !prev[pkgId] }))
+                  }
+                  whatsappTarget={whatsappTarget}
+                  kickerText={meta.kicker}
+                  priorityBadge={meta.priorityBadge}
+                  nafdacLabel={meta.nafdacLabel}
+                />
+              );
+            })}
           </div>
-
-          {/* Cards Presentation */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
-            {/* Protocol 01: Natural Prostate Care Formula */}
-            {prostateBundle && (
-              <ClinicalPackageCard
-                pkg={prostateBundle}
-                cardIndex={0}
-                selectedIdx={getPkgOptionIdx(prostateBundle)}
-                onSelectOption={handleSelectPackageOption}
-                onOpenCheckout={(pkg, optIdx) => openExpressCheckout(pkg, 'package', optIdx)}
-                onInspectDetail={(pkg) => setDetailModalItem({ item: pkg, type: 'package' })}
-                isBenefitsExpanded={Boolean(expandedBenefitsMap[prostateBundle.id])}
-                onToggleBenefits={(pkgId) =>
-                  setExpandedBenefitsMap((prev) => ({ ...prev, [pkgId]: !prev[pkgId] }))
-                }
-                whatsappTarget={whatsappTarget}
-                kickerText="PROTOCOL 01 · MEN'S PROSTATE WELLNESS"
-                priorityBadge={isDedicatedProstate ? 'Primary Focus' : 'Flagship Formula'}
-              />
-            )}
-
-            {/* Protocol 02: Male Performance & Stamina */}
-            {performanceBundle && (
-              <ClinicalPackageCard
-                pkg={performanceBundle}
-                cardIndex={1}
-                selectedIdx={getPkgOptionIdx(performanceBundle)}
-                onSelectOption={handleSelectPackageOption}
-                onOpenCheckout={(pkg, optIdx) => openExpressCheckout(pkg, 'package', optIdx)}
-                onInspectDetail={(pkg) => setDetailModalItem({ item: pkg, type: 'package' })}
-                isBenefitsExpanded={Boolean(expandedBenefitsMap[performanceBundle.id])}
-                onToggleBenefits={(pkgId) =>
-                  setExpandedBenefitsMap((prev) => ({ ...prev, [pkgId]: !prev[pkgId] }))
-                }
-                whatsappTarget={whatsappTarget}
-                kickerText="PROTOCOL 02 · MALE STAMINA & VITALITY"
-                priorityBadge={isDedicatedVitality ? 'Primary Focus' : 'Core Synergy'}
-              />
-            )}
-          </div>
-
-          {/* Quiet Collapsible Drawer for Other Conditions (Zero Distraction) */}
-          {otherBundles.length > 0 && (
-            <div className="pt-4 border-t border-slate-200">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl bg-white border border-[#DCE4E0]">
-                <div>
-                  <h4 className="text-base font-semibold text-[#0F1E17]">
-                    Seeking formulations for a different wellness condition?
-                  </h4>
-                  <p className="text-xs sm:text-sm text-[#52685D] mt-0.5">
-                    We also distribute NAFDAC-certified packs for Joint Comfort, Blood Sugar, and
-                    Women's Health.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setShowOtherPacks((prev) => !prev)}
-                  className="self-start sm:self-auto px-4 py-2 rounded-xl border border-slate-300 hover:border-[#065F46] text-xs font-bold text-[#0F1E17] transition-colors cursor-pointer flex items-center gap-2 whitespace-nowrap"
-                >
-                  <span>
-                    {showOtherPacks
-                      ? 'Hide Additional Packs'
-                      : `View ${otherBundles.length} Other Packs`}
-                  </span>
-                  <ChevronDown
-                    className={`w-4 h-4 text-[#065F46] transition-transform duration-200 ${
-                      showOtherPacks ? 'rotate-180' : ''
-                    }`}
-                  />
-                </button>
-              </div>
-
-              {showOtherPacks && (
-                <div className="pt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {otherBundles.map((pkg, idx) => (
-                    <ClinicalPackageCard
-                      key={pkg.id}
-                      pkg={pkg}
-                      cardIndex={idx + 2}
-                      selectedIdx={getPkgOptionIdx(pkg)}
-                      onSelectOption={handleSelectPackageOption}
-                      onOpenCheckout={(p, optIdx) => openExpressCheckout(p, 'package', optIdx)}
-                      onInspectDetail={(p) => setDetailModalItem({ item: p, type: 'package' })}
-                      isBenefitsExpanded={Boolean(expandedBenefitsMap[pkg.id])}
-                      onToggleBenefits={(pkgId) =>
-                        setExpandedBenefitsMap((prev) => ({ ...prev, [pkgId]: !prev[pkgId] }))
-                      }
-                      whatsappTarget={whatsappTarget}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
         </div>
       </section>
 
@@ -1650,14 +1700,14 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                         : []
                   }
                   alt={detailModalItem.item.name}
-                  heightClassName="h-[320px] sm:h-[420px] md:h-[460px]"
-                  optimizeWidth={1400}
+                  heightClassName="h-[380px] sm:h-[460px] md:h-[520px]"
+                  optimizeWidth={1600}
                 />
               </div>
 
-              <div className="md:col-span-5 p-6 sm:p-7 flex flex-col justify-between space-y-6 text-sm text-[#2F4239]">
+              <div className="md:col-span-5 p-6 sm:p-8 flex flex-col justify-between space-y-6 text-[#2F4239]">
                 <div className="space-y-4">
-                  <p className="leading-relaxed">
+                  <p className="text-base sm:text-[16.5px] leading-relaxed">
                     {detailModalItem.type === 'package'
                       ? (detailModalItem.item as PackageData).description
                       : (detailModalItem.item as Product).long_desc ||
@@ -1665,14 +1715,14 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                   </p>
 
                   {(detailModalItem.item.health_benefits || []).length > 0 && (
-                    <div className="space-y-2 pt-2 border-t border-slate-100">
-                      <h4 className="font-bold text-[#0F1E17] text-xs uppercase tracking-wider">
-                        Wellness Benefits:
+                    <div className="space-y-2.5 pt-3 border-t border-slate-100">
+                      <h4 className="font-bold text-[#0F1E17] text-xs sm:text-sm uppercase tracking-wider">
+                        Wellness &amp; Health Benefits:
                       </h4>
-                      <ul className="space-y-1.5">
+                      <ul className="space-y-2">
                         {detailModalItem.item.health_benefits.map((b, idx) => (
-                          <li key={idx} className="flex items-start gap-2 text-xs leading-normal">
-                            <CheckCircle2 className="w-3.5 h-3.5 text-[#065F46] shrink-0 mt-0.5" />
+                          <li key={idx} className="flex items-start gap-2.5 text-sm sm:text-base leading-relaxed">
+                            <CheckCircle2 className="w-4 h-4 text-[#065F46] shrink-0 mt-0.5" />
                             <span>{b}</span>
                           </li>
                         ))}
@@ -1681,7 +1731,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                   )}
                 </div>
 
-                <div className="pt-4 border-t border-slate-100 space-y-2">
+                <div className="pt-4 border-t border-slate-100 space-y-2.5">
                   <button
                     type="button"
                     onClick={() => {
@@ -1693,7 +1743,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                           : getProdOptionIdx(target.item as Product);
                       openExpressCheckout(target.item, target.type, optIdx);
                     }}
-                    className="w-full min-h-[48px] px-5 py-3 rounded-xl bg-[#065F46] hover:bg-[#044E39] text-white font-bold text-sm cursor-pointer whitespace-nowrap"
+                    className="w-full min-h-[52px] sm:min-h-[56px] px-5 py-3.5 rounded-xl bg-[#065F46] hover:bg-[#044E39] text-white font-bold text-base cursor-pointer shadow-sm transition-colors whitespace-nowrap"
                   >
                     Order Now — Pay on Delivery
                   </button>
