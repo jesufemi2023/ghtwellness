@@ -197,14 +197,14 @@ export function resolveAdIntent(searchString?: string): AdIntentConfig {
   if (/prostate|prostbeta|urinar|p001/.test(rawQuery)) {
     return {
       category: 'prostate',
-      kicker: "Authorized GHT Healthcare Distribution · Men's Prostate Wellness",
+      kicker: "Authorized GHT Healthcare Distribution · Natural Prostate Care",
       headline: "Targeted Botanical Support for Men's Prostate Comfort & Uninterrupted Rest",
       subheadline:
         'Genuine NAFDAC-registered herbal formulations crafted to support healthy urinary flow, bladder ease, and restful nights—delivered sealed to your doorstep so you inspect before paying.',
-      pageTitle: "Men's Prostate Wellness Packs – Pay on Delivery | SD GHT Health Care",
+      pageTitle: "Natural Prostate Care Formula – Pay on Delivery | SD GHT Health Care",
       metaDescription:
-        "Order NAFDAC-registered GHT herbal prostate wellness packs with Free 24–48hr Nationwide Delivery across Nigeria. Inspect seals upon arrival before payment.",
-      ctaLabel: 'Explore Prostate Packs',
+        "Order NAFDAC-registered GHT natural prostate care herbal packs with Free 24–48hr Nationwide Delivery across Nigeria. Inspect seals upon arrival before payment.",
+      ctaLabel: 'Explore Prostate Formula',
       matchedKeyword: rawQuery,
       requestedPackageCode: pkgParam || 'P001',
     };
@@ -242,17 +242,21 @@ export function resolveAdIntent(searchString?: string): AdIntentConfig {
     };
   }
 
-  if (/vitality|stamina|erection|endurance|reodoe|vigor|\bmen\b|\bmens\b|\bmale\b|mens_|male_|p002/.test(rawQuery)) {
+  if (
+    /vitality|performance|stamina|erection|endurance|reodoe|vigor|\bmen\b|\bmens\b|\bmale\b|mens_|male_|p002/.test(
+      rawQuery
+    )
+  ) {
     return {
       category: 'vitality',
-      kicker: "Authorized GHT Healthcare Distribution · Men's Stamina & Vitality",
-      headline: "Restorative Herbal Nutrition for Men's Stamina, Circulation & Quiet Confidence",
+      kicker: "Authorized GHT Healthcare Distribution · Men's Performance & Stamina",
+      headline: "Restorative Herbal Nutrition for Men's Performance, Stamina & Quiet Confidence",
       subheadline:
-        'Synergistic NAFDAC-registered botanical packs formulated to support male energy, physical endurance, and lasting vitality—delivered in discreet sealed packaging with Pay on Delivery.',
-      pageTitle: "Men's Stamina & Vitality Wellness Packs – Pay on Delivery | SD GHT Health Care",
+        'Synergistic NAFDAC-registered botanical packs formulated to support male endurance, physical vitality, and healthy circulation—delivered in discreet sealed packaging with Pay on Delivery.',
+      pageTitle: "Male Performance & Stamina Packs – Pay on Delivery | SD GHT Health Care",
       metaDescription:
-        "Authentic NAFDAC-registered GHT men's vitality combo packs with discreet 24–48hr nationwide delivery and Pay on Delivery.",
-      ctaLabel: "Explore Men's Vitality Packs",
+        "Authentic NAFDAC-registered GHT male performance and stamina combo packs with discreet 24–48hr nationwide delivery and Pay on Delivery.",
+      ctaLabel: "Explore Performance & Stamina Packs",
       matchedKeyword: rawQuery,
       requestedPackageCode: pkgParam || 'P002',
     };

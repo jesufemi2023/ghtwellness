@@ -164,30 +164,58 @@ function resolvePackageVisualTheme(pkg: PackageData, index: number): PackageVisu
   return themeList[index % themeList.length];
 }
 
-const CUSTOMER_STORIES = [
+const CUSTOMER_STORIES: Array<{
+  name: string;
+  role: string;
+  location: string;
+  packName: string;
+  category: SymptomCategory;
+  quote: string;
+}> = [
   {
     name: 'Chief Adebayo O.',
     role: 'Retired Civil Engineer, 64',
     location: 'Bodija, Ibadan',
-    packName: '3-Bottle Prostate Pack',
+    packName: 'Natural Prostate Care Formula (3-Bottle Pack)',
+    category: 'prostate',
     quote:
       'The dispatch rider delivered to my residence in Bodija within 36 hours. Every bottle carried its intact factory seal and NAFDAC registration number, and I paid via transfer only after inspecting the package. Consistent daily use has noticeably supported my nighttime comfort.',
+  },
+  {
+    name: 'Engr. Musa K.',
+    role: 'Project Director, 51',
+    location: 'Wuse II, Abuja',
+    packName: 'Male Performance & Stamina Pack',
+    category: 'vitality',
+    quote:
+      'Discreetly packaged and delivered straight to my office in Wuse the next afternoon. Authentic GHT herbal bottles with clear printed expiry dates and dependable customer follow-up.',
   },
   {
     name: 'Mrs. Evelyn N.',
     role: 'School Principal, 56',
     location: 'GRA, Benin City',
     packName: 'Joint Comfort & Calcium Pack',
+    category: 'joints',
     quote:
       'What gave my family confidence was the zero-risk Pay on Delivery service. Their specialist explained the morning and evening mealtime schedule clearly on WhatsApp, and my mother moves around the compound with much steadier comfort.',
   },
   {
-    name: 'Engr. Musa K.',
-    role: 'Project Director, 51',
-    location: 'Wuse II, Abuja',
-    packName: "Men's Stamina & Vitality Pack",
+    name: 'Mrs. Folashade A.',
+    role: 'Business Executive, 44',
+    location: 'Ikeja GRA, Lagos',
+    packName: "Women's Wellness & Hormonal Balance Pack",
+    category: 'womens',
     quote:
-      'Discreetly packaged and delivered straight to my office in Wuse the next afternoon. Authentic GHT herbal bottles with clear printed expiry dates and dependable customer follow-up.',
+      'I was hesitant at first until the regional hub delivered directly to my home in Ikeja. Factory seals were completely intact, NAFDAC registrations verified, and the WhatsApp advisory team checked in regularly. Truly respectful service.',
+  },
+  {
+    name: 'Pastor Daniel E.',
+    role: 'Clergy, 58',
+    location: 'Port Harcourt, Rivers State',
+    packName: 'Metabolic & Sugar Balance Pack',
+    category: 'sugar',
+    quote:
+      'Paying only upon doorstep inspection gave me complete peace of mind. The herbal supplements were delivered within 48 hours with intact factory seals, and consistent use has greatly supported my steady daily energy.',
   },
 ];
 
@@ -608,6 +636,19 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
   }, [packages, combos]);
 
   const [activeFilter, setActiveFilter] = useState<FilterTabId>(adIntent.category);
+  const isDedicatedConditionLanding = adIntent.category !== 'all';
+  const activeTabObj = SYMPTOM_TABS.find((t) => t.id === activeFilter);
+  const activeCategoryLabel = activeTabObj ? activeTabObj.label : 'Wellness Focus';
+
+  const prioritizedStories = useMemo(() => {
+    if (activeFilter === 'all' || activeFilter === 'singles') return CUSTOMER_STORIES;
+    return [...CUSTOMER_STORIES].sort((a, b) => {
+      const matchA = a.category === activeFilter ? 1 : 0;
+      const matchB = b.category === activeFilter ? 1 : 0;
+      return matchB - matchA;
+    });
+  }, [activeFilter]);
+
   const [packageOptionMap, setPackageOptionMap] = useState<Record<string, number>>({});
   const [productOptionMap, setProductOptionMap] = useState<Record<string, number>>({});
   const [expandedBenefitsMap, setExpandedBenefitsMap] = useState<Record<string, boolean>>({});
@@ -1070,63 +1111,97 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
         className="pt-5 sm:pt-6 lg:pt-11 pb-14 sm:pb-20 lg:pb-24 bg-[#FAFBF9] scroll-mt-20"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-5 sm:space-y-6 lg:space-y-8">
-          {/* Desktop-Only Section Heading — Removed from Mobile & Tablet View Only */}
+          {/* Desktop-Only Section Heading — Laser-Focused on Condition if Dedicated Landing, or Flagship if General */}
           <div className="hidden lg:block max-w-3xl space-y-2.5">
             <h2 className="text-[2rem] font-semibold text-[#14261E] font-[family-name:var(--font-editorial)] tracking-[-0.012em] leading-[1.24] [text-wrap:balance]">
-              Select Your Targeted Herbal Wellness Pack
+              {activeFilter === 'all'
+                ? 'Select Your Targeted Herbal Wellness Pack'
+                : `Targeted Botanical Care for ${activeCategoryLabel}`}
             </h2>
             <p className="text-[17.5px] text-[#283B32] leading-[1.74] tracking-[0.005em]">
-              Featuring our two center-of-focus formulas—<strong className="font-semibold text-[#14261E]">Natural Prostate Care Formula</strong> and{' '}
-              <strong className="font-semibold text-[#14261E]">Male Performance &amp; Stamina</strong>—or tap any category below to filter to your wellness focus and request Pay-on-Delivery dispatch.
+              {activeFilter === 'all' ? (
+                <>
+                  Featuring our two center-of-focus formulas—<strong className="font-semibold text-[#14261E]">Natural Prostate Care Formula</strong> and{' '}
+                  <strong className="font-semibold text-[#14261E]">Male Performance &amp; Stamina</strong>—or tap any category below to filter to your wellness focus and request Pay-on-Delivery dispatch.
+                </>
+              ) : (
+                <>
+                  Inspected and sealed to NAFDAC-certified standards. Select your targeted multi-bottle pack for{' '}
+                  <strong className="font-semibold text-[#14261E]">{activeCategoryLabel}</strong> below, with free nationwide dispatch and doorstep verification before payment.
+                </>
+              )}
             </p>
           </div>
 
-          {/* Smooth Horizontal Category Selection for Mobile, Tablet & Desktop */}
+          {/* Clean Focused Campaign Bar (if dedicated condition) OR Category Tabs (if browsing all) */}
           <div className="space-y-3">
-            <div className="relative -mx-4 px-4 sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0">
-              <div
-                role="tablist"
-                aria-label="Filter supplements by wellness focus"
-                className="flex flex-nowrap items-center gap-2 sm:gap-2.5 overflow-x-auto no-scrollbar scroll-smooth snap-x py-1 pr-6 lg:pr-0"
-              >
-                {visibleSymptomTabs.map((tab) => {
-                  const isActive = activeFilter === tab.id;
-                  const count = categoryCounts[tab.id];
-                  return (
-                    <button
-                      key={tab.id}
-                      role="tab"
-                      aria-selected={isActive}
-                      type="button"
-                      onClick={(e) => {
-                        e.currentTarget.scrollIntoView({
-                          behavior: 'smooth',
-                          inline: 'center',
-                          block: 'nearest',
-                        });
-                        handleSelectCategory(tab.id);
-                      }}
-                      className={`snap-start min-h-[46px] sm:min-h-[48px] px-4 sm:px-5 py-2.5 rounded-xl border text-[15px] sm:text-[15.5px] whitespace-nowrap shrink-0 transition-all duration-150 cursor-pointer tabular-nums flex items-center gap-2 ${
-                        isActive
-                          ? 'bg-[#0E261D] border-[#0E261D] text-white font-semibold shadow-2xs'
-                          : 'bg-white border-[#CBD8D1] text-[#1E3128] font-medium hover:border-[#047857] hover:bg-[#F4F9F6]'
-                      }`}
-                    >
-                      <span>{tab.label}</span>
-                      {count > 0 && (
-                        <span
-                          className={`text-xs sm:text-[13px] ${
-                            isActive ? 'text-[#95E4B9]' : 'text-[#52675D]'
-                          }`}
-                        >
-                          ({count})
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
+            {isDedicatedConditionLanding && activeFilter !== 'all' ? (
+              <div className="p-3.5 sm:p-4.5 rounded-2xl bg-white border border-[#CBD8D1] shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#047857] shrink-0 animate-pulse" />
+                  <span className="text-[14.5px] sm:text-base text-[#14261E]">
+                    Showing dedicated formulas for:{' '}
+                    <strong className="font-semibold text-[#047857]">{activeCategoryLabel}</strong>
+                  </span>
+                  <span className="text-xs px-2 py-0.5 rounded-md bg-[#EEF6F1] text-[#047857] font-semibold tabular-nums">
+                    {bundlesToDisplay.length} {bundlesToDisplay.length === 1 ? 'Pack Available' : 'Packs Available'}
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => handleSelectCategory('all')}
+                  className="self-start sm:self-auto text-[13.5px] sm:text-sm font-semibold text-[#047857] hover:text-[#065F46] underline underline-offset-4 cursor-pointer whitespace-nowrap"
+                >
+                  Browse All Categories ({allBundles.length} Packs) →
+                </button>
               </div>
-            </div>
+            ) : (
+              <div className="relative -mx-4 px-4 sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0">
+                <div
+                  role="tablist"
+                  aria-label="Filter supplements by wellness focus"
+                  className="flex flex-nowrap items-center gap-2 sm:gap-2.5 overflow-x-auto no-scrollbar scroll-smooth snap-x py-1 pr-6 lg:pr-0"
+                >
+                  {visibleSymptomTabs.map((tab) => {
+                    const isActive = activeFilter === tab.id;
+                    const count = categoryCounts[tab.id];
+                    return (
+                      <button
+                        key={tab.id}
+                        role="tab"
+                        aria-selected={isActive}
+                        type="button"
+                        onClick={(e) => {
+                          e.currentTarget.scrollIntoView({
+                            behavior: 'smooth',
+                            inline: 'center',
+                            block: 'nearest',
+                          });
+                          handleSelectCategory(tab.id);
+                        }}
+                        className={`snap-start min-h-[46px] sm:min-h-[48px] px-4 sm:px-5 py-2.5 rounded-xl border text-[15px] sm:text-[15.5px] whitespace-nowrap shrink-0 transition-all duration-150 cursor-pointer tabular-nums flex items-center gap-2 ${
+                          isActive
+                            ? 'bg-[#0E261D] border-[#0E261D] text-white font-semibold shadow-2xs'
+                            : 'bg-white border-[#CBD8D1] text-[#1E3128] font-medium hover:border-[#047857] hover:bg-[#F4F9F6]'
+                        }`}
+                      >
+                        <span>{tab.label}</span>
+                        {count > 0 && (
+                          <span
+                            className={`text-xs sm:text-[13px] ${
+                              isActive ? 'text-[#95E4B9]' : 'text-[#52675D]'
+                            }`}
+                          >
+                            ({count})
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Unboxed Status & Reset Row — 'Showing all X authentic wellness packs...' Hidden on Mobile & Tablet Only */}
             {!showSkeletonState &&
@@ -1142,7 +1217,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                     paying
                   </span>
                 </div>
-              ) : (
+              ) : isDedicatedConditionLanding ? null : (
                 <div className="min-h-[28px] flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[15px] sm:text-[16px] text-[#283B32] leading-relaxed">
                   <span>
                     Showing{' '}
@@ -1156,7 +1231,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                         : 'wellness packs'}{' '}
                     for{' '}
                     <strong className="font-semibold text-[#047857]">
-                      {SYMPTOM_TABS.find((t) => t.id === activeFilter)?.label}
+                      {activeCategoryLabel}
                     </strong>
                   </span>
                   <span aria-hidden="true" className="text-slate-300">
@@ -1761,7 +1836,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-              {CUSTOMER_STORIES.map((story, idx) => (
+              {prioritizedStories.slice(0, 3).map((story, idx) => (
                 <blockquote
                   key={idx}
                   className="p-6 sm:p-7 rounded-2xl bg-[#F7FAF8] border border-[#DCE5E0] flex flex-col justify-between space-y-5"
@@ -1848,8 +1923,9 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
               Complete Your Pay-on-Delivery Order
             </h2>
             <p className="text-[16.5px] sm:text-[18px] text-[#263930] leading-[1.74]">
-              Enter your delivery address below. Our regional hub dispatches directly to your home
-              or office with free nationwide doorstep delivery.
+              {isDedicatedConditionLanding && activeFilter !== 'all'
+                ? `Enter your delivery address below to dispatch your ${activeCategoryLabel} pack. Free nationwide delivery across all 36 states and FCT.`
+                : 'Enter your delivery address below. Our regional hub dispatches directly to your home or office with free nationwide doorstep delivery.'}
             </p>
           </div>
 
