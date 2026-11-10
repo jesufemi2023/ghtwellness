@@ -312,14 +312,14 @@ export function resolveAdIntent(searchString?: string): AdIntentConfig {
 
   return {
     category: 'all',
-    kicker: 'Authorized GHT Healthcare Distribution · NAFDAC Registered Formulations',
-    headline: 'Natural Prostate Care & Male Stamina Formulations',
+    kicker: 'Official Nigerian Distribution · NAFDAC-Certified Botanicals',
+    headline: 'Pure Herbal Formulations for Lasting Vitality, Joint Comfort & Daily Strength',
     subheadline:
-      'Genuine, laboratory-tested herbal formulations supporting healthy prostate function, smooth urinary ease, and restored male stamina. Inspect your factory-sealed bottles upon delivery before payment.',
-    pageTitle: 'Natural Prostate Care & Male Stamina Formulations – Pay on Delivery | SD GHT Health Care',
+      'Every multi-bottle GHT wellness pack is factory-sealed, NAFDAC-registered, and delivered free to your home or office—so you can inspect your supplements in person before making payment.',
+    pageTitle: 'Official GHT Herbal Wellness Packs – Nationwide Pay on Delivery | SD GHT Health Care',
     metaDescription:
-      'Order authentic NAFDAC-registered GHT Natural Prostate Care and Male Performance formulations with free 24–48hr delivery across Nigeria and Pay on Delivery.',
-    ctaLabel: 'Order on Delivery',
+      'Shop authentic NAFDAC-registered GHT herbal wellness packs and value bundles. Free 24–48hr delivery across Nigeria with zero upfront risk—Pay on Delivery.',
+    ctaLabel: 'Explore Wellness Packs',
     requestedPackageCode: pkgParam || undefined,
   };
 }
