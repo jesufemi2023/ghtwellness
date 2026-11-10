@@ -198,7 +198,7 @@ export function resolveAdIntent(searchString?: string): AdIntentConfig {
     return {
       category: 'prostate',
       kicker: "Authorized GHT Healthcare Distribution · Natural Prostate Care",
-      headline: "Targeted Botanical Support for Men's Prostate Comfort & Uninterrupted Rest",
+      headline: "Targeted Herbal Support for Men's Prostate Comfort & Uninterrupted Rest",
       subheadline:
         'Genuine NAFDAC-registered herbal formulations crafted to support healthy urinary flow, bladder ease, and restful nights—delivered sealed to your doorstep so you inspect before paying.',
       pageTitle: "Natural Prostate Care Formula – Pay on Delivery | SD GHT Health Care",
@@ -230,7 +230,7 @@ export function resolveAdIntent(searchString?: string): AdIntentConfig {
     return {
       category: 'womens',
       kicker: "Authorized GHT Healthcare Distribution · Women's Holistic Wellness",
-      headline: "Gentle Botanical Nutrition for Women's Hormonal Balance & Reproductive Care",
+      headline: "Gentle Herbal Nutrition for Women's Hormonal Balance & Reproductive Care",
       subheadline:
         'Pure NAFDAC-registered plant formulations thoughtfully paired to support cycle harmony and feminine vitality—dispatched discreetly to your door with payment only upon inspection.',
       pageTitle: "Women's Herbal Wellness Packs – Pay on Delivery | SD GHT Health Care",
@@ -252,7 +252,7 @@ export function resolveAdIntent(searchString?: string): AdIntentConfig {
       kicker: "Authorized GHT Healthcare Distribution · Men's Performance & Stamina",
       headline: "Restorative Herbal Nutrition for Men's Performance, Stamina & Quiet Confidence",
       subheadline:
-        'Synergistic NAFDAC-registered botanical packs formulated to support male endurance, physical vitality, and healthy circulation—delivered in discreet sealed packaging with Pay on Delivery.',
+        'Synergistic NAFDAC-registered herbal wellness packs formulated to support male endurance, physical vitality, and healthy circulation—delivered in discreet sealed packaging with Pay on Delivery.',
       pageTitle: "Male Performance & Stamina Packs – Pay on Delivery | SD GHT Health Care",
       metaDescription:
         "Authentic NAFDAC-registered GHT male performance and stamina combo packs with discreet 24–48hr nationwide delivery and Pay on Delivery.",
@@ -266,7 +266,7 @@ export function resolveAdIntent(searchString?: string): AdIntentConfig {
     return {
       category: 'sugar',
       kicker: 'Authorized GHT Healthcare Distribution · Metabolic & Glucose Support',
-      headline: 'Balanced Botanical Nutrition for Steady Glucose Metabolism & Daily Energy',
+      headline: 'Balanced Herbal Nutrition for Steady Glucose Metabolism & Daily Energy',
       subheadline:
         'Carefully selected NAFDAC-registered herbal formulations supporting healthy metabolic balance, nerve comfort, and sustained vitality—inspect your factory-sealed bottles upon delivery before paying.',
       pageTitle: 'Metabolic & Sugar Balance Wellness Packs – Pay on Delivery | SD GHT Health Care',
@@ -284,7 +284,7 @@ export function resolveAdIntent(searchString?: string): AdIntentConfig {
       kicker: 'Authorized GHT Healthcare Distribution · Cardiovascular Wellness',
       headline: 'Plant-Based Nutritional Support for Healthy Circulation & Vascular Calm',
       subheadline:
-        'Genuine NAFDAC-registered GHT botanical packs formulated to support cardiovascular balance and steady daily vitality—delivered free across Nigeria with Pay on Delivery.',
+        'Genuine NAFDAC-registered GHT herbal wellness packs formulated to support cardiovascular balance and steady daily vitality—delivered free across Nigeria with Pay on Delivery.',
       pageTitle: 'Cardiovascular & Circulation Wellness Packs – Pay on Delivery | SD GHT Health Care',
       metaDescription:
         'Shop NAFDAC-registered GHT cardiovascular and circulation herbal wellness packs with Free Nationwide Pay on Delivery.',
@@ -298,7 +298,7 @@ export function resolveAdIntent(searchString?: string): AdIntentConfig {
     return {
       category: 'womens',
       kicker: "Authorized GHT Healthcare Distribution · Women's Holistic Wellness",
-      headline: "Gentle Botanical Nutrition for Women's Hormonal Balance & Reproductive Care",
+      headline: "Gentle Herbal Nutrition for Women's Hormonal Balance & Reproductive Care",
       subheadline:
         'Pure NAFDAC-registered plant formulations thoughtfully paired to support cycle harmony and feminine vitality—dispatched discreetly to your door with payment only upon inspection.',
       pageTitle: "Women's Herbal Wellness Packs – Pay on Delivery | SD GHT Health Care",
@@ -312,7 +312,7 @@ export function resolveAdIntent(searchString?: string): AdIntentConfig {
 
   return {
     category: 'all',
-    kicker: 'Official Nigerian Distribution · NAFDAC-Certified Botanicals',
+    kicker: 'Official Nigerian Distribution · NAFDAC-Certified Formulations',
     headline: 'Pure Herbal Formulations for Lasting Vitality, Joint Comfort & Daily Strength',
     subheadline:
       'Every multi-bottle GHT wellness pack is factory-sealed, NAFDAC-registered, and delivered free to your home or office—so you can inspect your supplements in person before making payment.',

@@ -89,7 +89,7 @@ export function sanitizeAdTitle(rawTitle: string): string {
 
 export function sanitizeAdText(rawText: string): string {
   if (!rawText) {
-    return "Formulated with NAFDAC-registered botanical extracts to support daily vitality, nutritional balance, and general well-being.";
+    return "Formulated with NAFDAC-registered herbal extracts to support daily vitality, nutritional balance, and general well-being.";
   }
   let cleaned = rawText.trim();
   for (const [pattern, replacement] of PROSE_REPLACEMENTS) {

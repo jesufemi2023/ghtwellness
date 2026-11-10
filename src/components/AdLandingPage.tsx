@@ -81,7 +81,7 @@ interface PackageVisualTheme {
   softSurfaceClass: string;
 }
 
-const SOFT_BOTANICAL_THEMES: Record<string, PackageVisualTheme> = {
+const PACKAGE_THEMES: Record<string, PackageVisualTheme> = {
   prostate: {
     categoryLabel: "Men's Prostate Care",
     headerBgClass: 'bg-[#EEF6F1]',
@@ -142,25 +142,25 @@ function resolvePackageVisualTheme(pkg: PackageData, index: number): PackageVisu
   const titleLower = `${pkg.package_code || ''} ${pkg.name || ''}`.toLowerCase();
 
   if (matchesSymptomCategory(pkg, 'prostate')) {
-    return SOFT_BOTANICAL_THEMES.prostate;
+    return PACKAGE_THEMES.prostate;
   }
   if (matchesSymptomCategory(pkg, 'womens')) {
-    return SOFT_BOTANICAL_THEMES.womens;
+    return PACKAGE_THEMES.womens;
   }
   if (matchesSymptomCategory(pkg, 'joints')) {
-    return SOFT_BOTANICAL_THEMES.joints;
+    return PACKAGE_THEMES.joints;
   }
   if (matchesSymptomCategory(pkg, 'sugar')) {
-    return SOFT_BOTANICAL_THEMES.sugar;
+    return PACKAGE_THEMES.sugar;
   }
   if (pkg.is_combo || titleLower.includes('combo')) {
-    return SOFT_BOTANICAL_THEMES.combo;
+    return PACKAGE_THEMES.combo;
   }
   if (matchesSymptomCategory(pkg, 'vitality')) {
-    return SOFT_BOTANICAL_THEMES.vitality;
+    return PACKAGE_THEMES.vitality;
   }
 
-  const themeList = Object.values(SOFT_BOTANICAL_THEMES);
+  const themeList = Object.values(PACKAGE_THEMES);
   return themeList[index % themeList.length];
 }
 
@@ -1017,90 +1017,195 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
         </div>
       </header>
 
-      {/* 2. Refined Botanical Apothecary Hero — Persuasive, Dignified & High-Trust for Adult Buyers */}
+      {/* 2. Responsive Healthcare Hero — Reduced to Half Height, Space-Optimized Across Screen Sizes */}
       <section className="relative bg-[#0E261D] text-[#FAF9F5] border-b border-[#1D3E31] overflow-hidden">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(95%_120%_at_90%_0%,rgba(16,185,129,0.18)_0%,rgba(14,38,29,0)_60%),radial-gradient(65%_90%_at_5%_100%,rgba(217,185,120,0.09)_0%,rgba(14,38,29,0)_55%)]"
         />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-7 sm:py-10 lg:py-14">
-          <div className="max-w-3xl space-y-3.5 sm:space-y-4.5">
-            <p className="text-[14px] sm:text-[15.5px] font-semibold text-[#95E4B9] tracking-[0.02em] leading-snug">
-              {adIntent.kicker}
-            </p>
+        {/* --- LAPTOP & DESKTOP HERO (lg & up): 2-Column Space-Optimized Split Layout --- */}
+        <div className="hidden lg:block relative max-w-7xl mx-auto px-6 lg:px-8 py-5 xl:py-6">
+          <div className="grid grid-cols-12 gap-8 xl:gap-10 items-center">
+            {/* Left Column: Headline, Kicker, Subtitle, Actions */}
+            <div className="col-span-7 xl:col-span-8 space-y-2.5">
+              <p className="text-xs xl:text-sm font-bold text-[#95E4B9] tracking-[0.03em] uppercase">
+                {adIntent.kicker}
+              </p>
 
-            <h1 className="text-[1.85rem] phablet:text-[2.1rem] sm:text-[2.6rem] lg:text-[3.15rem] font-semibold text-[#FAF9F5] tracking-[-0.015em] leading-[1.18] [text-wrap:balance] font-[family-name:var(--font-editorial)]">
-              {adIntent.headline}
-            </h1>
+              <h1 className="text-[1.95rem] xl:text-[2.25rem] font-semibold text-[#FAF9F5] tracking-[-0.015em] leading-[1.18] font-[family-name:var(--font-editorial)] [text-wrap:balance]">
+                {adIntent.headline}
+              </h1>
 
-            <p className="text-[17px] sm:text-[19px] lg:text-[20px] text-[#E1EBE5] leading-[1.72] tracking-[0.01em] max-w-2xl font-normal">
-              {adIntent.subheadline}
-            </p>
+              <p className="text-[14.5px] xl:text-[15.5px] text-[#D4E6DC] leading-[1.58] max-w-2xl font-normal line-clamp-2">
+                {adIntent.subheadline}
+              </p>
 
-            {/* Primary Exploration CTA + Direct Specialist Advisory */}
-            <div className="pt-2 flex flex-wrap items-center gap-3.5 sm:gap-4">
-              <button
-                type="button"
-                onClick={() => scrollToSection('ad-bundles')}
-                className="min-h-[52px] sm:min-h-[56px] px-6 sm:px-7 py-3 rounded-xl bg-[#F5FAF7] hover:bg-white text-[#0E261D] text-[16px] sm:text-[17px] font-bold transition-all inline-flex items-center justify-center gap-2.5 whitespace-nowrap cursor-pointer shadow-sm hover:shadow-md"
-              >
-                <span>{adIntent.ctaLabel}</span>
-                <ArrowDown className="w-4 h-4 text-[#047857] shrink-0" />
-              </button>
+              <div className="pt-1.5 flex items-center gap-3 xl:gap-4 flex-wrap">
+                <button
+                  type="button"
+                  onClick={() => scrollToSection('ad-bundles')}
+                  className="min-h-[44px] px-5 py-2.5 rounded-xl bg-[#F5FAF7] hover:bg-white text-[#0E261D] text-[14.5px] font-bold transition-all inline-flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer shadow-sm hover:shadow"
+                >
+                  <span>{adIntent.ctaLabel}</span>
+                  <ArrowDown className="w-4 h-4 text-[#047857] shrink-0" />
+                </button>
 
-              <a
-                href={getAdvisorWhatsAppHref()}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => recordAdvisorWhatsAppClick('Ad Hero Specialist')}
-                className="min-h-[52px] sm:min-h-[56px] px-5 sm:px-6 py-3 rounded-xl border border-white/30 bg-white/[0.08] hover:bg-white/[0.16] text-[#FAF9F5] text-[16px] sm:text-[17px] font-medium transition-colors inline-flex items-center justify-center gap-2.5 whitespace-nowrap cursor-pointer"
-              >
-                <MessageCircle className="w-5 h-5 text-[#95E4B9] shrink-0" />
-                <span>Speak with a Specialist</span>
-              </a>
+                <a
+                  href={getAdvisorWhatsAppHref()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => recordAdvisorWhatsAppClick('Ad Hero Specialist (Desktop)')}
+                  className="min-h-[44px] px-4 py-2.5 rounded-xl border border-white/25 bg-white/[0.08] hover:bg-white/[0.16] text-[#FAF9F5] text-[14px] font-semibold transition-colors inline-flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer"
+                >
+                  <MessageCircle className="w-4.5 h-4.5 text-[#95E4B9] shrink-0" />
+                  <span>Speak with Specialist</span>
+                </a>
 
-              <a
-                href={`tel:${contactPhone.replace(/\s+/g, '')}`}
-                className="inline-flex items-center gap-2 text-[15.5px] sm:text-[16.5px] font-medium text-[#C8DDD2] hover:text-white transition-colors py-1.5 sm:pl-1 tabular-nums whitespace-nowrap"
-              >
-                <Phone className="w-4 h-4 text-[#95E4B9] shrink-0" />
-                <span>Call {contactPhone}</span>
-              </a>
+                <a
+                  href={`tel:${contactPhone.replace(/\s+/g, '')}`}
+                  className="inline-flex items-center gap-1.5 text-[14px] font-medium text-[#C8DDD2] hover:text-white transition-colors py-1 tabular-nums whitespace-nowrap ml-1"
+                >
+                  <Phone className="w-4 h-4 text-[#95E4B9] shrink-0" />
+                  <span>{contactPhone}</span>
+                </a>
+              </div>
+            </div>
+
+            {/* Right Column: High-Trust Executive Assurance Card Cluster (Utilizes Available Width) */}
+            <div className="col-span-5 xl:col-span-4">
+              <div className="bg-white/[0.06] border border-white/15 rounded-2xl p-4 xl:p-4.5 backdrop-blur-xs space-y-3 shadow-lg">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-[#143B2E] border border-[#235845] flex items-center justify-center text-[#95E4B9] shrink-0 mt-0.5">
+                    <Truck className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <div className="text-[13.5px] font-bold text-[#FAF9F5]">Pay on Delivery (₦0 Upfront)</div>
+                    <div className="text-[12px] text-[#BED5C9] leading-snug">Inspect intact factory seals at your door before payment</div>
+                  </div>
+                </div>
+
+                <div className="h-px bg-white/10" />
+
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-[#143B2E] border border-[#235845] flex items-center justify-center text-[#95E4B9] shrink-0 mt-0.5">
+                    <Clock className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <div className="text-[13.5px] font-bold text-[#FAF9F5]">Free 24–48hr Nationwide Dispatch</div>
+                    <div className="text-[12px] text-[#BED5C9] leading-snug">Prompt doorstep delivery across all 36 states &amp; Abuja FCT</div>
+                  </div>
+                </div>
+
+                <div className="h-px bg-white/10" />
+
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-[#143B2E] border border-[#235845] flex items-center justify-center text-[#95E4B9] shrink-0 mt-0.5">
+                    <ShieldCheck className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <div className="text-[13.5px] font-bold text-[#FAF9F5]">100% NAFDAC Certified</div>
+                    <div className="text-[12px] text-[#BED5C9] leading-snug">Authentic batch-verified GHT herbal healthcare formulas</div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
+        </div>
 
-          {/* Architectural 3-Column Doorstep Assurance Ledger — Zero Broken Dots, 'Pay ₦0 Upfront' Desktop-Only */}
-          <div className="mt-8 sm:mt-10 pt-5 sm:pt-6 border-t border-white/14 grid grid-cols-3 gap-3 sm:gap-8 divide-x divide-white/14">
-            <div className="pr-1.5 sm:pr-4">
-              <div className="text-[14px] phablet:text-[15.5px] sm:text-[17px] font-bold text-[#FAF9F5] leading-snug">
-                <span className="hidden lg:inline">Pay ₦0 Upfront — </span>
-                <span>Pay on Delivery</span>
-              </div>
-              <div className="text-[13px] sm:text-[14.5px] text-[#C2D6CC] leading-snug mt-1">
-                Inspect seals before paying
-              </div>
-            </div>
+        {/* --- TABLET HERO (sm to lg): Clean Horizontal Compact Layout --- */}
+        <div className="hidden sm:block lg:hidden relative max-w-7xl mx-auto px-6 py-5 space-y-3">
+          <p className="text-xs font-bold text-[#95E4B9] tracking-[0.03em] uppercase">
+            {adIntent.kicker}
+          </p>
 
-            <div className="pl-3 sm:pl-8 pr-1.5 sm:pr-4">
-              <div className="text-[14px] phablet:text-[15.5px] sm:text-[17px] font-bold text-[#FAF9F5] leading-snug">
-                <span className="sm:hidden">Free Dispatch</span>
-                <span className="hidden sm:inline">Free Nationwide Delivery</span>
-              </div>
-              <div className="text-[13px] sm:text-[14.5px] text-[#C2D6CC] leading-snug mt-1 tabular-nums">
-                24–48 hrs to all 36 states
-              </div>
-            </div>
+          <h1 className="text-[1.75rem] md:text-[1.95rem] font-semibold text-[#FAF9F5] tracking-[-0.015em] leading-[1.2] font-[family-name:var(--font-editorial)] [text-wrap:balance]">
+            {adIntent.headline}
+          </h1>
 
-            <div className="pl-3 sm:pl-8">
-              <div className="text-[14px] phablet:text-[15.5px] sm:text-[17px] font-bold text-[#FAF9F5] leading-snug">
-                <span className="phablet:hidden">NAFDAC Reg.</span>
-                <span className="hidden phablet:inline">NAFDAC Certified</span>
-              </div>
-              <div className="text-[13px] sm:text-[14.5px] text-[#C2D6CC] leading-snug mt-1">
-                Genuine GHT herbal packs
-              </div>
-            </div>
+          <p className="text-[14px] text-[#D4E6DC] leading-[1.58] max-w-xl font-normal line-clamp-2">
+            {adIntent.subheadline}
+          </p>
+
+          <div className="pt-1 flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => scrollToSection('ad-bundles')}
+              className="min-h-[44px] px-5 py-2 rounded-xl bg-[#F5FAF7] hover:bg-white text-[#0E261D] text-sm font-bold transition-all inline-flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer shadow-sm"
+            >
+              <span>{adIntent.ctaLabel}</span>
+              <ArrowDown className="w-4 h-4 text-[#047857] shrink-0" />
+            </button>
+
+            <a
+              href={getAdvisorWhatsAppHref()}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => recordAdvisorWhatsAppClick('Ad Hero Specialist (Tablet)')}
+              className="min-h-[44px] px-4 py-2 rounded-xl border border-white/25 bg-white/[0.08] text-[#FAF9F5] text-sm font-semibold inline-flex items-center justify-center gap-2 whitespace-nowrap"
+            >
+              <MessageCircle className="w-4 h-4 text-[#95E4B9] shrink-0" />
+              <span>Speak with Specialist</span>
+            </a>
+
+            <a
+              href={`tel:${contactPhone.replace(/\s+/g, '')}`}
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-[#C8DDD2] hover:text-white transition-colors py-1 tabular-nums whitespace-nowrap ml-auto"
+            >
+              <Phone className="w-3.5 h-3.5 text-[#95E4B9] shrink-0" />
+              <span>{contactPhone}</span>
+            </a>
+          </div>
+
+          <div className="pt-3 border-t border-white/12 grid grid-cols-3 gap-2 text-center text-xs text-[#C8DDD2]">
+            <div><strong>Pay on Delivery</strong><span className="block text-[11px] text-[#9CBCAE]">₦0 upfront risk</span></div>
+            <div className="border-x border-white/12 px-2"><strong>24–48hr Dispatch</strong><span className="block text-[11px] text-[#9CBCAE]">Free nationwide</span></div>
+            <div><strong>NAFDAC Certified</strong><span className="block text-[11px] text-[#9CBCAE]">100% genuine GHT</span></div>
+          </div>
+        </div>
+
+        {/* --- MOBILE HERO (< sm): Ultra-Streamlined High-Impact Mobile Card --- */}
+        <div className="block sm:hidden relative px-4 py-3.5 space-y-2">
+          <p className="text-[11px] font-bold text-[#95E4B9] uppercase tracking-wider">
+            {adIntent.kicker}
+          </p>
+
+          <h1 className="text-[1.38rem] phablet:text-[1.55rem] font-semibold text-[#FAF9F5] leading-[1.22] font-[family-name:var(--font-editorial)] [text-wrap:balance]">
+            {adIntent.headline}
+          </h1>
+
+          <p className="text-[13px] text-[#CEE0D6] leading-snug line-clamp-2">
+            {adIntent.subheadline}
+          </p>
+
+          <div className="pt-1 flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => scrollToSection('ad-bundles')}
+              className="flex-1 min-h-[42px] px-3.5 py-2 rounded-xl bg-[#F5FAF7] active:bg-white text-[#0E261D] text-xs font-bold inline-flex items-center justify-center gap-1.5 whitespace-nowrap shadow-xs"
+            >
+              <span>{adIntent.ctaLabel}</span>
+              <ArrowDown className="w-3.5 h-3.5 text-[#047857] shrink-0" />
+            </button>
+
+            <a
+              href={getAdvisorWhatsAppHref()}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => recordAdvisorWhatsAppClick('Ad Hero Specialist (Mobile)')}
+              className="min-h-[42px] px-3.5 py-2 rounded-xl border border-white/25 bg-white/[0.08] text-white text-xs font-semibold inline-flex items-center justify-center gap-1.5 shrink-0"
+            >
+              <MessageCircle className="w-4 h-4 text-[#95E4B9] shrink-0" />
+              <span>Specialist</span>
+            </a>
+          </div>
+
+          <div className="flex items-center justify-between text-[11px] text-[#A6CDBA] font-medium pt-2 border-t border-white/10">
+            <span>₦0 Upfront POD</span>
+            <span aria-hidden="true" className="text-white/20">·</span>
+            <span>Free 24–48h Dispatch</span>
+            <span aria-hidden="true" className="text-white/20">·</span>
+            <span>NAFDAC Reg.</span>
           </div>
         </div>
       </section>
@@ -1116,7 +1221,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
             <h2 className="text-[2rem] font-semibold text-[#14261E] font-[family-name:var(--font-editorial)] tracking-[-0.012em] leading-[1.24] [text-wrap:balance]">
               {activeFilter === 'all'
                 ? 'Select Your Targeted Herbal Wellness Pack'
-                : `Targeted Botanical Care for ${activeCategoryLabel}`}
+                : `Targeted Herbal Care for ${activeCategoryLabel}`}
             </h2>
             <p className="text-[17.5px] text-[#283B32] leading-[1.74] tracking-[0.005em]">
               {activeFilter === 'all' ? (
@@ -1314,108 +1419,112 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                 return (
                   <article
                     key={pkg.id}
-                    className={`bg-white rounded-[26px] sm:rounded-[28px] border transition-all duration-200 flex flex-col overflow-hidden ${
+                    className={`bg-white rounded-[28px] sm:rounded-[32px] border transition-all duration-300 flex flex-col overflow-hidden ${
                       isCenterOfFocus
-                        ? 'border-[#047857]/50 ring-2 ring-[#047857]/20 shadow-[0_18px_44px_-16px_rgba(4,120,87,0.18)] hover:-translate-y-1 hover:shadow-[0_24px_50px_-16px_rgba(4,120,87,0.26)]'
-                        : `${theme.cardBorderClass} shadow-[0_12px_34px_-16px_rgba(15,31,24,0.07)] hover:-translate-y-0.5 hover:shadow-[0_18px_42px_-16px_rgba(15,31,24,0.12)]`
+                        ? 'border-[#047857]/45 ring-2 ring-[#047857]/15 shadow-[0_16px_40px_-14px_rgba(4,120,87,0.16)] hover:-translate-y-1 hover:shadow-[0_24px_50px_-14px_rgba(4,120,87,0.22)]'
+                        : `${theme.cardBorderClass} shadow-[0_10px_32px_-14px_rgba(15,31,24,0.07)] hover:-translate-y-0.5 hover:shadow-[0_18px_42px_-14px_rgba(15,31,24,0.12)]`
                     }`}
                   >
-                    {/* Top Package Identity Header — Soft Tinted Clarity for Adult Differentiation */}
+                    {/* Top Package Identity Header — Distinct Editorial Presence */}
                     <div
                       className={`${
                         isProstateFocus
-                          ? 'bg-gradient-to-r from-[#EEF6F1] via-[#F5FAF7] to-[#EEF6F1]'
+                          ? 'bg-gradient-to-r from-[#EEF6F1] via-[#F4FAF6] to-[#EEF6F1]'
                           : isPerformanceFocus
                             ? 'bg-gradient-to-r from-[#FBF4E7] via-[#FFF9F0] to-[#FBF4E7]'
                             : theme.headerBgClass
-                      } px-5 sm:px-7 py-4 sm:py-5 border-b border-slate-200/65 space-y-2`}
+                      } px-5 sm:px-7 py-4 sm:py-5 border-b border-slate-200/70 space-y-2`}
                     >
-                      <div className="flex flex-wrap items-center justify-between gap-2 text-[13.5px] sm:text-sm">
+                      <div className="flex flex-wrap items-center justify-between gap-2 text-[13px] sm:text-[13.5px]">
                         <div className="flex flex-wrap items-center gap-2">
                           {isProstateFocus ? (
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#047857] text-white text-[12px] sm:text-[13px] font-bold tracking-tight shadow-2xs">
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#047857] text-white text-[11.5px] sm:text-xs font-bold tracking-tight shadow-2xs">
                               <Sparkles className="w-3.5 h-3.5 shrink-0" />
                               Primary Focus · Package 01
                             </span>
                           ) : isPerformanceFocus ? (
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#0E3E2E] text-[#95E4B9] border border-[#1D634B] text-[12px] sm:text-[13px] font-bold tracking-tight shadow-2xs">
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#0E3E2E] text-[#95E4B9] border border-[#1D634B] text-[11.5px] sm:text-xs font-bold tracking-tight shadow-2xs">
                               <Flame className="w-3.5 h-3.5 text-[#95E4B9] shrink-0" />
                               Core Focus · Package 02
                             </span>
                           ) : (
-                            <>
-                              <span className={`font-semibold tabular-nums ${theme.accentTextClass}`}>
+                            <div className="flex items-center gap-1.5 font-semibold text-[#1F332A]">
+                              <span className={`tabular-nums ${theme.accentTextClass}`}>
                                 Package {indexDisplay}
                               </span>
-                              <span aria-hidden="true" className="text-slate-400">
-                                ·
-                              </span>
-                              <span className={`font-medium ${theme.accentTextClass}`}>
-                                {theme.categoryLabel}
-                              </span>
-                            </>
+                              <span aria-hidden="true" className="text-slate-400">·</span>
+                              <span className={theme.accentTextClass}>{theme.categoryLabel}</span>
+                            </div>
                           )}
                         </div>
 
-                        <div className="text-[#4A5E54] font-medium tabular-nums text-xs sm:text-[13px]">
-                          {pkg.package_code ? `${pkg.package_code} · ` : ''}
-                          NAFDAC Registered
+                        <div className="text-[#3E5248] font-medium tabular-nums text-xs sm:text-[13px] flex items-center gap-1">
+                          <ShieldCheck className="w-3.5 h-3.5 text-[#047857] shrink-0" />
+                          <span>{pkg.package_code ? `${pkg.package_code} · ` : ''}NAFDAC Registered</span>
                         </div>
                       </div>
 
                       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 pt-0.5">
-                        <h3 className="text-[1.55rem] sm:text-[1.78rem] lg:text-[1.95rem] font-semibold text-[#14261E] font-[family-name:var(--font-editorial)] leading-[1.22] tracking-[-0.012em] [text-wrap:balance]">
+                        <h3 className="text-[1.62rem] sm:text-[1.85rem] lg:text-[1.98rem] font-bold text-[#0E241B] font-[family-name:var(--font-editorial)] leading-[1.2] tracking-[-0.012em] [text-wrap:balance]">
                           {pkg.name}
                         </h3>
 
                         <div className="tabular-nums text-left sm:text-right shrink-0">
-                          <span className="text-2xl sm:text-3xl font-bold text-[#14261E]">
-                            ₦{pricing.currentPrice.toLocaleString()}
-                          </span>
-                          {pricing.savings > 0 && (
-                            <span className="ml-2.5 text-sm sm:text-base text-slate-400 line-through">
-                              ₦{pricing.retailPrice.toLocaleString()}
+                          <div className="flex items-baseline gap-2">
+                            <span className="text-2xl sm:text-3xl font-bold text-[#0E241B]">
+                              ₦{pricing.currentPrice.toLocaleString()}
                             </span>
-                          )}
+                            {pricing.savings > 0 && (
+                              <span className="text-sm sm:text-base text-slate-400 line-through">
+                                ₦{pricing.retailPrice.toLocaleString()}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
 
-                    {/* Oversized Soft-Lit Studio Product Stage + Non-Clipped Full Pack Switcher */}
+                    {/* Studio Product Stage */}
                     <div className="border-b border-slate-200/70">
                       <StudioProductStage
                         entries={galleryEntries}
                         alt={pkg.name}
-                        heightClassName="h-[300px] phablet:h-[340px] sm:h-[380px] md:h-[320px] lg:h-[410px]"
+                        heightClassName="h-[280px] phablet:h-[320px] sm:h-[360px] md:h-[300px] lg:h-[390px]"
                         studioGradientClass={theme.studioGradientClass}
                         optimizeWidth={1200}
                         onInspect={() => setDetailModalItem({ item: pkg, type: 'package' })}
                       />
                     </div>
 
-                    {/* Soft, Spacious Adult Reading & Purchase Body */}
-                    <div className="p-5 sm:p-7 lg:p-8 flex-1 flex flex-col justify-between space-y-5 sm:space-y-6 bg-white">
-                      <div className="space-y-4 sm:space-y-5">
+                    {/* Luxurious, Highly-Legible Card Reading & Conversion Body */}
+                    <div className="p-5 sm:p-7 lg:p-8 flex-1 flex flex-col justify-between space-y-6 bg-white">
+                      <div className="space-y-5">
+                        {/* CLEARLY SPELLED OUT, BIGGER, BOLDER, WELL-DESIGNED & DIFFERENTIATED DESCRIPTION */}
                         {pkg.description && pkg.description.trim().length > 0 && (
-                          <ExpandableDescription
-                            text={pkg.description}
-                            maxChars={160}
-                            className="text-[17px] sm:text-[17.5px] lg:text-[18px] text-[#263930] leading-[1.76] font-normal tracking-[0.006em]"
-                          />
+                          <div className="rounded-2xl bg-gradient-to-br from-[#F4F9F6] via-[#EEF6F2] to-[#E8F3EC] border border-[#BFDACB] p-4.5 sm:p-5.5 shadow-2xs">
+                            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#047857] mb-2">
+                              <span className="w-1.5 h-1.5 rounded-full bg-[#047857] shrink-0" />
+                              <span>Targeted Action &amp; Health Purpose</span>
+                            </div>
+                            <p className="text-[17.5px] sm:text-[19px] lg:text-[20px] font-semibold text-[#0B1E15] leading-[1.62] tracking-[-0.012em] [text-wrap:balance]">
+                              {pkg.description}
+                            </p>
+                          </div>
                         )}
 
+                        {/* Verified Health Benefits */}
                         {visibleBenefits.length > 0 && (
                           <div className="space-y-3 pt-0.5">
-                            <h4 className="text-[16px] sm:text-[17px] font-semibold text-[#14261E]">
-                              Key Wellness Benefits:
+                            <h4 className="text-[15.5px] sm:text-[16.5px] font-bold text-[#0E241B]">
+                              Key Verified Benefits:
                             </h4>
-                            <ul className="grid grid-cols-1 xl:grid-cols-2 gap-x-5 gap-y-3">
+                            <ul className="grid grid-cols-1 xl:grid-cols-2 gap-x-5 gap-y-2.5">
                               {visibleBenefits.map((benefit, bIdx) => (
                                 <li
                                   key={bIdx}
-                                  className="flex items-start gap-2.5 text-[16.5px] sm:text-[17.5px] text-[#263930] leading-[1.7] font-normal"
+                                  className="flex items-start gap-2.5 text-[15.5px] sm:text-[16.5px] text-[#24382F] leading-[1.6] font-normal"
                                 >
-                                  <CheckCircle2 className="w-5 h-5 text-[#057A55] shrink-0 mt-0.5" />
+                                  <CheckCircle2 className="w-4.5 h-4.5 text-[#047857] shrink-0 mt-0.5" />
                                   <span>{benefit}</span>
                                 </li>
                               ))}
@@ -1430,7 +1539,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                                     [pkg.id]: !isBenefitsExpanded,
                                   }))
                                 }
-                                className="text-[15.5px] sm:text-[16px] font-semibold text-[#047857] hover:underline underline-offset-4 pt-1 cursor-pointer"
+                                className="text-[14.5px] sm:text-[15px] font-semibold text-[#047857] hover:underline underline-offset-4 pt-1 cursor-pointer"
                               >
                                 {isBenefitsExpanded
                                   ? 'Show fewer benefits'
@@ -1440,18 +1549,19 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                           </div>
                         )}
 
+                        {/* Bottle Pack Options Selector */}
                         {pkg.options && pkg.options.length > 0 && (
                           <div className="space-y-2.5 pt-4 border-t border-slate-200/75">
                             <div className="flex items-center justify-between gap-2">
-                              <span className="text-[16px] sm:text-[17px] font-semibold text-[#14261E]">
-                                Choose Your Bottle Pack:
+                              <span className="text-[15.5px] sm:text-[16.5px] font-bold text-[#0E241B]">
+                                Select Supply Size:
                               </span>
-                              <span className="text-[13.5px] sm:text-[14.5px] font-normal text-[#4F6359]">
-                                Tap to select size
+                              <span className="text-[13px] sm:text-[14px] font-medium text-[#4F6359]">
+                                Tap to select bottle pack
                               </span>
                             </div>
 
-                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-2 xl:grid-cols-3 gap-3">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-2 xl:grid-cols-3 gap-2.5 sm:gap-3">
                               {pkg.options.map((opt, oIdx) => {
                                 const isSel = oIdx === selectedIdx;
                                 const optPriceInfo = resolveSingleOptionPricing(
@@ -1478,24 +1588,24 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                                         optPriceInfo.sellingPrice
                                       );
                                     }}
-                                    className={`min-h-[72px] sm:min-h-[76px] p-3.5 sm:p-4 rounded-2xl border text-left transition-colors cursor-pointer tabular-nums ${
+                                    className={`min-h-[72px] sm:min-h-[76px] p-3 sm:p-3.5 rounded-2xl border text-left transition-all cursor-pointer tabular-nums relative ${
                                       isSel
-                                        ? 'border-[#047857] bg-[#F2F9F5] ring-2 ring-[#047857]'
-                                        : 'border-[#D8E2DC] bg-[#FAFBF9] hover:bg-white hover:border-[#94ACA0]'
+                                        ? 'border-[#047857] bg-[#F2F9F5] ring-2 ring-[#047857] shadow-xs'
+                                        : 'border-[#D5E1DA] bg-[#FAFBF9] hover:bg-white hover:border-[#96B1A2]'
                                     }`}
                                   >
                                     <div className="flex items-center justify-between gap-1">
-                                      <span className="text-[14px] sm:text-[15px] font-semibold text-[#162820] whitespace-nowrap">
+                                      <span className="text-[13.5px] sm:text-[14.5px] font-bold text-[#14261E] whitespace-nowrap">
                                         {optPriceInfo.label}
                                       </span>
                                       {optPriceInfo.discountPercent > 0 && (
-                                        <span className="text-xs font-semibold text-[#047857]">
+                                        <span className="text-[11px] font-bold text-[#047857] bg-[#E1F3EA] px-1.5 py-0.5 rounded">
                                           -{optPriceInfo.discountPercent}%
                                         </span>
                                       )}
                                     </div>
                                     <div className="mt-1 space-y-0.5">
-                                      <div className="text-[16px] sm:text-[17.5px] font-bold text-[#047857]">
+                                      <div className="text-[16px] sm:text-[17px] font-bold text-[#047857]">
                                         ₦{optPriceInfo.sellingPrice.toLocaleString()}
                                       </div>
                                       {optPriceInfo.savings > 0 && (
@@ -1512,21 +1622,19 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                         )}
 
                         {pricing.includedList.length > 0 && (
-                          <p className="text-[16px] sm:text-[17px] text-[#263930] leading-[1.7] pt-0.5">
-                            <strong className="font-semibold text-[#14261E]">
-                              Included in Pack:{' '}
-                            </strong>
+                          <div className="text-[14.5px] sm:text-[15.5px] text-[#2C4137] leading-[1.65] pt-0.5">
+                            <strong className="font-semibold text-[#0E241B]">Included in Pack: </strong>
                             {pricing.includedList.join(' · ')}
-                          </p>
+                          </div>
                         )}
                       </div>
 
-                      {/* Clear Package Summary, Primary Order Action & 'Chat with us' Button */}
-                      <div className="pt-5 border-t border-slate-200/75 space-y-4">
+                      {/* Package Pricing Summary & Conversion Actions */}
+                      <div className="pt-4 border-t border-slate-200/75 space-y-3.5">
                         <div className="flex flex-wrap items-baseline justify-between gap-3 tabular-nums">
                           <div>
                             <div className="flex items-baseline gap-2.5 flex-wrap">
-                              <span className="text-[1.8rem] sm:text-[2.05rem] font-bold text-[#162820] tracking-tight">
+                              <span className="text-[1.85rem] sm:text-[2.1rem] font-bold text-[#0E241B] tracking-tight">
                                 ₦{pricing.currentPrice.toLocaleString()}
                               </span>
                               {pricing.savings > 0 && (
@@ -1535,9 +1643,9 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                                 </span>
                               )}
                             </div>
-                            <div className="text-[13.5px] sm:text-[14.5px] text-[#047857] font-medium mt-0.5">
+                            <div className="text-[13px] sm:text-[14px] text-[#047857] font-semibold mt-0.5">
                               {pricing.savings > 0
-                                ? `Save ₦${pricing.savings.toLocaleString()} (${pricing.discount}% Off) · Free Doorstep Delivery`
+                                ? `Save ₦${pricing.savings.toLocaleString()} (${pricing.discount}% Off) · Free Nationwide Delivery`
                                 : 'Free Nationwide Delivery · Pay on Delivery'}
                             </div>
                           </div>
@@ -1545,9 +1653,9 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                           <button
                             type="button"
                             onClick={() => setDetailModalItem({ item: pkg, type: 'package' })}
-                            className="text-[14.5px] sm:text-[15.5px] font-medium text-[#475A50] hover:text-[#047857] underline underline-offset-4 cursor-pointer whitespace-nowrap"
+                            className="text-[14px] sm:text-[15px] font-medium text-[#475A50] hover:text-[#047857] underline underline-offset-4 cursor-pointer whitespace-nowrap"
                           >
-                            Full Details
+                            View Bottle Details
                           </button>
                         </div>
 
@@ -1555,7 +1663,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                           <button
                             type="button"
                             onClick={() => openExpressCheckout(pkg, 'package', selectedIdx)}
-                            className="sm:col-span-3 md:col-span-1 xl:col-span-3 min-h-[56px] sm:min-h-[58px] px-5 py-3.5 rounded-2xl bg-[#047857] hover:bg-[#065F46] text-white font-bold text-[17px] sm:text-[18px] transition-colors flex items-center justify-center gap-2.5 whitespace-nowrap cursor-pointer shadow-sm"
+                            className="sm:col-span-3 md:col-span-1 xl:col-span-3 min-h-[54px] sm:min-h-[58px] px-5 py-3 rounded-2xl bg-[#047857] hover:bg-[#065F46] text-white font-bold text-[16.5px] sm:text-[17.5px] transition-all flex items-center justify-center gap-2.5 whitespace-nowrap cursor-pointer shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
                           >
                             <ShoppingBag className="w-5 h-5 shrink-0" />
                             <span>Order on Delivery</span>
@@ -1570,11 +1678,19 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                             onClick={() =>
                               recordAdvisorWhatsAppClick(`Ad Package Card Chat: ${pkg.name}`)
                             }
-                            className="sm:col-span-2 md:col-span-1 xl:col-span-2 min-h-[54px] sm:min-h-[58px] px-4 py-3 rounded-2xl border border-[#BBD6C8] bg-[#F4FAF7] hover:bg-[#E7F4ED] text-[#065F46] font-bold text-[16px] sm:text-[17px] transition-colors flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer"
+                            className="sm:col-span-2 md:col-span-1 xl:col-span-2 min-h-[52px] sm:min-h-[58px] px-4 py-3 rounded-2xl border border-[#BBD6C8] bg-[#F4FAF7] hover:bg-[#E7F4ED] text-[#065F46] font-bold text-[15.5px] sm:text-[16.5px] transition-colors flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer"
                           >
                             <MessageCircle className="w-5 h-5 shrink-0" />
-                            <span>Chat with us</span>
+                            <span>Speak with Specialist</span>
                           </a>
+                        </div>
+
+                        <div className="flex items-center justify-center gap-2 text-xs text-[#52695E] pt-1 text-center">
+                          <span>₦0 Upfront</span>
+                          <span aria-hidden="true">·</span>
+                          <span>Inspect Intact Seals at Doorstep</span>
+                          <span aria-hidden="true">·</span>
+                          <span>Pay Rider</span>
                         </div>
                       </div>
                     </div>
