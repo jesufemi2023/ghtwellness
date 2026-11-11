@@ -1057,6 +1057,8 @@ export default function App() {
                   searchParams.set("total_price", String(totalPrice));
                   searchParams.set("delivery_date", deliveryDate);
                   searchParams.set("payment_method", paymentMethod);
+                  const storedTx = typeof window !== "undefined" ? sessionStorage.getItem("ght_last_order_tx") : null;
+                  if (storedTx) searchParams.set("tx_id", storedTx);
                   const attr = getStoredAdAttribution();
                   if (attr.gclid) searchParams.set("gclid", attr.gclid);
                   if (attr.utm_campaign) searchParams.set("utm_campaign", attr.utm_campaign);
@@ -2699,6 +2701,8 @@ export default function App() {
             searchParams.set("total_price", String(totalPrice));
             searchParams.set("delivery_date", deliveryDate);
             searchParams.set("payment_method", paymentMethod);
+            const storedTx = typeof window !== "undefined" ? sessionStorage.getItem("ght_last_order_tx") : null;
+            if (storedTx) searchParams.set("tx_id", storedTx);
             window.history.pushState(null, '', `/thank-you?${searchParams.toString()}`);
             setActiveTab("thank-you");
             setIsOrderDrawerOpen(false);

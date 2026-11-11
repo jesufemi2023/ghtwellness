@@ -288,15 +288,20 @@ export async function createServer() {
   
   // Settings API (Must be before generic admin routes)
   app.get("/api/settings", async (req, res) => {
-    if (!supabase) return res.status(500).json({ error: "Database not initialized" });
+    const defaultSettings: Record<string, string> = {
+      google_tag_id: "AW-18237021036",
+      google_conversion_label: "uMelCPiLyLYdEOy2i_hD",
+    };
+
+    if (!supabase) return res.json(defaultSettings);
     const { data, error } = await supabase.from('settings').select('*');
-    if (error) return res.status(500).json({ error: error.message });
+    if (error || !data) return res.json(defaultSettings);
     
-    // Convert array to object for easier frontend use
+    // Convert array to object for easier frontend use with defaults merged in
     const settings = data.reduce((acc: any, curr: any) => {
       acc[curr.key] = curr.value;
       return acc;
-    }, {});
+    }, { ...defaultSettings });
     
     res.json(settings);
   });

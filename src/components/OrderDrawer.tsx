@@ -283,7 +283,14 @@ export const OrderDrawer: React.FC<OrderDrawerProps> = ({
 
       if (res.ok) {
         console.log("Order submitted successfully");
-        trackOrderComplete(item.name, totalPrice);
+        const txId = `ORD_${Date.now()}_${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+        try {
+          sessionStorage.setItem("ght_last_order_tx", txId);
+          sessionStorage.setItem("ght_last_order_value", String(totalPrice));
+        } catch (e) {
+          // ignore
+        }
+        trackOrderComplete(item.name, totalPrice, txId);
         setIsSuccess(true);
         if (onOrderSuccess) {
           onOrderSuccess(

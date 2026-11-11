@@ -75,8 +75,8 @@ export const trackAdBundleSelect = (bundleName: string, optionLabel: string, pri
   });
 };
 
-export const trackOrderComplete = (itemName: string, amount: number) => {
-  const txId = `T_${Date.now()}`;
+export const trackOrderComplete = (itemName: string, amount: number, transactionId?: string) => {
+  const txId = transactionId || `ORD_${Date.now()}_${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
   trackEvent("Ecommerce", "Order Complete", itemName, amount);
   trackPixelPurchase(itemName, amount);
   trackGoogleTagEvent("purchase", {

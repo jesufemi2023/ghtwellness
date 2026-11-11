@@ -469,7 +469,15 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
         );
       }
 
-      trackOrderComplete(activeItem.name, totalPrice);
+      const txId = `ORD_${Date.now()}_${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+      try {
+        sessionStorage.setItem("ght_last_order_tx", txId);
+        sessionStorage.setItem("ght_last_order_value", String(totalPrice));
+      } catch (e) {
+        // ignore
+      }
+
+      trackOrderComplete(activeItem.name, totalPrice, txId);
       setIsSuccess(true);
 
       if (onOrderSuccess) {

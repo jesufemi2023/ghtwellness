@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { motion } from "motion/react";
 import { 
   CheckCircle2, 
   MessageSquare, 
   ArrowRight, 
-  Home as HomeIcon,
+  Home as HomeIcon, 
   ShoppingBag, 
   PhoneCall, 
   Truck, 
@@ -17,6 +17,7 @@ import {
 import { CONFIG } from "../config";
 import { openWhatsAppLink } from "../utils/whatsapp";
 import { formatOrderDisplayName } from "../utils/bottleFormatter";
+import { trackGoogleAdsConversion } from "../lib/googleTag";
 
 interface ThankYouPageProps {
   onNavigate: (tab: "home" | "products" | "recommended" | "combo") => void;
@@ -33,6 +34,30 @@ export const ThankYouPage: React.FC<ThankYouPageProps> = ({ onNavigate }) => {
   const paymentMethod = params.get("payment_method") || "";
 
   const isDirectAccess = !fullName && !itemName;
+
+  // Google Ads conversion event tracking on landing on /thank-you
+  const conversionFiredRef = useRef(false);
+
+  useEffect(() => {
+    if (conversionFiredRef.current) return;
+    conversionFiredRef.current = true;
+
+    // Parse numeric order value in Naira
+    const parsedPrice = parseInt(totalPrice, 10);
+    const amount = !isNaN(parsedPrice) && parsedPrice > 0 ? parsedPrice : 0;
+
+    // Resolve transaction ID: URL param > sessionStorage > generated unique ID
+    const urlTxId = params.get("tx_id") || params.get("transaction_id") || "";
+    let txId = urlTxId;
+    if (!txId && typeof window !== "undefined") {
+      txId = sessionStorage.getItem("ght_last_order_tx") || "";
+    }
+    if (!txId) {
+      txId = `TY_${Date.now()}_${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+    }
+
+    trackGoogleAdsConversion(amount, txId);
+  }, [totalPrice]);
 
   const handleWhatsAppConfirm = () => {
     const itemDisplay = formatOrderDisplayName(itemName, parseInt(quantity) || 1);
