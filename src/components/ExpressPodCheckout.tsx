@@ -636,23 +636,23 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
             )}
           </div>
 
-          <div className="flex-1 w-full space-y-2 text-center sm:text-left">
-            <div className="text-xs font-medium text-[#047857]">
+          <div className="flex-1 w-full space-y-2.5 text-center sm:text-left">
+            <div className="text-[13.5px] sm:text-[14px] font-bold text-[#047857]">
               NAFDAC Registered · Free Doorstep Delivery · Pay on Delivery
             </div>
-            <h4 className="text-xl sm:text-2xl font-semibold text-[#162820] font-[family-name:var(--font-editorial)] leading-snug">
+            <h4 className="text-2xl sm:text-[27px] font-bold text-[#162820] font-[family-name:var(--font-editorial)] leading-snug">
               {displayTitle}
             </h4>
-            <div className="text-2xl font-bold text-[#162820] tabular-nums">
+            <div className="text-[26px] sm:text-[30px] font-black text-[#162820] tabular-nums">
               ₦{totalPrice.toLocaleString()}
               {totalSavings > 0 && (
-                <span className="ml-2 text-sm font-normal text-slate-400 line-through">
+                <span className="ml-2.5 text-base sm:text-lg font-normal text-slate-400 line-through">
                   ₦{totalRetail.toLocaleString()}
                 </span>
               )}
             </div>
             {totalSavings > 0 && (
-              <div className="text-xs font-medium text-[#047857]">
+              <div className="text-[13.5px] sm:text-[14.5px] font-bold text-[#047857]">
                 You Save ₦{totalSavings.toLocaleString()} ({computedPricing.discount}% Off)
               </div>
             )}
@@ -660,48 +660,48 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
         </div>
 
         {/* Desktop Inline Title + Quantity Row */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 pt-1.5">
           <div className={mode === 'inline' ? 'hidden lg:block' : 'hidden'}>
-            <div className="text-xs font-medium text-[#047857]">
+            <div className="text-[13.5px] font-bold text-[#047857]">
               NAFDAC Registered · Inspect Seals Before Paying
             </div>
-            <h4 className="text-xl font-bold text-[#0F1F18] font-[family-name:var(--font-editorial)] mt-0.5">
+            <h4 className="text-[22px] sm:text-2xl font-bold text-[#0F1F18] font-[family-name:var(--font-editorial)] mt-0.5">
               {displayTitle}
             </h4>
           </div>
 
-          <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
-            <span className="text-sm font-medium text-slate-700">Quantity (Packs):</span>
-            <div className="inline-flex items-center gap-2">
+          <div className="flex items-center justify-between sm:justify-end gap-3.5 w-full sm:w-auto">
+            <span className="text-[15.5px] sm:text-[16.5px] font-bold text-slate-800">Quantity (Packs):</span>
+            <div className="inline-flex items-center gap-2.5">
               <button
                 type="button"
                 aria-label="Decrease quantity"
                 onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                className="w-10 h-10 rounded-lg border border-[#CBD5CF] bg-white hover:bg-slate-50 flex items-center justify-center text-slate-800 cursor-pointer"
+                className="w-11 h-11 rounded-xl border border-[#CBD5CF] bg-white hover:bg-slate-50 flex items-center justify-center text-slate-800 cursor-pointer shadow-2xs"
               >
-                <Minus className="w-4 h-4" />
+                <Minus className="w-4.5 h-4.5" />
               </button>
-              <span className="w-9 text-center font-bold text-lg text-[#0F1F18] tabular-nums">
+              <span className="w-10 text-center font-black text-xl text-[#0F1F18] tabular-nums">
                 {quantity}
               </span>
               <button
                 type="button"
                 aria-label="Increase quantity"
                 onClick={() => setQuantity((q) => q + 1)}
-                className="w-10 h-10 rounded-lg border border-[#CBD5CF] bg-white hover:bg-slate-50 flex items-center justify-center text-slate-800 cursor-pointer"
+                className="w-11 h-11 rounded-xl border border-[#CBD5CF] bg-white hover:bg-slate-50 flex items-center justify-center text-slate-800 cursor-pointer shadow-2xs"
               >
-                <Plus className="w-4 h-4" />
+                <Plus className="w-4.5 h-4.5" />
               </button>
             </div>
           </div>
         </div>
 
         {itemOptions.length > 0 && (
-          <div className="space-y-2.5">
-            <div className="text-sm font-semibold text-[#0F1F18]">
+          <div className="space-y-3">
+            <div className="text-[15.5px] sm:text-[16.5px] font-bold text-[#0F1F18]">
               Select Bottle Pack &amp; Discounted Price:
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {itemOptions.map((opt, idx) => {
                 const isSelected = idx === activeOptIdx;
                 const optPriceInfo = resolveSingleOptionPricing(opt, parentDiscountPercent);
@@ -720,32 +720,32 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
                         onSelectBundle?.(activeItem as PackageData, idx);
                       }
                     }}
-                    className={`p-3 rounded-xl border text-left transition-colors cursor-pointer tabular-nums ${
+                    className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer tabular-nums ${
                       isSelected
-                        ? 'border-[#047857] bg-white ring-2 ring-[#047857]'
+                        ? 'border-[#047857] bg-white ring-2 ring-[#047857] shadow-xs'
                         : 'border-[#D5DFDA] bg-white/85 hover:bg-white hover:border-slate-400'
                     }`}
                   >
                     <div className="flex items-center justify-between gap-1">
                       <span
-                        className={`text-sm font-bold whitespace-nowrap ${
+                        className={`text-[15px] font-bold whitespace-nowrap ${
                           isSelected ? 'text-[#047857]' : 'text-[#0F1F18]'
                         }`}
                       >
                         {optPriceInfo.label}
                       </span>
                       {optPriceInfo.discountPercent > 0 && (
-                        <span className="text-xs font-bold text-[#047857]">
+                        <span className="text-[12px] font-extrabold text-[#047857]">
                           -{optPriceInfo.discountPercent}%
                         </span>
                       )}
                     </div>
-                    <div className="mt-1 space-y-0.5">
-                      <div className="text-sm font-extrabold text-[#0F1F18]">
+                    <div className="mt-1.5 space-y-0.5">
+                      <div className="text-[16px] sm:text-[17px] font-black text-[#0F1F18]">
                         ₦{optPriceInfo.sellingPrice.toLocaleString()}
                       </div>
                       {optPriceInfo.savings > 0 && (
-                        <div className="text-[11px] text-slate-400 line-through">
+                        <div className="text-[12px] sm:text-[12.5px] text-slate-400 line-through">
                           ₦{optPriceInfo.originalPrice.toLocaleString()}
                         </div>
                       )}
@@ -758,8 +758,8 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
         )}
 
         {includedProducts.length > 0 && (
-          <p className="text-sm text-slate-700 leading-relaxed pt-1">
-            <strong className="text-[#0F1F18]">Included Bottles: </strong>
+          <p className="text-[15px] sm:text-[16px] text-slate-700 leading-relaxed pt-1">
+            <strong className="text-[#0F1F18] font-bold">Included Bottles: </strong>
             {includedProducts.join(' · ')}
           </p>
         )}
