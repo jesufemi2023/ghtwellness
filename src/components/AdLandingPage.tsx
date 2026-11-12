@@ -186,7 +186,7 @@ const CUSTOMER_STORIES: Array<{
     packName: 'Natural Prostate Care Formula (3-Bottle Pack)',
     category: 'prostate',
     quote:
-      'The dispatch rider delivered to my residence in Bodija within 36 hours. Every bottle carried its intact factory seal and NAFDAC registration number, and I paid via transfer only after inspecting the package. Consistent daily use has noticeably supported my nighttime comfort.',
+      'I used to wake up 5 to 6 times every single night just to struggle and pass small drops of urine with pain. It was ruining my sleep and health. Within 2 weeks of using this GHT Prostate Pack, the burning stopped, my urine stream became powerful, and now I sleep peacefully straight till 6:00 AM! Being able to inspect the bottles before paying the rider gave me 100% confidence.',
   },
   {
     name: 'Engr. Musa K.',
@@ -195,7 +195,7 @@ const CUSTOMER_STORIES: Array<{
     packName: 'Male Performance & Stamina Pack',
     category: 'vitality',
     quote:
-      'Discreetly packaged and delivered straight to my office in Wuse the next afternoon. Authentic GHT herbal bottles with clear printed expiry dates and dependable customer follow-up.',
+      'Work stress and age were seriously killing my bedroom stamina, and I was finishing in less than 2 minutes. This herbal formula completely turned things around. I now easily last 35 to 45 minutes with solid firmness, and my wife is extremely happy! Best part: zero headache, zero racing heart, unlike chemical pills.',
   },
   {
     name: 'Mrs. Evelyn N.',
@@ -204,7 +204,7 @@ const CUSTOMER_STORIES: Array<{
     packName: 'Joint Comfort & Calcium Pack',
     category: 'joints',
     quote:
-      'What gave my family confidence was the zero-risk Pay on Delivery service. Their specialist explained the morning and evening mealtime schedule clearly on WhatsApp, and my mother moves around the compound with much steadier comfort.',
+      'My knee pain was so terrible that climbing stairs in my school was pure punishment. After starting this 3-bottle Joint Pack, the severe stiffness and grinding sound vanished. I now walk comfortably and climb stairs without holding onto the rails. It really works!',
   },
   {
     name: 'Mrs. Folashade A.',
@@ -213,7 +213,7 @@ const CUSTOMER_STORIES: Array<{
     packName: "Women's Wellness & Hormonal Balance Pack",
     category: 'womens',
     quote:
-      'I was hesitant at first until the regional hub delivered directly to my home in Ikeja. Factory seals were completely intact, NAFDAC registrations verified, and the WhatsApp advisory team checked in regularly. Truly respectful service.',
+      'For years I battled severe menstrual cramps that knocked me out for 3 days every month, plus irregular cycles. Within one month of this herbal regimen, my period came smoothly with zero pain! I was also impressed that delivery arrived in Ikeja within 24 hours with free inspection.',
   },
   {
     name: 'Pastor Daniel E.',
@@ -222,30 +222,35 @@ const CUSTOMER_STORIES: Array<{
     packName: 'Metabolic & Sugar Balance Pack',
     category: 'sugar',
     quote:
-      'Paying only upon doorstep inspection gave me complete peace of mind. The herbal supplements were delivered within 48 hours with intact factory seals, and consistent use has greatly supported my steady daily energy.',
+      'The burning and numbness in my feet was terrifying, and I always felt completely drained by 2:00 PM. This herbal sugar pack helped stabilize my blood readings and the numbness in my feet is gone. I have real energy to preach and visit church members all day without fatigue.',
   },
 ];
 
 const BUYER_FAQS = [
   {
-    question: 'Do I really pay only when my supplements arrive at my doorstep?',
+    question: 'How do I know this is 100% genuine and safe for my body?',
     answer:
-      'Yes. Every order placed on this page qualifies for Nationwide Pay on Delivery. Our dispatch rider brings your sealed package to your home or office first—you inspect the factory seals and NAFDAC numbers before paying via Bank Transfer, POS, or Cash.',
+      'Every GHT wellness pack is 100% pure herbal, formulated from trusted medicinal plants, and officially registered and certified by NAFDAC. You get authentic bottles with tamper-proof factory seals and verifiable batch numbers. There are zero harmful chemicals or dangerous stimulants.',
   },
   {
-    question: 'How fast is delivery to Lagos, Abuja, Port Harcourt, and other states?',
+    question: 'How does Pay on Delivery work? Can I really check the package first?',
     answer:
-      'Orders within Lagos, Abuja, Ibadan, Port Harcourt, Benin City, and major state capitals typically arrive within 24 to 48 hours through our regional fulfillment hubs. Other towns nationwide are delivered within 48 to 72 hours at ₦0 delivery cost.',
+      'Yes, absolutely! You do not pay a single kobo upfront. When our dispatch rider arrives at your home or office, you have the right to open the package, verify the bottles, inspect the intact seals, and check the expiry dates before handing over payment via Bank Transfer, POS, or Cash.',
   },
   {
-    question: 'How do I verify that the GHT herbal bottles are authentic?',
+    question: 'How fast will my order arrive?',
     answer:
-      'All supplements supplied by SD GHT Health Care Nigeria Ltd are sourced directly from authorized GHT corporate distribution, featuring tamper-evident foil seals, batch numbers, manufacturing/expiry dates, and NAFDAC registration details.',
+      'We deliver free nationwide. Orders within Lagos, Abuja, Port Harcourt, Ibadan, and major cities arrive within 24 to 48 hours. Other states and towns arrive within 48 to 72 hours. Our local dispatch rider will call you before coming to ensure you are available.',
   },
   {
-    question: 'Which multi-bottle pack size is recommended for adults?',
+    question: 'How soon can I expect noticeable results?',
     answer:
-      'A 2-Bottle Starter Pack covers initial nutritional support, while our 3-Bottle and 4-Bottle Value Packs are structured for a complete 30 to 60-day herbal wellness regimen with multi-bottle discount savings.',
+      'Most customers notice significant relief within the first 7 to 14 days of consistent daily use — such as sleeping through the night without waking up to pee, stronger urine flow, less knee stiffness, or renewed stamina. For full and permanent restoration, we recommend completing the 2 or 3-bottle regimen.',
+  },
+  {
+    question: 'Which pack size should I order for the best results?',
+    answer:
+      'While the 1 or 2-bottle pack gives quick initial relief, the 3-Bottle Regimen (60-Day Therapy) is our most popular and doctor-recommended choice because it gives your body enough time to thoroughly heal and prevent the problem from returning. Plus, you save extra money on multi-bottle discounts!',
   },
 ];
 
@@ -429,7 +434,7 @@ const StudioProductStage: React.FC<StudioProductStageProps> = ({
               <div className="w-16 h-16 rounded-2xl bg-white border border-[#D5E0DA] flex items-center justify-center text-[#047857] mb-3">
                 <ShieldCheck className="w-8 h-8" />
               </div>
-              <span className="text-lg font-bold text-[#0F1F18] font-[family-name:var(--font-editorial)]">
+              <span className="text-lg font-black text-[#0F1F18]">
                 {alt}
               </span>
               <span className="text-[13.5px] text-[#047857] font-semibold mt-1">
@@ -607,35 +612,35 @@ interface PackageProfile {
 
 const PACKAGE_ENHANCED_PROFILES: Record<string, PackageProfile> = {
   prostate: {
-    kicker: 'CLINICAL PROSTATE & BLADDER REGIMEN · PACKAGE 01',
-    badgeLabel: 'Primary Recommended Step',
+    kicker: '★ BEST SELLER FOR MEN 40+ · PROVEN RELIEF',
+    badgeLabel: '#1 Best Seller for Men',
     subtitle:
-      'A gentle, physician-guided botanical therapy to soothe prostate swelling, release urethral tension, and restore serene, unbroken nighttime sleep.',
+      'Sleep deeply through the night without waking up to pee. Restore strong, painless urine flow naturally.',
     description:
-      'Formulated with standardized whole-plant botanical extracts including high-potency Saw Palmetto, African Plum Bark (Pygeum), and Cold-Pressed Pumpkin Seed. This therapeutic formulation works gently from within to calm enlarged prostate tissues, release pressure around the bladder neck, and restore a steady, unhurried urinary stream — so you can sleep peacefully through the night without frequent, exhausting bathroom awakenings.',
+      'Tired of waking up 4, 5, or 6 times every single night just to strain and dribble weak drops of urine? This pure herbal solution shrinks swollen prostate tissue naturally, clears painful urinary burning, stops embarrassing leaks, and helps your bladder empty completely in seconds. Within days, you will enjoy unbroken night rest, wake up energized, and regain your peace of mind.',
     pillars: [
       {
-        title: 'Unbroken, Peaceful Night Sleep',
+        title: 'Sleep Soundly Through the Night',
         description:
-          'Gently settles bladder urgency, reducing exhausting 3–5 nightly awakenings down to serene, restorative whole-night rest.',
+          'Stops constant midnight bathroom urges so you can sleep uninterrupted from night till morning without exhausting awakenings.',
         icon: 'clock',
       },
       {
-        title: 'Steady, Natural Urinary Stream',
+        title: 'Strong, Pain-Free Urine Stream',
         description:
-          'Eases urethral resistance and painful straining, ensuring your bladder empties freely, completely, and without delayed starts.',
+          'Ends painful straining, hesitations, and weak dribbles. Empty your bladder effortlessly, fully, and in one go.',
         icon: 'droplets',
       },
       {
-        title: 'Soothes Tissue & Relieves Pelvic Fullness',
+        title: 'Shrinks Swollen Prostate Naturally',
         description:
-          'Targeted plant phytosterols calm swollen prostate tissue, releasing heavy lower abdominal discomfort and groin tightness.',
+          'Soothes deep inflammation and relieves heavy pelvic pressure, lower belly tightness, and groin pain without surgery.',
         icon: 'shield',
       },
       {
-        title: 'Certified Herbal Safety · NAFDAC Approved',
+        title: '100% Herbal & NAFDAC Approved',
         description:
-          '100% natural, non-hormonal wellness therapy with authentic NAFDAC certification, gentle on digestion and free from synthetic side effects.',
+          'Certified safe with zero dangerous side effects. No harmful chemicals, gentle on digestion, and 100% natural.',
         icon: 'award',
       },
     ],
@@ -654,35 +659,35 @@ const PACKAGE_ENHANCED_PROFILES: Record<string, PackageProfile> = {
     pillText: 'text-[#047857]',
   },
   vitality: {
-    kicker: 'MALE VITALITY & ENDURANCE REGIMEN · PACKAGE 02',
-    badgeLabel: 'Core Stamina & Firmness',
+    kicker: '★ TOP RATED MALE ENDURANCE & STAMINA',
+    badgeLabel: '#1 for Bedroom Power & Control',
     subtitle:
-      'A revitalizing, cardiovascular-safe herbal synergy formulated to awaken vascular flow, enhance natural rigidity, and restore lasting bedroom endurance.',
+      'Regain rock-solid firmness on demand, last 35–45+ minutes, and satisfy your partner every single time.',
     description:
-      'An exquisite botanical fusion of premium Maca Root, Black Tongkat Ali, Korean Red Ginseng, and Epimedium. Formulated to naturally encourage nitric oxide balance and microvascular circulation, giving you smooth, dependable firmness, longer-lasting endurance, and deep physical stamina without synthetic jitter, racing pulse, or cardiovascular strain.',
+      'Never suffer from bedroom embarrassment or performance anxiety again. This potent herbal formula boosts your natural masculine energy, delivers rock-solid firmness whenever intimacy starts, and gives you complete staying power to last 35 to 45+ minutes. You will feel revitalized, confident, and recover quickly between rounds — with zero headache, zero racing heart, and zero chemical crashes.',
     pillars: [
       {
-        title: 'Dependable, Natural Firmness',
+        title: 'Rock-Solid Firmness On Demand',
         description:
-          'Promotes healthy cavernous microcirculation for firm, robust responsiveness whenever intimacy begins.',
+          'Boosts healthy blood circulation for firm, dependable stiffness whenever you and your partner are ready.',
         icon: 'zap',
       },
       {
-        title: 'Composed Staying Power (30–45+ Mins)',
+        title: 'Last 35 to 45+ Minutes',
         description:
-          'Relieves nervous performance tension and helps steady hypersensitivity, giving you full control and lingering stamina.',
+          'Overcomes quick finishes and gives you total control to satisfy your partner completely every round.',
         icon: 'clock',
       },
       {
-        title: 'Recharged Vitality & Quick Recovery',
+        title: 'High Energy & Fast Recovery',
         description:
-          'Replenishes core masculine stamina so you stay energized, confident, and refreshed rather than depleted after intimacy.',
+          'Recharges deep masculine stamina so you stay vigorous, strong, and ready for more without feeling drained or weak.',
         icon: 'flame',
       },
       {
-        title: 'Safe Cardiovascular Harmony',
+        title: '100% Safe with Zero Side Effects',
         description:
-          'Pure therapeutic adaptogens that nourish your body naturally — zero headaches, zero blood pressure spikes, and zero synthetic crashes.',
+          'Pure organic herbs that protect your heart and blood pressure — no pounding headache, no racing pulse, no dizzy spells.',
         icon: 'shield',
       },
     ],
@@ -701,35 +706,35 @@ const PACKAGE_ENHANCED_PROFILES: Record<string, PackageProfile> = {
     pillText: 'text-[#92400E]',
   },
   joints: {
-    kicker: 'JOINT MOBILITY & CARTILAGE COMFORT REGIMEN',
-    badgeLabel: 'Joint Ease & Flexibility',
+    kicker: '★ INSTANT KNEE, WAIST & JOINT RELIEF',
+    badgeLabel: 'Fast Knee & Back Freedom',
     subtitle:
-      'Herbal Nourishment to Relieve Stiffness, Rebuild Cartilage Cushion & Restore Pain-Free Walking',
+      'Walk, bend, and climb stairs freely without agonizing knee, back, or waist pain.',
     description:
-      'A soothing botanical matrix formulated with bioavailable Glucosamine, Calcium, and natural anti-inflammatory herbs to comfort aching knees, ease morning stiffness, and lubricate movement for confident, pain-free daily mobility.',
+      'Are stiff knees, painful waist, and creaking joints making simple everyday movements feel like punishment? This proven herbal formula lubricates dry joints, rebuilds worn-out cartilage cushions, and stops deep inflammation. Wake up without morning stiffness, walk freely to work or church, and enjoy comfortable, pain-free mobility again.',
     pillars: [
       {
-        title: 'Relieves Knee & Lower Back Stiffness',
+        title: 'Stops Severe Knee & Waist Pain',
         description:
-          'Calms chronic joint inflammation and eases soreness so walking and standing feel natural and effortless.',
+          'Quickly calms burning aches and throbbing joint soreness so you can walk, bend, and stand with complete ease.',
         icon: 'shield',
       },
       {
-        title: 'Rebuilds Cartilage Cushion',
+        title: 'Restores Joint Cushion & Oil',
         description:
-          'Supplies essential structural nutrients to nourish joint cartilage and replenish synovial fluid.',
+          'Rebuilds natural cartilage lubrication, preventing painful bone-on-bone grinding, creaking, and wear-and-tear.',
         icon: 'droplets',
       },
       {
-        title: 'Smooth, Pain-Free Morning Movement',
+        title: 'Wake Up Without Morning Stiffness',
         description:
-          'Helps you rise from bed or chairs comfortably without morning stiffness, clicking joints, or hesitation.',
+          'Rise from bed or stand up from low chairs effortlessly without hesitation, stiffness, or needing support.',
         icon: 'clock',
       },
       {
-        title: 'NAFDAC Certified Botanical Purity',
+        title: 'NAFDAC Certified Pure Herbal Formula',
         description:
-          '100% natural, certified safe for everyday use with zero gastric irritation and zero harmful additives.',
+          '100% natural and gentle on the stomach. Tested, trusted, and safe for everyday long-term use without side effects.',
         icon: 'award',
       },
     ],
@@ -748,35 +753,35 @@ const PACKAGE_ENHANCED_PROFILES: Record<string, PackageProfile> = {
     pillText: 'text-[#0E7490]',
   },
   sugar: {
-    kicker: 'METABOLIC BALANCE & GLUCOSE HARMONY REGIMEN',
-    badgeLabel: 'Metabolic Balance',
+    kicker: '★ HEALTHY BLOOD SUGAR & DAILY ENERGY',
+    badgeLabel: 'Natural Blood Sugar Control',
     subtitle:
-      'Botanical Support to Maintain Steady Energy, Promote Healthy Circulation & Balance Blood Sugar',
+      'Keep your blood sugar steady, stop constant fatigue, and end tingling numbness in your feet.',
     description:
-      'A gentle adaptogenic synergy crafted to encourage natural cellular glucose uptake, protect peripheral nerve endings, and support cardiovascular microcirculation so you feel energized, balanced, and active throughout the day.',
+      'Stop worrying about dangerous sugar spikes, constant thirst, and frightening numbness or burning sensations in your feet and palms. This herbal blend naturally supports your pancreas, keeps your sugar readings in a healthy balance, and shields your kidneys, eyes, and heart from long-term damage — so you stay vibrant, active, and energetic all day.',
     pillars: [
       {
-        title: 'Steady, Sustained Daily Energy',
+        title: 'Keeps Blood Sugar Steady All Day',
         description:
-          'Helps smooth out post-meal slumps and sudden energy dips, maintaining clear and steady daytime stamina.',
+          'Prevents sudden post-meal spikes and dangerous crashes, keeping your daily glucose numbers stable and balanced.',
         icon: 'zap',
       },
       {
-        title: 'Supports Healthy Nerve & Foot Comfort',
+        title: 'Ends Foot Numbness & Burning',
         description:
-          'Enhances peripheral blood flow to nourish extremities and protect against numbness and pins-and-needles.',
+          'Restores healthy nerve sensation and blood circulation to eliminate foot pricking, burning, and sudden pain.',
         icon: 'shield',
       },
       {
-        title: 'Encourages Balanced Glucose Metabolism',
+        title: 'All-Day Stamina & No Fatigue',
         description:
-          'Targeted plant nutrients support natural insulin sensitivity and healthy pancreas function.',
+          'Stops midday exhaustion, heavy legs, and constant sleepiness so you stay energetic from morning to night.',
         icon: 'droplets',
       },
       {
-        title: 'Safe, Gentle Daily Botanical Synergy',
+        title: 'Protects Eyes, Kidneys & Heart',
         description:
-          'NAFDAC certified herbal formulation with zero synthetic chemicals, safe alongside regular wellness routines.',
+          'Strengthens your vital organs against complications, giving you total health protection and peace of mind.',
         icon: 'award',
       },
     ],
@@ -795,35 +800,35 @@ const PACKAGE_ENHANCED_PROFILES: Record<string, PackageProfile> = {
     pillText: 'text-[#1D4ED8]',
   },
   womens: {
-    kicker: 'FEMININE HORMONAL HARMONY & REPRODUCTIVE CARE',
-    badgeLabel: 'Hormonal Harmony',
+    kicker: '★ TOTAL FEMININE HORMONAL BALANCE',
+    badgeLabel: 'Pain-Free Periods & Hormonal Harmony',
     subtitle:
-      'Nourishing Botanical Care to Balance Hormones, Ease Cycle Tension & Restore Inner Radiance',
+      'End painful menstrual cramps, irregular periods, hot flashes, and balance your hormones naturally.',
     description:
-      'An empowering botanical blend of traditional feminine adaptogens that nurture endocrine rhythm, relieve pelvic cramping and hot flushes, and cultivate deep holistic vitality at every stage of womanhood.',
+      'Experience peaceful, pain-free womanhood every month. This nourishing herbal remedy eases agonizing menstrual cramps, regulates unpredictable cycles, clears stubborn hormonal acne, and soothes uncomfortable hot flashes and mood swings. Balance your reproductive health and feel radiant, confident, and full of life.',
     pillars: [
       {
-        title: 'Harmonious Hormonal Rhythms',
+        title: 'Stops Severe Menstrual Cramps',
         description:
-          'Helps balance endocrine fluctuations, steady mood, and support healthy, predictable cycles.',
+          'Quickly relaxes tight tummy muscles to eliminate severe monthly cramps and abdominal heaviness.',
         icon: 'clock',
       },
       {
-        title: 'Relief from Cramps & Pelvic Discomfort',
+        title: 'Regulates Irregular Periods',
         description:
-          'Soothes smooth muscle contractions to ease abdominal heaviness, pelvic tension, and monthly cramps.',
+          'Balances natural female hormones to restore regular, predictable, and healthy monthly cycles.',
         icon: 'shield',
       },
       {
-        title: 'Rejuvenated Radiance & Stamina',
+        title: 'Cools Down Hot Flashes & Mood Swings',
         description:
-          'Nourishes skin glow, restorative sleep, and youthful vitality from deep within your natural biology.',
+          'Relieves sudden body heat, night sweats, and irritability so you feel calm, refreshed, and in control.',
         icon: 'flame',
       },
       {
-        title: '100% Pure Certified Herbal Purity',
+        title: 'Glowing Skin & Feminine Energy',
         description:
-          'NAFDAC registered whole-herb formulation with zero synthetic hormones and zero artificial additives.',
+          'Pure herbal adaptogens that boost your natural glow, restful sleep, and youthful vitality from within.',
         icon: 'award',
       },
     ],
@@ -842,35 +847,35 @@ const PACKAGE_ENHANCED_PROFILES: Record<string, PackageProfile> = {
     pillText: 'text-[#BE185D]',
   },
   combo: {
-    kicker: 'COMPREHENSIVE MASTER WELLNESS REGIMEN',
-    badgeLabel: 'Full Spectrum Wellness',
+    kicker: '★ ALL-IN-ONE MASTER BODY RESTORATION',
+    badgeLabel: 'Ultimate Full-Body Cleanse & Power',
     subtitle:
-      'All-Inclusive Multi-System Botanical Care for Total Vitality, Deep Immunity & Lifelong Health',
+      'The complete herbal regimen to renew your vital organs, supercharge stamina, and boost immunity.',
     description:
-      'A complete, synergistic collection combining our most revered therapeutic herbal formulations. Designed to strengthen immunity, support vital organ function, and rejuvenate cellular resilience from head to toe.',
+      'Why treat only one symptom when you can restore your entire body? This master combination cleanses your prostate, supports healthy kidneys and liver, supercharges your bedroom stamina, and fortifies your immune system. Experience maximum whole-body revitalization with Nigeria’s most trusted comprehensive health regimen.',
     pillars: [
       {
-        title: 'Multi-System Cellular Rejuvenation',
+        title: 'Deep Organ Cleanse & Kidney Health',
         description:
-          'Delivers full-spectrum botanical antioxidants and adaptogens to nourish all vital body organs.',
+          'Flushes harmful toxins, supports liver and kidney vitality, and restores youthful organ function.',
         icon: 'sparkles',
       },
       {
-        title: 'Deep Immune Defense & Stamina',
+        title: 'Maximum Stamina & Bedroom Confidence',
         description:
-          'Strengthens natural immunological barriers and provides resilient, all-day physical energy.',
+          'Combines our best vitality boosters for powerful energy, lasting endurance, and unbreakable virility.',
         icon: 'shield',
       },
       {
-        title: 'Optimal Synergy & Complete Care',
+        title: 'Unbreakable Immune Defense',
         description:
-          'Carefully paired herbal formulas that amplify one another for faster, more lasting health results.',
+          'Builds a strong natural shield against frequent illnesses, chronic fatigue, and bodily weakness.',
         icon: 'zap',
       },
       {
-        title: 'Authentic NAFDAC Certified Formulation',
+        title: 'Best Value Multi-Bottle Bundle',
         description:
-          'Guaranteed authentic GHT herbal heritage with tamper-proof security seals and free nationwide delivery.',
+          'Get our complete medical-grade herbal regimen at our biggest discounted rate with free nationwide delivery.',
         icon: 'award',
       },
     ],
@@ -895,15 +900,14 @@ function getDurationLabel(bottlesCount: number | string | null, optionIdx: numbe
     typeof bottlesCount === 'number'
       ? bottlesCount
       : parseInt(String(bottlesCount || ''), 10);
-  if (count === 1) return '15-Day Introductory Pack';
-  if (count === 2) return '30-Day Starter Regimen';
-  if (count === 3) return '60-Day Complete Therapy (Recommended)';
-  if (count === 4) return '90-Day Full Restoration Regimen';
-  if (count >= 5) return `${count}-Bottle Maximum Restoration Regimen`;
-  if (optionIdx === 0) return 'Starter Regimen';
-  if (optionIdx === 1) return '60-Day Therapy (Recommended)';
-  if (optionIdx === 2) return 'Full Restoration Regimen';
-  return 'Herbal Wellness Regimen';
+  if (count === 1) return '15-Day Trial Pack';
+  if (count === 2) return '30-Day Starter Pack';
+  if (count === 3) return '60-Day Complete Regimen (Best Value)';
+  if (count === 4) return '90-Day Full Restoration Supply';
+  if (count >= 5) return `${count}-Bottle Full Restoration Supply`;
+  if (optionIdx === 0) return 'Starter Pack';
+  if (optionIdx === 1) return '60-Day Regimen (Best Value)';
+  return 'Full Treatment Pack';
 }
 
 interface PackageCardProps {
@@ -1021,56 +1025,56 @@ const PackageCard: React.FC<PackageCardProps> = ({
   return (
     <article
       id={`package-card-${pkg.package_code || cardIndex}`}
-      className={`relative bg-white rounded-2xl md:rounded-3xl border border-slate-200 transition-all duration-500 flex flex-col overflow-hidden hover:shadow-2xl hover:-translate-y-1 group ${cardBorderClass} ${
+      className={`relative bg-white rounded-3xl border border-slate-200/90 transition-all duration-300 flex flex-col overflow-hidden shadow-lg hover:shadow-2xl hover:-translate-y-1.5 group ${cardBorderClass} ${
         isHeroCard ? 'ring-2 ring-emerald-500/30' : ''
       }`}
     >
       {/* Urgency Badge - Top Center */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 z-30 bg-red-600 text-white px-4 py-1 rounded-b-xl text-[10px] md:text-xs font-black uppercase tracking-[0.2em] shadow-lg animate-bounce">
-        Limited Stock - Get it Today
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 z-30 bg-red-600 text-white px-5 py-1 rounded-b-xl text-[10px] md:text-xs font-black uppercase tracking-[0.2em] shadow-md animate-bounce">
+        Limited Stock · Pay on Delivery Available
       </div>
 
       {/* 1. Identity Header */}
-      <div className={`${headerBgClass} px-5 sm:px-8 pt-7 sm:pt-8 pb-5 border-b border-slate-200/90 space-y-3`}>
+      <div className={`${headerBgClass} px-5 sm:px-8 pt-7 sm:pt-8 pb-5 border-b border-slate-200/90 space-y-3.5`}>
         {/* Top Badges Row */}
         <div className="flex flex-wrap items-center justify-between gap-2.5">
           <div className="flex flex-wrap items-center gap-2">
             {isProstateFocus ? (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#047857] text-white text-xs font-black uppercase tracking-wider shadow-xs">
-                <Sparkles size={12} className="text-white" />
-                {badgeLabel || enhancedProfile?.badgeLabel || 'Primary Focus · Package 01'}
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#047857] text-white text-xs font-black uppercase tracking-wider shadow-xs">
+                <Sparkles size={13} className="text-white" />
+                {badgeLabel || enhancedProfile?.badgeLabel || '#1 Best Seller for Men'}
               </span>
             ) : isPerformanceFocus ? (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#78350F] text-[#FDE68A] border border-[#92400E]/40 text-xs font-black uppercase tracking-wider shadow-xs">
-                <Flame size={12} className="text-[#FDE68A]" />
-                {badgeLabel || enhancedProfile?.badgeLabel || 'Core Focus · Package 02'}
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#78350F] text-[#FDE68A] border border-[#92400E]/40 text-xs font-black uppercase tracking-wider shadow-xs">
+                <Flame size={13} className="text-[#FDE68A]" />
+                {badgeLabel || enhancedProfile?.badgeLabel || '#1 for Bedroom Power & Control'}
               </span>
             ) : (
-              <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white border border-slate-200 text-xs font-black uppercase tracking-wider ${theme.accentTextClass} shadow-2xs`}>
+              <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-xs font-black uppercase tracking-wider ${theme.accentTextClass} shadow-2xs`}>
                 Package {indexDisplay} · {theme.categoryLabel}
               </span>
             )}
 
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/95 border border-slate-200 text-xs font-black text-slate-800 shadow-2xs">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/95 border border-slate-200 text-xs font-black text-slate-800 shadow-2xs">
               <ShieldCheck size={14} className="text-[#047857]" />
               NAFDAC Certified
             </span>
           </div>
 
           <div className="flex items-center gap-1.5">
-            <span className="bg-white/95 text-slate-900 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider border border-slate-200 shadow-xs">
+            <span className="bg-white/95 text-slate-900 px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider border border-slate-200 shadow-xs">
               {pkg.package_code || 'PACKAGE'}
             </span>
-            <span className="bg-emerald-600/95 text-white px-2 py-0.5 rounded text-[10px] font-black border border-emerald-500 shadow-xs">
-              Free Shipping
+            <span className="bg-emerald-600/95 text-white px-2.5 py-1 rounded-md text-[10px] font-black border border-emerald-500 shadow-xs">
+              Free Express Dispatch
             </span>
           </div>
         </div>
 
-        {/* Title & Kicker */}
+        {/* Title, Kicker & Benefit Subtitle */}
         <div className="space-y-1.5">
           {enhancedProfile?.kicker && (
-            <div className="text-[10px] md:text-xs font-black text-slate-400 uppercase tracking-widest">
+            <div className="text-[11px] md:text-xs font-black text-slate-400 uppercase tracking-widest">
               {enhancedProfile.kicker}
             </div>
           )}
@@ -1097,7 +1101,7 @@ const PackageCard: React.FC<PackageCardProps> = ({
 
           {enhancedProfile?.subtitle && (
             <p
-              className="text-sm sm:text-base font-medium leading-relaxed"
+              className="text-sm sm:text-base font-semibold leading-relaxed"
               style={{ color: accentColor }}
             >
               {enhancedProfile.subtitle}
@@ -1107,7 +1111,7 @@ const PackageCard: React.FC<PackageCardProps> = ({
       </div>
 
       {/* 2. Studio Product Stage Gallery */}
-      <div className="border-b border-slate-200/80">
+      <div className="border-b border-slate-200/80 bg-slate-50/50">
         <StudioProductStage
           entries={galleryEntries}
           alt={pkg.name}
@@ -1121,44 +1125,50 @@ const PackageCard: React.FC<PackageCardProps> = ({
       {/* 3. Package Information Body */}
       <div className="p-5 sm:p-7 lg:p-8 flex-1 flex flex-col justify-between space-y-6 bg-white">
         <div className="space-y-5">
-          {/* Description */}
+          {/* Solution Highlight Box */}
           {displayDescription && (
-            <p className="text-base sm:text-lg text-slate-600 leading-relaxed font-medium">
-              {displayDescription}
-            </p>
+            <div className="p-4 sm:p-5 rounded-2xl bg-emerald-50/50 border border-emerald-100/80 space-y-2">
+              <div className="flex items-center gap-1.5 text-xs font-black text-emerald-800 uppercase tracking-wider">
+                <Sparkles className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>What This Solution Does For You:</span>
+              </div>
+              <p className="text-base sm:text-lg text-slate-700 leading-relaxed font-medium">
+                {displayDescription}
+              </p>
+            </div>
           )}
 
-          {/* Ratings & Trust Info Strip (Home Page Card Format) */}
-          <div className="flex items-center justify-between gap-1 bg-slate-50 p-2 sm:p-2.5 rounded-xl border border-slate-100 font-black">
+          {/* Ratings & Social Proof Strip */}
+          <div className="flex items-center justify-between gap-1 bg-slate-50 p-2 sm:p-2.5 rounded-xl border border-slate-200/70 font-black">
             <div className="flex items-center gap-1.5 sm:gap-2">
               <div className="flex items-center">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} size={13} className="fill-orange-400 text-orange-400" />
+                  <Star key={i} size={14} className="fill-amber-400 text-amber-400" />
                 ))}
               </div>
-              <span className="text-xs sm:text-sm text-slate-600 font-black">10k+ Sold · 4.9/5 Rating</span>
+              <span className="text-xs sm:text-sm text-slate-700 font-black">10,000+ Satisfied Customers · 4.9/5 Rating</span>
             </div>
             <div className="flex items-center gap-1.5 text-xs sm:text-sm font-black text-emerald-700 uppercase tracking-widest">
-              <Award size={13} />
-              Organic · NAFDAC Certified
+              <Award size={14} />
+              100% Organic · NAFDAC Approved
             </div>
           </div>
 
-          {/* Health Benefits & Pillars (Home Page Format) */}
+          {/* Key Health Benefits & Pillars (High-Converting Benefit Cards) */}
           {enhancedProfile?.pillars ? (
             <div className="space-y-3">
-              <div className="text-[10px] md:text-xs font-black text-slate-400 uppercase tracking-widest mb-1 flex items-center justify-between">
-                <span>Perfect for &amp; Key Health Benefits:</span>
-                <span className="text-emerald-700 font-black">NAFDAC Regulated</span>
+              <div className="text-xs sm:text-sm font-black text-slate-900 uppercase tracking-wider flex items-center justify-between">
+                <span>What You Will Experience:</span>
+                <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">NAFDAC Certified</span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {enhancedProfile.pillars.map((pillar, pIdx) => (
                   <div
                     key={pIdx}
-                    className="p-3.5 sm:p-4 rounded-xl border border-slate-100 bg-slate-50/70 hover:bg-white hover:border-slate-200 transition-all flex items-start gap-3 shadow-2xs"
+                    className="p-3.5 sm:p-4 rounded-xl border border-slate-200/70 bg-white hover:bg-emerald-50/30 hover:border-emerald-300 transition-all flex items-start gap-3 shadow-2xs"
                   >
-                    <div className="p-2 rounded-lg bg-white border border-slate-200/80 shadow-2xs shrink-0 mt-0.5">
+                    <div className="p-2 rounded-lg bg-emerald-50/80 border border-emerald-100/80 shadow-2xs shrink-0 mt-0.5">
                       {renderPillarIcon(pillar.icon)}
                     </div>
                     <div className="space-y-1 min-w-0">
@@ -1175,9 +1185,9 @@ const PackageCard: React.FC<PackageCardProps> = ({
             </div>
           ) : rawBenefits.length > 0 ? (
             <div className="space-y-2.5">
-              <div className="text-[10px] md:text-xs font-black text-slate-400 uppercase tracking-widest mb-1 flex items-center justify-between">
-                <span>Perfect for &amp; Key Health Benefits:</span>
-                <span className="text-emerald-700 font-black">NAFDAC Regulated</span>
+              <div className="text-xs sm:text-sm font-black text-slate-900 uppercase tracking-wider flex items-center justify-between">
+                <span>What You Will Experience:</span>
+                <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">NAFDAC Certified</span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {(isBenefitsExpanded ? rawBenefits : rawBenefits.slice(0, 4)).map((benefit, bIdx) => (
@@ -1205,9 +1215,9 @@ const PackageCard: React.FC<PackageCardProps> = ({
           {/* 4. Treatment Duration Selector (Bottle Pack Option Pills) */}
           {pkg.options && pkg.options.length > 0 && (
             <div className="space-y-3 pt-3 border-t border-slate-100">
-              <div className="text-[10px] md:text-xs font-black text-slate-400 uppercase tracking-widest mb-1 flex items-center justify-between">
-                <span>Select Treatment Duration:</span>
-                <span className="text-emerald-700 font-black">Multi-Bottle Savings</span>
+              <div className="text-xs sm:text-sm font-black text-slate-900 uppercase tracking-wider flex items-center justify-between">
+                <span>Step 1: Choose Treatment Duration</span>
+                <span className="text-xs font-bold text-emerald-700">Multi-Bottle Savings</span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
@@ -1228,15 +1238,15 @@ const PackageCard: React.FC<PackageCardProps> = ({
                       key={oIdx}
                       type="button"
                       onClick={() => onSelectOption(pkg, oIdx)}
-                      className={`relative p-3.5 sm:p-4 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
+                      className={`relative p-3.5 sm:p-4 rounded-xl border-2 text-left transition-all cursor-pointer flex flex-col justify-between ${
                         isSel
-                          ? 'bg-emerald-50/70 border-emerald-600 ring-2 ring-emerald-600/70 shadow-xs'
-                          : 'border-slate-200 bg-white hover:bg-slate-50'
+                          ? 'bg-emerald-50/90 border-emerald-600 ring-2 ring-emerald-500/20 shadow-xs'
+                          : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
                       }`}
                     >
                       {isRecommended && (
-                        <span className="absolute -top-2.5 left-3 px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[9px] sm:text-[10px] font-black uppercase tracking-wider shadow-xs">
-                          ★ Most Popular
+                        <span className="absolute -top-3 left-3 px-2.5 py-0.5 rounded-full bg-emerald-600 text-white text-[9px] sm:text-[10px] font-black uppercase tracking-wider shadow-xs">
+                          ★ Most Popular Choice
                         </span>
                       )}
 
@@ -1274,10 +1284,10 @@ const PackageCard: React.FC<PackageCardProps> = ({
 
               {/* Dynamic Included in Pack Details */}
               {pricing.includedList.length > 0 && (
-                <div className="p-3 sm:p-3.5 rounded-xl bg-slate-50 border border-slate-100 flex items-start gap-2 text-xs sm:text-sm text-slate-700">
+                <div className="p-3 sm:p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-start gap-2 text-xs sm:text-sm text-slate-700">
                   <Check size={16} className="text-emerald-600 shrink-0 mt-0.5" />
                   <div>
-                    <strong className="font-black text-slate-900">Included in pack: </strong>
+                    <strong className="font-black text-slate-900">Supplements included in this parcel: </strong>
                     <span className="font-medium text-slate-600">{pricing.includedList.join(' · ')}</span>
                   </div>
                 </div>
@@ -1286,7 +1296,7 @@ const PackageCard: React.FC<PackageCardProps> = ({
           )}
         </div>
 
-        {/* 5. Pricing Section & Action Buttons (Home Page Card Format) */}
+        {/* 5. Pricing Section & Action Buttons */}
         <div className="pt-3 border-t border-slate-100 mt-auto space-y-3">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-baseline gap-2 flex-wrap">
@@ -1301,13 +1311,13 @@ const PackageCard: React.FC<PackageCardProps> = ({
             </div>
             <div className="flex flex-col items-end shrink-0">
               {pkg.options && pkg.options.length > 0 && (
-                <div className="bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded text-[8px] md:text-[9px] font-black uppercase tracking-widest mb-1 border border-indigo-100">
+                <div className="bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded text-[8px] md:text-[9px] font-black uppercase tracking-widest mb-1 border border-emerald-200">
                   {pkg.options.length} Sizes Available
                 </div>
               )}
               <div className="text-[10px] md:text-xs font-black text-red-600 uppercase tracking-tighter mb-0.5 flex items-center gap-1">
                 <Flame size={12} className="animate-pulse" />
-                Only 5 Left in Stock!
+                Only 5 Packs Left Today!
               </div>
               <div className="w-20 sm:w-28 h-1.5 bg-slate-100 rounded-full overflow-hidden">
                 <div className="h-full bg-red-500 w-[85%] rounded-full" />
@@ -1330,35 +1340,50 @@ const PackageCard: React.FC<PackageCardProps> = ({
             </button>
           </div>
 
-          {/* Action Buttons - Refined Size Matching Home Page */}
+          {/* Action Buttons - Refined Size & Clear Messaging */}
           <div className="pt-1 flex flex-col gap-2.5">
-            <div className="flex items-center gap-2.5">
-              <a
-                href={getWhatsAppHref()}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => {
-                  try {
-                    trackWhatsAppClick(`Ad Package Card Chat: ${pkg.name}`);
-                  } catch {}
-                }}
-                className="flex-1 bg-white border border-slate-200 text-slate-600 py-3 sm:py-3.5 px-4 rounded-xl font-black text-xs sm:text-sm hover:bg-slate-50 transition-all flex items-center justify-center gap-2 uppercase tracking-widest"
-              >
-                <Phone size={16} className="text-emerald-600" />
-                Chat with us
-              </a>
-              <button
-                type="button"
-                onClick={() => onOpenCheckout(pkg, selectedIdx)}
-                className="flex-[1.5] bg-emerald-600 text-white py-3 sm:py-3.5 px-4 rounded-xl font-black text-base sm:text-lg hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100 active:scale-[0.98] flex items-center justify-center gap-2 group/order animate-shimmer"
-              >
-                Order Now
-                <ChevronRight size={18} className="group-hover/order:translate-x-1 transition-transform" />
-              </button>
-            </div>
-            <div className="flex items-center justify-center gap-1.5 text-xs sm:text-sm font-black text-slate-500 uppercase tracking-widest">
-              <CheckCircle2 size={14} className="text-emerald-600" />
-              Pay on Delivery · Free Nationwide Delivery
+            <button
+              type="button"
+              onClick={() => onOpenCheckout(pkg, selectedIdx)}
+              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 sm:py-4 px-6 rounded-2xl font-black text-base sm:text-lg transition-all shadow-lg shadow-emerald-700/20 active:scale-[0.98] flex flex-col items-center justify-center cursor-pointer animate-shimmer"
+            >
+              <div className="flex items-center gap-2">
+                <ShoppingBag size={20} className="shrink-0" />
+                <span>Order on Delivery Now</span>
+                <ChevronRight size={18} className="transition-transform group-hover:translate-x-1" />
+              </div>
+              <span className="text-xs text-emerald-100 font-medium mt-0.5">
+                Pay ₦0 Upfront · Doorstep Inspection Before Payment
+              </span>
+            </button>
+
+            <a
+              href={getWhatsAppHref()}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => {
+                try {
+                  trackWhatsAppClick(`Ad Package Card Chat: ${pkg.name}`);
+                } catch {}
+              }}
+              className="w-full bg-white border-2 border-slate-200 text-slate-700 py-3 sm:py-3.5 px-4 rounded-2xl font-black text-xs sm:text-sm hover:bg-slate-50 hover:border-slate-300 transition-all flex items-center justify-center gap-2 uppercase tracking-wider"
+            >
+              <MessageCircle size={16} className="text-[#25D366] shrink-0" />
+              <span>Chat with a Health Specialist on WhatsApp</span>
+            </a>
+
+            <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs font-bold text-slate-500 uppercase tracking-wider pt-1">
+              <span className="inline-flex items-center gap-1">
+                <CheckCircle2 size={13} className="text-emerald-600" /> Pay on Delivery
+              </span>
+              <span>·</span>
+              <span className="inline-flex items-center gap-1">
+                <Truck size={13} className="text-emerald-600" /> Free 24–48hr Dispatch
+              </span>
+              <span>·</span>
+              <span className="inline-flex items-center gap-1">
+                <ShieldCheck size={13} className="text-emerald-600" /> NAFDAC Certified
+              </span>
             </div>
           </div>
         </div>
@@ -1808,7 +1833,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
             )}
 
             <div className="flex flex-col justify-center min-w-0">
-              <span className="text-[16px] phablet:text-[18px] sm:text-[21px] font-bold tracking-tight text-[#14261E] font-[family-name:var(--font-editorial)] leading-[1.15] whitespace-nowrap">
+              <span className="text-[16px] phablet:text-[18px] sm:text-[21px] font-black tracking-tight text-[#14261E] leading-[1.15] whitespace-nowrap">
                 {CONFIG.company.name}
               </span>
               {CONFIG.company.subtitle && (
@@ -1887,11 +1912,11 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
               {adIntent.kicker}
             </p>
 
-            <h1 className="text-[2.1rem] phablet:text-[2.45rem] sm:text-[2.95rem] lg:text-[3.4rem] font-bold text-[#FAF9F5] tracking-[-0.015em] leading-[1.18] [text-wrap:balance] font-[family-name:var(--font-editorial)]">
+            <h1 className="text-2xl phablet:text-3xl sm:text-4xl lg:text-[2.85rem] font-black text-[#FAF9F5] tracking-tight leading-[1.18] [text-wrap:balance]">
               {adIntent.headline}
             </h1>
 
-            <p className="text-[18px] sm:text-[20px] lg:text-[21.5px] text-[#E4EDE7] leading-[1.78] tracking-[0.01em] max-w-2xl font-normal">
+            <p className="text-base sm:text-lg lg:text-xl text-[#E4EDE7] leading-relaxed max-w-2xl font-medium">
               {adIntent.subheadline}
             </p>
 
@@ -1963,11 +1988,11 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
           {/* DISPLAY THE PROSTATE CARD IN HERO THEN FOLLOW BY MALE PERFORMANCE CARD */}
           <div id="hero-cards" className="pt-4 sm:pt-6 scroll-mt-24 space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3 text-white/90 pb-1">
-              <div className="flex items-center gap-2 text-[14px] sm:text-[15.5px] font-bold tracking-wide text-[#95E4B9] uppercase font-sans">
-                <Sparkles className="w-4.5 h-4.5 shrink-0 text-[#95E4B9]" />
-                <span>Primary Focus Regimens · Select Pack Size &amp; Order on Delivery</span>
+              <div className="flex items-center gap-2 text-xs sm:text-sm font-black tracking-wider text-[#95E4B9] uppercase font-sans">
+                <Sparkles className="w-4 h-4 shrink-0 text-[#95E4B9]" />
+                <span>★ Most Popular Formulations · Select Pack &amp; Order on Delivery</span>
               </div>
-              <div className="text-[14px] sm:text-[15.5px] text-[#D4E6DC] font-medium hidden sm:block">
+              <div className="text-xs sm:text-sm text-[#D4E6DC] font-semibold hidden sm:block">
                 Free Nationwide Delivery · Inspect seals at your doorstep before payment
               </div>
             </div>
@@ -2183,68 +2208,64 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16 sm:space-y-20">
           <div className="space-y-10 sm:space-y-12">
             <div className="max-w-2xl space-y-3">
-              <p className="text-[15px] sm:text-[16px] font-bold text-[#047857] tracking-wider uppercase">
-                Peace-of-Mind Doorstep Fulfillment
+              <p className="text-[14px] sm:text-[15px] font-black text-[#047857] tracking-wider uppercase">
+                100% Risk-Free Doorstep Fulfillment
               </p>
-              <h2 className="text-[2rem] sm:text-4xl lg:text-[42px] font-bold text-[#14261E] font-[family-name:var(--font-editorial)] tracking-tight leading-[1.2] [text-wrap:balance]">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#14261E] tracking-tight leading-tight [text-wrap:balance]">
                 How Nationwide Pay-on-Delivery Works
               </h2>
-              <p className="text-[17.5px] sm:text-[19px] text-[#263930] leading-[1.78]">
-                Designed for complete comfort and confidence—you inspect your factory-sealed
-                supplements in person at your doorstep before making payment.
+              <p className="text-base sm:text-lg text-[#263930] leading-relaxed font-medium">
+                Designed for your complete peace of mind — inspect your sealed herbal bottles in person at your doorstep before paying the delivery rider.
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10 pt-6 border-t border-[#E4EBE7]">
               <div className="space-y-3 pt-2">
-                <span className="text-[15px] sm:text-[16px] font-bold text-[#047857] tabular-nums">
-                  01. Request Dispatch
+                <span className="text-xs sm:text-sm font-black text-[#047857] uppercase tracking-wider tabular-nums">
+                  Step 01 · Quick Request
                 </span>
-                <h3 className="text-[1.45rem] sm:text-[1.75rem] font-bold text-[#14261E] font-[family-name:var(--font-editorial)] leading-snug">
+                <h3 className="text-lg sm:text-xl font-black text-[#14261E] leading-snug">
                   Select Your Wellness Pack
                 </h3>
-                <p className="text-[17px] sm:text-[18px] text-[#263930] leading-[1.78]">
-                  Choose your preferred multi-bottle pack and enter your phone number, state, and
-                  street address. No card or online payment is required.
+                <p className="text-sm sm:text-base text-[#263930] leading-relaxed font-medium">
+                  Choose your preferred pack size and enter your phone number, state, and delivery address. No ATM card or upfront payment needed.
                 </p>
               </div>
 
               <div className="space-y-3 pt-2">
-                <span className="text-[15px] sm:text-[16px] font-bold text-[#047857] tabular-nums">
-                  02. Rider Scheduling
+                <span className="text-xs sm:text-sm font-black text-[#047857] uppercase tracking-wider tabular-nums">
+                  Step 02 · Fast Dispatch
                 </span>
-                <h3 className="text-[1.45rem] sm:text-[1.75rem] font-bold text-[#14261E] font-[family-name:var(--font-editorial)] leading-snug">
-                  Personal Phone Confirmation
+                <h3 className="text-lg sm:text-xl font-black text-[#14261E] leading-snug">
+                  Phone &amp; Rider Confirmation
                 </h3>
-                <p className="text-[17px] sm:text-[18px] text-[#263930] leading-[1.78]">
-                  Our regional fulfillment desk calls or messages you on WhatsApp to confirm your
-                  convenient delivery window within 24–48 hours.
+                <p className="text-sm sm:text-base text-[#263930] leading-relaxed font-medium">
+                  Our regional fulfillment desk calls or messages you to confirm your convenient delivery time within 24 to 48 hours.
                 </p>
               </div>
 
               <div className="space-y-3 pt-2">
-                <span className="text-[15px] sm:text-[16px] font-bold text-[#047857] tabular-nums">
-                  03. Doorstep Verification
+                <span className="text-xs sm:text-sm font-black text-[#047857] uppercase tracking-wider tabular-nums">
+                  Step 03 · Doorstep Inspection
                 </span>
-                <h3 className="text-[1.45rem] sm:text-[1.75rem] font-bold text-[#14261E] font-[family-name:var(--font-editorial)] leading-snug">
-                  Inspect Intact Seals &amp; Pay
+                <h3 className="text-lg sm:text-xl font-black text-[#14261E] leading-snug">
+                  Inspect Sealed Bottles &amp; Pay
                 </h3>
-                <p className="text-[17px] sm:text-[18px] text-[#263930] leading-[1.78]">
-                  Verify intact factory seals, NAFDAC numbers, and expiry dates at your door, then
-                  pay the rider via Bank Transfer, POS, or Cash.
+                <p className="text-sm sm:text-base text-[#263930] leading-relaxed font-medium">
+                  Open your parcel, verify intact factory seals, NAFDAC numbers, and expiry dates, then pay the rider via Transfer, POS, or Cash.
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Verified Adult Customer Experiences */}
+          {/* Verified Customer Experiences */}
           <div id="ad-reviews" className="pt-14 border-t border-[#E4EBE7] space-y-10 sm:space-y-12 scroll-mt-20">
             <div className="max-w-2xl space-y-3">
-              <p className="text-[15px] sm:text-[16px] font-bold text-[#047857] tracking-wider uppercase">
-                Verified Doorstep Buyers
+              <p className="text-[14px] sm:text-[15px] font-black text-[#047857] tracking-wider uppercase">
+                Real Nigerian Customer Reviews
               </p>
-              <h2 className="text-[2rem] sm:text-4xl lg:text-[42px] font-bold text-[#14261E] font-[family-name:var(--font-editorial)] tracking-tight leading-[1.2] [text-wrap:balance]">
-                Trusted by Adults &amp; Families Nationwide
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#14261E] tracking-tight leading-tight [text-wrap:balance]">
+                Over 10,000+ Men &amp; Women Trust GHT Wellness
               </h2>
             </div>
 
@@ -2252,31 +2273,31 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
               {prioritizedStories.slice(0, 3).map((story, idx) => (
                 <blockquote
                   key={idx}
-                  className="p-6 sm:p-8 rounded-2xl bg-[#F7FAF8] border border-[#DCE5E0] flex flex-col justify-between space-y-6"
+                  className="p-6 sm:p-7 rounded-2xl bg-[#F7FAF8] border border-[#DCE5E0] flex flex-col justify-between space-y-5 shadow-2xs hover:shadow-md transition-shadow"
                 >
-                  <div className="space-y-4">
+                  <div className="space-y-3.5">
                     <div
                       className="flex items-center gap-1.5 text-amber-500"
                       aria-label="5 out of 5 stars"
                     >
                       {[...Array(5)].map((_, sIdx) => (
-                        <Star key={sIdx} className="w-5 h-5 fill-current" />
+                        <Star key={sIdx} className="w-4 h-4 fill-current" />
                       ))}
                     </div>
-                    <p className="text-[17px] sm:text-[18.5px] text-[#24372E] leading-[1.8] font-normal">
+                    <p className="text-sm sm:text-base text-[#24372E] leading-relaxed font-medium">
                       &ldquo;{story.quote}&rdquo;
                     </p>
                   </div>
 
-                  <footer className="pt-4 border-t border-[#DCE5E0]">
-                    <div className="font-bold text-[17.5px] sm:text-[19px] text-[#14261E] font-[family-name:var(--font-editorial)]">
+                  <footer className="pt-3.5 border-t border-[#DCE5E0]">
+                    <div className="font-black text-base text-[#14261E]">
                       {story.name}
                     </div>
-                    <div className="text-[15px] sm:text-[16px] text-[#4C6056] mt-0.5">
+                    <div className="text-xs sm:text-sm text-[#4C6056] font-medium mt-0.5">
                       {story.role} · {story.location}
                     </div>
-                    <div className="text-[14.5px] sm:text-[15.5px] font-bold text-[#047857] mt-1.5">
-                      {story.packName}
+                    <div className="text-xs font-black text-[#047857] mt-1 uppercase tracking-wider">
+                      Verified Buyer · {story.packName}
                     </div>
                   </footer>
                 </blockquote>
@@ -2285,8 +2306,8 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
 
             {/* Clean High-Legibility FAQ Accordion */}
             <div className="max-w-3xl mx-auto pt-6 sm:pt-8 space-y-6">
-              <h3 className="text-[1.8rem] sm:text-3xl lg:text-4xl font-bold text-[#14261E] font-[family-name:var(--font-editorial)] text-center leading-snug [text-wrap:balance]">
-                Questions Before Placing Your Order
+              <h3 className="text-xl sm:text-2xl lg:text-3xl font-black text-[#14261E] text-center leading-snug [text-wrap:balance]">
+                Frequently Asked Questions Before You Order
               </h3>
               <div className="divide-y divide-[#E4EBE7] border-y border-[#E4EBE7]">
                 {BUYER_FAQS.map((faq, idx) => {
@@ -2299,17 +2320,17 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                         aria-expanded={isOpen}
                         className="w-full py-4 sm:py-5 text-left flex items-center justify-between gap-4 cursor-pointer"
                       >
-                        <span className="text-[17.5px] sm:text-[19.5px] font-bold text-[#14261E] leading-snug">
+                        <span className="text-base sm:text-lg font-black text-[#14261E] leading-snug">
                           {faq.question}
                         </span>
                         <ChevronDown
-                          className={`w-6 h-6 text-[#4C6056] shrink-0 transition-transform duration-200 ${
+                          className={`w-5 h-5 text-[#4C6056] shrink-0 transition-transform duration-200 ${
                             isOpen ? 'rotate-180' : ''
                           }`}
                         />
                       </button>
                       {isOpen && (
-                        <div className="pb-5 text-[17px] sm:text-[18px] text-[#263930] leading-[1.8] font-normal">
+                        <div className="pb-5 text-sm sm:text-base text-[#263930] leading-relaxed font-medium">
                           {faq.answer}
                         </div>
                       )}
@@ -2322,23 +2343,23 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
         </div>
       </section>
 
-      {/* 5. Contiguous Express Checkout Section — Sticky Large Product Stage Left + Clean Form Right */}
+      {/* 5. Contiguous Express Checkout Section */}
       <section
         id="express-order"
         className="py-16 sm:py-24 bg-[#F2F5F3] border-t border-[#DCE5E0] scroll-mt-20"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-10">
           <div className="max-w-2xl space-y-3">
-            <p className="text-[15px] sm:text-[16px] font-bold text-[#047857] tracking-wider uppercase">
+            <p className="text-[14px] sm:text-[15px] font-black text-[#047857] tracking-wider uppercase">
               1-Step Doorstep Dispatch Form
             </p>
-            <h2 className="text-[2rem] sm:text-4xl lg:text-[42px] font-bold text-[#14261E] font-[family-name:var(--font-editorial)] tracking-tight leading-[1.2] [text-wrap:balance]">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#14261E] tracking-tight leading-tight [text-wrap:balance]">
               Complete Your Pay-on-Delivery Order
             </h2>
-            <p className="text-[17.5px] sm:text-[19px] text-[#263930] leading-[1.78]">
+            <p className="text-base sm:text-lg text-[#263930] leading-relaxed font-medium">
               {isDedicatedConditionLanding && activeFilter !== 'all'
-                ? `Enter your delivery address below to dispatch your ${activeCategoryLabel} pack. Free nationwide delivery across all 36 states and FCT.`
-                : 'Enter your delivery address below. Our regional hub dispatches directly to your home or office with free nationwide doorstep delivery.'}
+                ? `Enter your delivery address below to dispatch your ${activeCategoryLabel} pack. Free nationwide delivery across all 36 states and FCT. Pay only upon inspection.`
+                : 'Enter your delivery address below. No payment or bank card is required now. We dispatch directly to your home or office with Free Nationwide Delivery. Inspect your parcel before paying.'}
             </p>
           </div>
 
@@ -2363,7 +2384,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                     <div className="text-xs font-medium text-[#047857]">
                       Selected for Doorstep Dispatch
                     </div>
-                    <h3 className="text-2xl font-semibold text-[#162820] font-[family-name:var(--font-editorial)]">
+                    <h3 className="text-xl sm:text-2xl font-black text-[#162820] leading-tight">
                       {inlineTarget.item.name}
                     </h3>
                     {inlineSummaryPricing.includedList.length > 0 && (
@@ -2436,7 +2457,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                 )}
 
                 <div>
-                  <div className="font-bold text-xl sm:text-2xl text-white font-[family-name:var(--font-editorial)] leading-tight">
+                  <div className="font-black text-xl sm:text-2xl text-white leading-tight">
                     {CONFIG.company.name}
                   </div>
                   {CONFIG.company.subtitle && (
@@ -2793,7 +2814,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
             <div className="px-6 py-4 border-b border-[#E4EBE7] flex items-center justify-between gap-3">
               <div className="flex items-center gap-2.5">
                 <FileText className="w-5 h-5 text-[#047857]" />
-                <h3 className="text-lg font-bold text-[#0F1F18] font-[family-name:var(--font-editorial)]">
+                <h3 className="text-lg font-black text-[#0F1F18]">
                   {POLICY_MODAL_CONTENT[activePolicyModal].title}
                 </h3>
               </div>
