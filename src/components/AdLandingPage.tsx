@@ -8,6 +8,7 @@ import {
   Mail,
   MapPin,
   ChevronDown,
+  ChevronRight,
   X,
   ShoppingBag,
   Clock,
@@ -1020,63 +1021,74 @@ const PackageCard: React.FC<PackageCardProps> = ({
   return (
     <article
       id={`package-card-${pkg.package_code || cardIndex}`}
-      className={`bg-white rounded-[28px] sm:rounded-[36px] border transition-all duration-300 flex flex-col overflow-hidden hover:-translate-y-1.5 ${cardBorderClass} ${
-        isHeroCard ? 'ring-1 ring-white/30' : ''
+      className={`relative bg-white rounded-2xl md:rounded-3xl border border-slate-200 transition-all duration-500 flex flex-col overflow-hidden hover:shadow-2xl hover:-translate-y-1 group ${cardBorderClass} ${
+        isHeroCard ? 'ring-2 ring-emerald-500/30' : ''
       }`}
     >
-      {/* 1. Top Identity Header — Distinct Medical/Apothecary Banner */}
-      <div className={`${headerBgClass} px-6 sm:px-9 py-6 sm:py-8 border-b border-slate-200/90 space-y-4`}>
+      {/* Urgency Badge - Top Center */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 z-30 bg-red-600 text-white px-4 py-1 rounded-b-xl text-[10px] md:text-xs font-black uppercase tracking-[0.2em] shadow-lg animate-bounce">
+        Limited Stock - Get it Today
+      </div>
+
+      {/* 1. Identity Header */}
+      <div className={`${headerBgClass} px-5 sm:px-8 pt-7 sm:pt-8 pb-5 border-b border-slate-200/90 space-y-3`}>
         {/* Top Badges Row */}
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-2.5">
+        <div className="flex flex-wrap items-center justify-between gap-2.5">
+          <div className="flex flex-wrap items-center gap-2">
             {isProstateFocus ? (
-              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#047857] text-[#FAFDFB] text-[13.5px] sm:text-[14.5px] font-bold tracking-wide shadow-xs uppercase">
-                <Sparkles className="w-4 h-4 shrink-0 text-[#FAFDFB]" />
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#047857] text-white text-xs font-black uppercase tracking-wider shadow-xs">
+                <Sparkles size={12} className="text-white" />
                 {badgeLabel || enhancedProfile?.badgeLabel || 'Primary Focus · Package 01'}
               </span>
             ) : isPerformanceFocus ? (
-              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#78350F] text-[#FDE68A] border border-[#92400E]/40 text-[13.5px] sm:text-[14.5px] font-bold tracking-wide shadow-xs uppercase">
-                <Flame className="w-4 h-4 text-[#FDE68A] shrink-0" />
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#78350F] text-[#FDE68A] border border-[#92400E]/40 text-xs font-black uppercase tracking-wider shadow-xs">
+                <Flame size={12} className="text-[#FDE68A]" />
                 {badgeLabel || enhancedProfile?.badgeLabel || 'Core Focus · Package 02'}
               </span>
             ) : (
-              <span className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-slate-200 text-[13.5px] sm:text-[14.5px] font-bold tabular-nums ${theme.accentTextClass} shadow-2xs`}>
+              <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white border border-slate-200 text-xs font-black uppercase tracking-wider ${theme.accentTextClass} shadow-2xs`}>
                 Package {indexDisplay} · {theme.categoryLabel}
               </span>
             )}
 
-            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white/95 border border-slate-200/90 text-[13px] sm:text-[14px] font-bold text-slate-800 shadow-2xs">
-              <ShieldCheck className="w-4.5 h-4.5 text-[#047857]" />
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/95 border border-slate-200 text-xs font-black text-slate-800 shadow-2xs">
+              <ShieldCheck size={14} className="text-[#047857]" />
               NAFDAC Certified
             </span>
           </div>
 
-          <div className="text-slate-700 font-bold tabular-nums text-[14px] sm:text-[15.5px]">
-            {pkg.package_code ? `${pkg.package_code} · ` : ''}
-            Pay on Delivery
+          <div className="flex items-center gap-1.5">
+            <span className="bg-white/95 text-slate-900 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider border border-slate-200 shadow-xs">
+              {pkg.package_code || 'PACKAGE'}
+            </span>
+            <span className="bg-emerald-600/95 text-white px-2 py-0.5 rounded text-[10px] font-black border border-emerald-500 shadow-xs">
+              Free Shipping
+            </span>
           </div>
         </div>
 
-        {/* Title, Kicker and Problem-Solving Subtitle */}
-        <div className="space-y-2">
+        {/* Title & Kicker */}
+        <div className="space-y-1.5">
           {enhancedProfile?.kicker && (
-            <p className="text-[13px] sm:text-[14px] font-bold tracking-[0.05em] uppercase text-slate-500 font-sans">
+            <div className="text-[10px] md:text-xs font-black text-slate-400 uppercase tracking-widest">
               {enhancedProfile.kicker}
-            </p>
+            </div>
           )}
 
-          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
-            <h3 className="text-[2rem] phablet:text-[2.35rem] sm:text-[2.65rem] lg:text-[2.9rem] font-bold text-slate-900 font-[family-name:var(--font-editorial)] leading-[1.18] tracking-[-0.015em] [text-wrap:balance]">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+            <h3 className="text-xl md:text-2xl lg:text-3xl font-black text-slate-900 leading-tight">
+              <span className={isProstateFocus ? 'text-[#047857]' : isPerformanceFocus ? 'text-[#B45309]' : 'text-emerald-600'}>
+                {isProstateFocus ? 'Wellness Pack: ' : isPerformanceFocus ? 'Performance Pack: ' : 'Wellness Pack: '}
+              </span>
               {pkg.name}
             </h3>
 
-            {/* Current Price Highlight */}
             <div className="tabular-nums text-left sm:text-right shrink-0">
-              <span className="text-[32px] sm:text-[38px] font-black text-slate-900 font-sans tracking-tight">
+              <span className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
                 ₦{pricing.currentPrice.toLocaleString()}
               </span>
               {pricing.savings > 0 && (
-                <span className="ml-2.5 text-lg sm:text-xl text-slate-400 line-through">
+                <span className="ml-2 text-sm sm:text-base text-slate-400 line-through font-bold">
                   ₦{pricing.retailPrice.toLocaleString()}
                 </span>
               )}
@@ -1085,7 +1097,7 @@ const PackageCard: React.FC<PackageCardProps> = ({
 
           {enhancedProfile?.subtitle && (
             <p
-              className="text-[16.5px] sm:text-[18px] lg:text-[19.5px] font-medium leading-[1.65] tracking-[0.005em]"
+              className="text-sm sm:text-base font-medium leading-relaxed"
               style={{ color: accentColor }}
             >
               {enhancedProfile.subtitle}
@@ -1099,7 +1111,7 @@ const PackageCard: React.FC<PackageCardProps> = ({
         <StudioProductStage
           entries={galleryEntries}
           alt={pkg.name}
-          heightClassName="h-[310px] phablet:h-[350px] sm:h-[390px] md:h-[340px] lg:h-[410px]"
+          heightClassName="h-[280px] sm:h-[320px] md:h-[340px] lg:h-[370px]"
           studioGradientClass={theme.studioGradientClass}
           optimizeWidth={1200}
           onInspect={() => onInspectDetail(pkg)}
@@ -1107,61 +1119,53 @@ const PackageCard: React.FC<PackageCardProps> = ({
       </div>
 
       {/* 3. Package Information Body */}
-      <div className="p-6 sm:p-9 lg:p-10 flex-1 flex flex-col justify-between space-y-8 bg-white">
-        <div className="space-y-7">
-          {/* Authoritative Medical/Herbal Description (Clear, Soft, Smooth & Highly Legible for Adults) */}
+      <div className="p-5 sm:p-7 lg:p-8 flex-1 flex flex-col justify-between space-y-6 bg-white">
+        <div className="space-y-5">
+          {/* Description */}
           {displayDescription && (
-            <div
-              className={`p-5 sm:p-7 rounded-[22px] border ${
-                isProstateFocus
-                  ? 'bg-[#F7FAF8] border-[#047857]/20 shadow-[inset_0_1px_3px_rgba(4,120,87,0.03)]'
-                  : isPerformanceFocus
-                    ? 'bg-[#FCF9F3] border-[#B45309]/20 shadow-[inset_0_1px_3px_rgba(180,83,9,0.03)]'
-                    : 'bg-[#F8FAF9] border-slate-200/90'
-              }`}
-            >
-              <div className="flex items-center gap-2 mb-2.5">
-                <Sparkles className="w-4.5 h-4.5" style={{ color: accentColor }} />
-                <span
-                  className="text-[13px] sm:text-[14px] font-bold uppercase tracking-[0.06em]"
-                  style={{ color: accentColor }}
-                >
-                  Clinical Botanical Action &amp; Therapy Overview
-                </span>
-              </div>
-              <p className="text-[18px] sm:text-[19.5px] lg:text-[20.5px] text-slate-800 leading-[1.82] font-normal tracking-[0.005em]">
-                {displayDescription}
-              </p>
-            </div>
+            <p className="text-base sm:text-lg text-slate-600 leading-relaxed font-medium">
+              {displayDescription}
+            </p>
           )}
 
-          {/* 4-Pillar Benefit Grid (Structured, Clear & Large Font for Adults) */}
+          {/* Ratings & Trust Info Strip (Home Page Card Format) */}
+          <div className="flex items-center justify-between gap-1 bg-slate-50 p-2 sm:p-2.5 rounded-xl border border-slate-100 font-black">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <div className="flex items-center">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} size={13} className="fill-orange-400 text-orange-400" />
+                ))}
+              </div>
+              <span className="text-xs sm:text-sm text-slate-600 font-black">10k+ Sold · 4.9/5 Rating</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-xs sm:text-sm font-black text-emerald-700 uppercase tracking-widest">
+              <Award size={13} />
+              Organic · NAFDAC Certified
+            </div>
+          </div>
+
+          {/* Health Benefits & Pillars (Home Page Format) */}
           {enhancedProfile?.pillars ? (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h4 className="text-[18.5px] sm:text-[20.5px] lg:text-[22px] font-bold text-slate-900 tracking-tight flex items-center gap-2.5">
-                  <CheckCircle2 className="w-6 h-6 text-[#047857] shrink-0" />
-                  <span>Key Therapeutic Benefits:</span>
-                </h4>
-                <span className="text-[13.5px] sm:text-[14.5px] text-slate-500 font-semibold hidden sm:inline">
-                  Clinically Structured Botanical Action
-                </span>
+            <div className="space-y-3">
+              <div className="text-[10px] md:text-xs font-black text-slate-400 uppercase tracking-widest mb-1 flex items-center justify-between">
+                <span>Perfect for &amp; Key Health Benefits:</span>
+                <span className="text-emerald-700 font-black">NAFDAC Regulated</span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {enhancedProfile.pillars.map((pillar, pIdx) => (
                   <div
                     key={pIdx}
-                    className="p-5 sm:p-5.5 rounded-[20px] border border-slate-200/95 bg-white hover:bg-slate-50/50 transition-all flex items-start gap-4 shadow-[0_2px_10px_-3px_rgba(15,31,24,0.04)]"
+                    className="p-3.5 sm:p-4 rounded-xl border border-slate-100 bg-slate-50/70 hover:bg-white hover:border-slate-200 transition-all flex items-start gap-3 shadow-2xs"
                   >
-                    <div className="p-3 rounded-2xl bg-slate-100/90 shrink-0 mt-0.5">
+                    <div className="p-2 rounded-lg bg-white border border-slate-200/80 shadow-2xs shrink-0 mt-0.5">
                       {renderPillarIcon(pillar.icon)}
                     </div>
-                    <div className="space-y-1.5 min-w-0">
-                      <div className="text-[17px] sm:text-[18.5px] font-bold text-slate-900 leading-[1.35]">
+                    <div className="space-y-1 min-w-0">
+                      <div className="text-sm sm:text-base font-black text-slate-900 leading-snug">
                         {pillar.title}
                       </div>
-                      <div className="text-[15px] sm:text-[16px] text-slate-600 leading-[1.65] font-normal">
+                      <div className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
                         {pillar.description}
                       </div>
                     </div>
@@ -1170,27 +1174,27 @@ const PackageCard: React.FC<PackageCardProps> = ({
               </div>
             </div>
           ) : rawBenefits.length > 0 ? (
-            <div className="space-y-4">
-              <h4 className="text-[18.5px] sm:text-[20.5px] font-bold text-slate-900 tracking-tight flex items-center gap-2.5">
-                <CheckCircle2 className="w-6 h-6 text-[#047857] shrink-0" />
-                <span>Key Therapeutic Benefits:</span>
-              </h4>
-              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div className="space-y-2.5">
+              <div className="text-[10px] md:text-xs font-black text-slate-400 uppercase tracking-widest mb-1 flex items-center justify-between">
+                <span>Perfect for &amp; Key Health Benefits:</span>
+                <span className="text-emerald-700 font-black">NAFDAC Regulated</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {(isBenefitsExpanded ? rawBenefits : rawBenefits.slice(0, 4)).map((benefit, bIdx) => (
-                  <li
+                  <div
                     key={bIdx}
-                    className="flex items-start gap-3.5 text-[16px] sm:text-[17px] text-slate-700 leading-snug p-4 rounded-2xl bg-slate-50/80 border border-slate-200/80"
+                    className="flex items-start gap-2 text-xs sm:text-sm text-slate-700 font-bold p-2.5 rounded-xl bg-slate-50 border border-slate-100"
                   >
-                    <CheckCircle2 className="w-5.5 h-5.5 text-[#047857] shrink-0 mt-0.5" />
+                    <ShieldCheck size={16} className="text-emerald-600 flex-shrink-0 mt-0.5" />
                     <span>{benefit}</span>
-                  </li>
+                  </div>
                 ))}
-              </ul>
+              </div>
               {rawBenefits.length > 4 && (
                 <button
                   type="button"
                   onClick={() => onToggleBenefits(pkg.id)}
-                  className="text-[15px] sm:text-[16px] font-bold text-[#047857] hover:underline cursor-pointer"
+                  className="text-xs sm:text-sm font-black text-emerald-700 hover:underline cursor-pointer"
                 >
                   {isBenefitsExpanded ? 'Show fewer benefits' : `+ Show ${rawBenefits.length - 4} more benefits`}
                 </button>
@@ -1200,22 +1204,13 @@ const PackageCard: React.FC<PackageCardProps> = ({
 
           {/* 4. Treatment Duration Selector (Bottle Pack Option Pills) */}
           {pkg.options && pkg.options.length > 0 && (
-            <div className="space-y-4 pt-4 border-t border-slate-200">
-              <div className="flex items-center justify-between gap-2">
-                <div className="space-y-0.5">
-                  <span className="text-[18px] sm:text-[19.5px] font-bold text-slate-900">
-                    Choose Your Recommended Treatment Duration:
-                  </span>
-                  <p className="text-[14px] sm:text-[15px] text-slate-500">
-                    Multi-bottle savings applied automatically · Select below
-                  </p>
-                </div>
-                <span className="text-[13px] sm:text-[14px] font-bold text-[#047857] bg-[#EEF7F2] px-3.5 py-1.5 rounded-full">
-                  Tap pack to choose
-                </span>
+            <div className="space-y-3 pt-3 border-t border-slate-100">
+              <div className="text-[10px] md:text-xs font-black text-slate-400 uppercase tracking-widest mb-1 flex items-center justify-between">
+                <span>Select Treatment Duration:</span>
+                <span className="text-emerald-700 font-black">Multi-Bottle Savings</span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                 {pkg.options.map((opt, oIdx) => {
                   const isSel = oIdx === selectedIdx;
                   const bottleNum = extractBottleCount(opt.bottles);
@@ -1233,44 +1228,41 @@ const PackageCard: React.FC<PackageCardProps> = ({
                       key={oIdx}
                       type="button"
                       onClick={() => onSelectOption(pkg, oIdx)}
-                      className={`relative p-4.5 sm:p-5 rounded-[20px] border text-left transition-all cursor-pointer tabular-nums flex flex-col justify-between min-h-[115px] ${
+                      className={`relative p-3.5 sm:p-4 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
                         isSel
-                          ? enhancedProfile
-                            ? `${enhancedProfile.optionActiveBg} ${enhancedProfile.optionActiveBorder} ${enhancedProfile.optionActiveRing} shadow-xs`
-                            : 'bg-[#EEF7F2] border-[#047857] ring-2 ring-[#047857] shadow-xs'
-                          : 'border-slate-200/90 bg-[#FAFAFA] hover:bg-white hover:border-slate-300 hover:shadow-2xs'
+                          ? 'bg-emerald-50/70 border-emerald-600 ring-2 ring-emerald-600/70 shadow-xs'
+                          : 'border-slate-200 bg-white hover:bg-slate-50'
                       }`}
                     >
-                      {/* Most Popular Badge on Top */}
                       {isRecommended && (
-                        <span className="absolute -top-3 left-4 px-3 py-0.5 rounded-full bg-[#047857] text-white text-[12px] sm:text-[12.5px] font-bold uppercase tracking-wider shadow-xs">
-                          ★ Most Popular Choice
+                        <span className="absolute -top-2.5 left-3 px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[9px] sm:text-[10px] font-black uppercase tracking-wider shadow-xs">
+                          ★ Most Popular
                         </span>
                       )}
 
                       <div>
-                        <div className="flex items-center justify-between gap-1.5">
-                          <span className="text-[17px] sm:text-[18.5px] font-bold text-slate-900">
+                        <div className="flex items-center justify-between gap-1">
+                          <span className="text-sm sm:text-base font-black text-slate-900">
                             {optPriceInfo.label}
                           </span>
                           {optPriceInfo.discountPercent > 0 && (
-                            <span className="text-[13px] sm:text-[13.5px] font-extrabold text-[#047857] bg-white px-2 py-0.5 rounded-md border border-emerald-200">
+                            <span className="text-[10px] sm:text-xs font-black text-emerald-700 bg-white px-1.5 py-0.5 rounded border border-emerald-200">
                               -{optPriceInfo.discountPercent}%
                             </span>
                           )}
                         </div>
 
-                        <div className="text-[14px] sm:text-[15px] text-slate-600 font-medium mt-1">
+                        <div className="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">
                           {durationLabel}
                         </div>
                       </div>
 
-                      <div className="mt-3 pt-2 border-t border-slate-200/70 flex items-baseline justify-between gap-1.5">
-                        <span className="text-[20px] sm:text-[22px] font-extrabold text-slate-900">
+                      <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-baseline justify-between gap-1">
+                        <span className="text-base sm:text-lg font-black text-slate-900">
                           ₦{optPriceInfo.sellingPrice.toLocaleString()}
                         </span>
                         {optPriceInfo.savings > 0 && (
-                          <span className="text-[14px] sm:text-[15px] text-slate-400 line-through">
+                          <span className="text-xs sm:text-sm text-slate-400 line-through font-bold">
                             ₦{optPriceInfo.originalPrice.toLocaleString()}
                           </span>
                         )}
@@ -1282,11 +1274,11 @@ const PackageCard: React.FC<PackageCardProps> = ({
 
               {/* Dynamic Included in Pack Details */}
               {pricing.includedList.length > 0 && (
-                <div className="p-4 sm:p-5 rounded-2xl bg-slate-50/90 border border-slate-200/85 flex items-start gap-3 text-[15.5px] sm:text-[16.5px] text-slate-800 leading-relaxed">
-                  <Check className="w-5.5 h-5.5 text-[#047857] shrink-0 mt-0.5" />
+                <div className="p-3 sm:p-3.5 rounded-xl bg-slate-50 border border-slate-100 flex items-start gap-2 text-xs sm:text-sm text-slate-700">
+                  <Check size={16} className="text-emerald-600 shrink-0 mt-0.5" />
                   <div>
-                    <strong className="font-bold text-slate-900">Supplements included in this regimen: </strong>
-                    <span className="text-slate-700 font-medium">{pricing.includedList.join(' · ')}</span>
+                    <strong className="font-black text-slate-900">Included in pack: </strong>
+                    <span className="font-medium text-slate-600">{pricing.includedList.join(' · ')}</span>
                   </div>
                 </div>
               )}
@@ -1294,88 +1286,80 @@ const PackageCard: React.FC<PackageCardProps> = ({
           )}
         </div>
 
-        {/* 5. Pricing Summary & High-Converting Action CTAs */}
-        <div className="pt-6 border-t border-slate-200 space-y-5">
-          <div className="flex flex-wrap items-baseline justify-between gap-3.5 tabular-nums">
-            <div>
-              <div className="flex items-baseline gap-3 flex-wrap">
-                <span className="text-[2.35rem] sm:text-[2.75rem] lg:text-[3.1rem] font-black text-slate-900 tracking-tight font-sans">
-                  ₦{pricing.currentPrice.toLocaleString()}
+        {/* 5. Pricing Section & Action Buttons (Home Page Card Format) */}
+        <div className="pt-3 border-t border-slate-100 mt-auto space-y-3">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-baseline gap-2 flex-wrap">
+              <span className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900">
+                ₦{pricing.currentPrice.toLocaleString()}
+              </span>
+              {pricing.savings > 0 && (
+                <span className="text-base sm:text-lg text-slate-400 line-through font-bold">
+                  ₦{pricing.retailPrice.toLocaleString()}
                 </span>
-                {pricing.savings > 0 && (
-                  <span className="text-xl sm:text-2xl text-slate-400 line-through">
-                    ₦{pricing.retailPrice.toLocaleString()}
-                  </span>
-                )}
+              )}
+            </div>
+            <div className="flex flex-col items-end shrink-0">
+              {pkg.options && pkg.options.length > 0 && (
+                <div className="bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded text-[8px] md:text-[9px] font-black uppercase tracking-widest mb-1 border border-indigo-100">
+                  {pkg.options.length} Sizes Available
+                </div>
+              )}
+              <div className="text-[10px] md:text-xs font-black text-red-600 uppercase tracking-tighter mb-0.5 flex items-center gap-1">
+                <Flame size={12} className="animate-pulse" />
+                Only 5 Left in Stock!
               </div>
-              <div className="text-[15.5px] sm:text-[17px] text-[#047857] font-bold mt-1">
-                {pricing.savings > 0
-                  ? `Save ₦${pricing.savings.toLocaleString()} (${pricing.discount}% Off) · Free Nationwide Delivery`
-                  : 'Free Nationwide Delivery · Pay on Delivery'}
+              <div className="w-20 sm:w-28 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                <div className="h-full bg-red-500 w-[85%] rounded-full" />
               </div>
             </div>
+          </div>
 
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <div className="text-xs sm:text-sm text-emerald-700 font-black">
+              {pricing.savings > 0
+                ? `Save ₦${pricing.savings.toLocaleString()} (${pricing.discount}% Off) · Free Nationwide Delivery`
+                : 'Free Nationwide Delivery · Pay on Delivery'}
+            </div>
             <button
               type="button"
               onClick={() => onInspectDetail(pkg)}
-              className="text-[15px] sm:text-[16.5px] font-bold text-slate-600 hover:text-[#047857] underline underline-offset-4 cursor-pointer whitespace-nowrap"
+              className="text-xs sm:text-sm font-black text-slate-500 hover:text-emerald-700 underline underline-offset-4 cursor-pointer"
             >
               View Full Pack Details
             </button>
           </div>
 
-          {/* Action Buttons */}
-          <div className="grid grid-cols-1 sm:grid-cols-5 gap-4">
-            <button
-              type="button"
-              onClick={() => onOpenCheckout(pkg, selectedIdx)}
-              className={`sm:col-span-3 min-h-[66px] sm:min-h-[72px] px-6 py-4 rounded-2xl ${
-                enhancedProfile?.ctaBg || 'bg-[#047857]'
-              } ${
-                enhancedProfile?.ctaHover || 'hover:bg-[#065F46]'
-              } text-white font-extrabold text-[19px] sm:text-[21px] transition-all flex flex-col items-center justify-center cursor-pointer shadow-md hover:shadow-xl`}
-            >
-              <div className="flex items-center gap-2.5">
-                <ShoppingBag className="w-5.5 h-5.5 shrink-0" />
-                <span>Order on Delivery</span>
-              </div>
-              <span className="text-[13.5px] sm:text-[14.5px] text-emerald-100 font-medium mt-0.5">
-                Pay ₦0 Upfront · Doorstep Inspection
-              </span>
-            </button>
-
-            <a
-              href={getWhatsAppHref()}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => {
-                try {
-                  trackWhatsAppClick(`Ad Package Card Chat: ${pkg.name}`);
-                } catch {}
-              }}
-              className="sm:col-span-2 min-h-[66px] sm:min-h-[72px] px-5 py-4 rounded-2xl border-2 border-slate-300 bg-white hover:bg-slate-50 text-slate-900 font-bold text-[17px] sm:text-[18.5px] transition-all flex flex-col items-center justify-center cursor-pointer shadow-2xs"
-            >
-              <div className="flex items-center gap-2">
-                <MessageCircle className="w-5.5 h-5.5 text-[#25D366] shrink-0" />
-                <span>WhatsApp Specialist</span>
-              </div>
-              <span className="text-[13px] sm:text-[13.5px] text-slate-600 font-medium mt-0.5">
-                Speak with Specialist
-              </span>
-            </a>
-          </div>
-
-          {/* Doorstep Inspection Assurance Strip */}
-          <div className="pt-3 flex flex-wrap items-center justify-between gap-3 text-[14px] sm:text-[15.5px] text-slate-700 font-medium border-t border-slate-100">
-            <span className="flex items-center gap-1.5">
-              <Check className="w-4.5 h-4.5 text-[#047857]" /> Pay after inspecting seals
-            </span>
-            <span className="flex items-center gap-1.5">
-              <Check className="w-4.5 h-4.5 text-[#047857]" /> Free express delivery nationwide
-            </span>
-            <span className="flex items-center gap-1.5">
-              <Check className="w-4.5 h-4.5 text-[#047857]" /> NAFDAC verified
-            </span>
+          {/* Action Buttons - Refined Size Matching Home Page */}
+          <div className="pt-1 flex flex-col gap-2.5">
+            <div className="flex items-center gap-2.5">
+              <a
+                href={getWhatsAppHref()}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => {
+                  try {
+                    trackWhatsAppClick(`Ad Package Card Chat: ${pkg.name}`);
+                  } catch {}
+                }}
+                className="flex-1 bg-white border border-slate-200 text-slate-600 py-3 sm:py-3.5 px-4 rounded-xl font-black text-xs sm:text-sm hover:bg-slate-50 transition-all flex items-center justify-center gap-2 uppercase tracking-widest"
+              >
+                <Phone size={16} className="text-emerald-600" />
+                Chat with us
+              </a>
+              <button
+                type="button"
+                onClick={() => onOpenCheckout(pkg, selectedIdx)}
+                className="flex-[1.5] bg-emerald-600 text-white py-3 sm:py-3.5 px-4 rounded-xl font-black text-base sm:text-lg hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100 active:scale-[0.98] flex items-center justify-center gap-2 group/order animate-shimmer"
+              >
+                Order Now
+                <ChevronRight size={18} className="group-hover/order:translate-x-1 transition-transform" />
+              </button>
+            </div>
+            <div className="flex items-center justify-center gap-1.5 text-xs sm:text-sm font-black text-slate-500 uppercase tracking-widest">
+              <CheckCircle2 size={14} className="text-emerald-600" />
+              Pay on Delivery · Free Nationwide Delivery
+            </div>
           </div>
         </div>
       </div>
@@ -2643,7 +2627,10 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                 <div className="text-xs font-medium text-[#047857]">
                   High-Resolution Bottle &amp; Formulation Details
                 </div>
-                <h3 className="text-lg sm:text-2xl font-semibold text-[#162820] font-[family-name:var(--font-editorial)]">
+                <h3 className="text-lg sm:text-2xl font-black text-slate-900 leading-tight">
+                  {detailModalItem.type === 'package' && (
+                    <span className="text-emerald-600">Wellness Pack: </span>
+                  )}
                   {detailModalItem.item.name}
                 </h3>
               </div>
