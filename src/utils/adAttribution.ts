@@ -197,14 +197,14 @@ export function resolveAdIntent(searchString?: string): AdIntentConfig {
   if (/prostate|prostbeta|urinar|p001/.test(rawQuery)) {
     return {
       category: 'prostate',
-      kicker: "★ OFFICIAL GHT HEALTHCARE NIGERIA · NAFDAC CERTIFIED",
-      headline: "Sleep Soundly All Night Without Frequent Urination, Pain, or Weak Stream",
+      kicker: 'Official GHT Healthcare Nigeria · NAFDAC Certified · Pay on Delivery',
+      headline: 'Natural Relief for Prostate Enlargement, Frequent Urination & Weak Flow',
       subheadline:
-        '100% natural herbal formula that naturally shrinks swollen prostate, stops midnight bathroom runs, and restores a powerful, painless urine flow. Delivered sealed to your door with zero upfront payment — inspect before paying.',
-      pageTitle: "Natural Prostate Care Formula – Pay on Delivery | SD GHT Health Care",
+        '100% natural herbal formula that helps shrink an enlarged prostate, stops frequent midnight bathroom trips, and restores a strong, painless urine flow. Delivered sealed to your door with zero upfront payment — inspect before paying.',
+      pageTitle: 'Natural Prostate Enlargement Care – Pay on Delivery | SD GHT Health Care',
       metaDescription:
-        "Order NAFDAC-registered GHT natural prostate care herbal packs with Free 24–48hr Nationwide Delivery across Nigeria. Inspect seals upon arrival before payment.",
-      ctaLabel: 'Order Prostate Formula',
+        'Order NAFDAC-registered GHT natural prostate enlargement care packs with Free 24–48hr Nationwide Delivery across Nigeria. Inspect seals upon arrival before payment.',
+      ctaLabel: 'Order Prostate Relief Pack',
       matchedKeyword: rawQuery,
       requestedPackageCode: pkgParam || 'P001',
     };
@@ -249,14 +249,14 @@ export function resolveAdIntent(searchString?: string): AdIntentConfig {
   ) {
     return {
       category: 'vitality',
-      kicker: "★ OFFICIAL GHT HEALTHCARE NIGERIA · MALE CONFIDENCE & STAMINA",
-      headline: "Regain Rock-Solid Firmness, Last 35–45+ Minutes & Restore Bedroom Power",
+      kicker: 'Official GHT Healthcare Nigeria · Male Strength & Stamina · Pay on Delivery',
+      headline: 'Overcome Weak Erection & Quick Finish — Regain Rock-Solid Stamina',
       subheadline:
-        '100% herbal endurance formula that eliminates quick finishes, restores dependable firmness, and gives you deep physical stamina. No headache, no racing heart — delivered sealed with Pay on Delivery.',
-      pageTitle: "Male Performance & Stamina Packs – Pay on Delivery | SD GHT Health Care",
+        '100% herbal male strength formula that reverses weak erection, stops quick finishes, and restores firm, dependable intimacy lasting 35 to 45+ minutes. No headache, no racing heart — delivered discreetly with Pay on Delivery.',
+      pageTitle: 'Weak Erection & Male Stamina Packs – Pay on Delivery | SD GHT Health Care',
       metaDescription:
-        "Authentic NAFDAC-registered GHT male performance and stamina combo packs with discreet 24–48hr nationwide delivery and Pay on Delivery.",
-      ctaLabel: "Order Performance & Stamina Pack",
+        'Authentic NAFDAC-registered GHT weak erection and male stamina combo packs with discreet 24–48hr nationwide delivery and Pay on Delivery.',
+      ctaLabel: 'Order Stamina & Erection Pack',
       matchedKeyword: rawQuery,
       requestedPackageCode: pkgParam || 'P002',
     };
@@ -312,14 +312,14 @@ export function resolveAdIntent(searchString?: string): AdIntentConfig {
 
   return {
     category: 'all',
-    kicker: '★ OFFICIAL GHT HEALTHCARE NIGERIA · NAFDAC CERTIFIED HERBAL REGIMENS',
-    headline: 'Natural Herbal Formulations That Restore Your Health, Sleep & Daily Vitality',
+    kicker: 'Official GHT Healthcare Nigeria · NAFDAC Certified · Pay on Delivery',
+    headline: 'Stop Suffering From Prostate Enlargement & Weak Erections — Sleep Soundly & Regain Full Strength',
     subheadline:
-      '100% pure herbal remedies certified by NAFDAC. Stops frequent midnight urination, weak urine stream, knee pain, and bedroom weakness. Pay ₦0 upfront — our rider delivers to your doorstep anywhere in Nigeria so you can inspect before payment.',
-    pageTitle: 'Official GHT Herbal Wellness Packs – Nationwide Pay on Delivery | SD GHT Health Care',
+      'Pure NAFDAC-certified herbal packs that help shrink an enlarged prostate, stop waking up 4–6 times every night to urinate, and restore firm erections naturally. Pay ₦0 upfront — inspect your sealed bottles at your doorstep anywhere in Nigeria before paying.',
+    pageTitle: 'Prostate Enlargement & Weak Erection Herbal Packs – Pay on Delivery | SD GHT Health Care',
     metaDescription:
-      'Shop authentic NAFDAC-registered GHT herbal wellness packs and value bundles. Free 24–48hr delivery across Nigeria with zero upfront risk—Pay on Delivery.',
-    ctaLabel: 'Order Wellness Packs',
+      'Natural NAFDAC-registered GHT herbal packs for prostate enlargement and weak erection. Free 24–48hr delivery across Nigeria with Pay on Delivery.',
+    ctaLabel: 'Order Relief Packs Now',
     requestedPackageCode: pkgParam || undefined,
   };
 }

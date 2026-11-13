@@ -463,9 +463,9 @@ const StudioProductStage: React.FC<StudioProductStageProps> = ({
               e.stopPropagation();
               onInspect();
             }}
-            className="absolute top-3.5 right-3.5 z-10 inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/95 hover:bg-white text-[#0F1F18] border border-slate-200/95 text-[13px] sm:text-[14px] font-bold shadow-xs transition-colors cursor-pointer whitespace-nowrap"
+            className="absolute top-3.5 right-3.5 z-10 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/95 hover:bg-white text-[#0F1F18] border border-slate-200/95 text-sm sm:text-[15px] font-bold shadow-xs transition-colors cursor-pointer whitespace-nowrap"
           >
-            <ZoomIn className="w-4 h-4 text-[#047857]" />
+            <ZoomIn className="w-4.5 h-4.5 text-[#047857]" />
             <span>Enlarge</span>
           </button>
         )}
@@ -477,7 +477,7 @@ const StudioProductStage: React.FC<StudioProductStageProps> = ({
           className="w-full bg-white/95 border-t border-slate-200/75 overflow-x-auto no-scrollbar py-2.5 px-3.5 sm:px-5"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="flex items-center gap-2 w-max sm:mx-auto">
+          <div className="flex items-center gap-2.5 w-max sm:mx-auto">
             {entries.map((entry, idx) => {
               const isSelected = idx === safeIdx;
               const thumbSrc = getOptimizedImageUrl(entry.url, 180) || entry.url;
@@ -487,10 +487,10 @@ const StudioProductStage: React.FC<StudioProductStageProps> = ({
                   type="button"
                   onClick={() => setActiveIdx(idx)}
                   title={entry.label}
-                  className={`min-h-[44px] flex items-center gap-2 px-3.5 py-2 rounded-xl border text-[13.5px] sm:text-[14px] font-bold transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
+                  className={`min-h-[46px] flex items-center gap-2 px-4 py-2 rounded-xl border text-[15px] sm:text-base font-bold transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
                     isSelected
                       ? 'bg-[#EEF6F2] border-[#047857] text-[#0F1F18] ring-2 ring-[#047857]'
-                      : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-700'
+                      : 'bg-white hover:bg-slate-50 border-slate-300 text-slate-800'
                   }`}
                 >
                   <img
@@ -612,35 +612,35 @@ interface PackageProfile {
 
 const PACKAGE_ENHANCED_PROFILES: Record<string, PackageProfile> = {
   prostate: {
-    kicker: '★ BEST SELLER FOR MEN 40+ · PROVEN RELIEF',
-    badgeLabel: '#1 Best Seller for Men',
+    kicker: 'Prostate Enlargement & Bladder Care',
+    badgeLabel: 'Prostate Enlargement Relief',
     subtitle:
       'Sleep deeply through the night without waking up to pee. Restore strong, painless urine flow naturally.',
     description:
-      'Tired of waking up 4, 5, or 6 times every single night just to strain and dribble weak drops of urine? This pure herbal solution shrinks swollen prostate tissue naturally, clears painful urinary burning, stops embarrassing leaks, and helps your bladder empty completely in seconds. Within days, you will enjoy unbroken night rest, wake up energized, and regain your peace of mind.',
+      'Tired of waking up 4, 5, or 6 times every night just to strain and pass weak drops of urine? This pure herbal formula shrinks an enlarged prostate naturally, clears painful burning, stops sudden leaks, and helps empty your bladder completely in seconds.',
     pillars: [
       {
         title: 'Sleep Soundly Through the Night',
         description:
-          'Stops constant midnight bathroom urges so you can sleep uninterrupted from night till morning without exhausting awakenings.',
+          'Stops constant midnight bathroom urges so you sleep uninterrupted from night till morning without exhausting awakenings.',
         icon: 'clock',
       },
       {
         title: 'Strong, Pain-Free Urine Stream',
         description:
-          'Ends painful straining, hesitations, and weak dribbles. Empty your bladder effortlessly, fully, and in one go.',
+          'Ends painful straining, slow hesitations, and weak dribbles. Empty your bladder effortlessly in one go.',
         icon: 'droplets',
       },
       {
-        title: 'Shrinks Swollen Prostate Naturally',
+        title: 'Shrinks Enlarged Prostate Naturally',
         description:
-          'Soothes deep inflammation and relieves heavy pelvic pressure, lower belly tightness, and groin pain without surgery.',
+          'Calms deep prostate swelling and relieves heavy lower-belly pressure and groin discomfort without surgery.',
         icon: 'shield',
       },
       {
-        title: '100% Herbal & NAFDAC Approved',
+        title: '100% Herbal & NAFDAC Certified',
         description:
-          'Certified safe with zero dangerous side effects. No harmful chemicals, gentle on digestion, and 100% natural.',
+          'Certified safe with zero harsh chemicals. Gentle on your stomach and trusted by Nigerian men over 40.',
         icon: 'award',
       },
     ],
@@ -648,8 +648,8 @@ const PACKAGE_ENHANCED_PROFILES: Record<string, PackageProfile> = {
     badgeBg: 'bg-[#047857]',
     badgeText: 'text-[#F3FAF6]',
     cardBorder:
-      'border-[#047857]/30 ring-1 ring-[#047857]/15 shadow-[0_22px_60px_-15px_rgba(4,120,87,0.14)] hover:shadow-[0_28px_70px_-15px_rgba(4,120,87,0.22)]',
-    headerGradient: 'bg-gradient-to-br from-[#F2FAF6] via-[#FAFDFB] to-[#E8F5EE]',
+      'border-[#047857]/30 ring-1 ring-[#047857]/15 shadow-[0_20px_50px_-15px_rgba(4,120,87,0.14)] hover:shadow-[0_26px_65px_-15px_rgba(4,120,87,0.22)]',
+    headerGradient: 'bg-[#F4FAF7]',
     ctaBg: 'bg-[#047857]',
     ctaHover: 'hover:bg-[#065F46]',
     optionActiveBg: 'bg-[#EDF7F2]',
@@ -659,44 +659,44 @@ const PACKAGE_ENHANCED_PROFILES: Record<string, PackageProfile> = {
     pillText: 'text-[#047857]',
   },
   vitality: {
-    kicker: '★ TOP RATED MALE ENDURANCE & STAMINA',
-    badgeLabel: '#1 for Bedroom Power & Control',
+    kicker: 'Weak Erection & Stamina Care',
+    badgeLabel: 'Weak Erection & Stamina Solution',
     subtitle:
-      'Regain rock-solid firmness on demand, last 35–45+ minutes, and satisfy your partner every single time.',
+      'Overcome weak erection and quick finish. Regain rock-solid firmness and last 35–45+ minutes naturally.',
     description:
-      'Never suffer from bedroom embarrassment or performance anxiety again. This potent herbal formula boosts your natural masculine energy, delivers rock-solid firmness whenever intimacy starts, and gives you complete staying power to last 35 to 45+ minutes. You will feel revitalized, confident, and recover quickly between rounds — with zero headache, zero racing heart, and zero chemical crashes.',
+      'Say goodbye to weak erections, soft starts, and finishing too quickly. This potent herbal formula boosts healthy blood flow to deliver firm, dependable erections on demand, helps you last 35 to 45+ minutes, and restores lasting bedroom confidence — with zero headache or racing heart.',
     pillars: [
       {
-        title: 'Rock-Solid Firmness On Demand',
+        title: 'Reverses Weak Erection On Demand',
         description:
-          'Boosts healthy blood circulation for firm, dependable stiffness whenever you and your partner are ready.',
+          'Supports healthy blood circulation for firm, dependable stiffness whenever intimacy begins.',
         icon: 'zap',
       },
       {
         title: 'Last 35 to 45+ Minutes',
         description:
-          'Overcomes quick finishes and gives you total control to satisfy your partner completely every round.',
+          'Stops embarrassing quick finishes and gives you steady control to satisfy your partner every round.',
         icon: 'clock',
       },
       {
-        title: 'High Energy & Fast Recovery',
+        title: 'Deep Stamina & Fast Recovery',
         description:
-          'Recharges deep masculine stamina so you stay vigorous, strong, and ready for more without feeling drained or weak.',
+          'Restores natural strength so you stay vigorous, energized, and ready for more without feeling worn out.',
         icon: 'flame',
       },
       {
-        title: '100% Safe with Zero Side Effects',
+        title: '100% Herbal & Heart-Safe',
         description:
-          'Pure organic herbs that protect your heart and blood pressure — no pounding headache, no racing pulse, no dizzy spells.',
+          'No harsh chemicals, no pounding headache, and no racing pulse — safe for adult men and discreetly delivered.',
         icon: 'shield',
       },
     ],
-    accentColor: '#B45309',
+    accentColor: '#92400E',
     badgeBg: 'bg-[#78350F]',
     badgeText: 'text-[#FDE68A]',
     cardBorder:
-      'border-[#B45309]/30 ring-1 ring-[#B45309]/15 shadow-[0_22px_60px_-15px_rgba(180,83,9,0.14)] hover:shadow-[0_28px_70px_-15px_rgba(180,83,9,0.22)]',
-    headerGradient: 'bg-gradient-to-br from-[#FDF8F0] via-[#FFFCF7] to-[#F8EFE0]',
+      'border-[#B45309]/30 ring-1 ring-[#B45309]/15 shadow-[0_20px_50px_-15px_rgba(180,83,9,0.14)] hover:shadow-[0_26px_65px_-15px_rgba(180,83,9,0.22)]',
+    headerGradient: 'bg-[#FDF9F1]',
     ctaBg: 'bg-[#92400E]',
     ctaHover: 'hover:bg-[#78350F]',
     optionActiveBg: 'bg-[#FEF6E9]',
@@ -706,35 +706,35 @@ const PACKAGE_ENHANCED_PROFILES: Record<string, PackageProfile> = {
     pillText: 'text-[#92400E]',
   },
   joints: {
-    kicker: '★ INSTANT KNEE, WAIST & JOINT RELIEF',
-    badgeLabel: 'Fast Knee & Back Freedom',
+    kicker: 'Joint, Knee & Waist Relief',
+    badgeLabel: 'Joint & Mobility Support',
     subtitle:
       'Walk, bend, and climb stairs freely without agonizing knee, back, or waist pain.',
     description:
-      'Are stiff knees, painful waist, and creaking joints making simple everyday movements feel like punishment? This proven herbal formula lubricates dry joints, rebuilds worn-out cartilage cushions, and stops deep inflammation. Wake up without morning stiffness, walk freely to work or church, and enjoy comfortable, pain-free mobility again.',
+      'Are stiff knees, painful waist, and creaking joints making simple everyday movements feel like punishment? This proven herbal formula lubricates dry joints, nourishes worn cartilage cushions, and calms deep soreness so you move with ease.',
     pillars: [
       {
         title: 'Stops Severe Knee & Waist Pain',
         description:
-          'Quickly calms burning aches and throbbing joint soreness so you can walk, bend, and stand with complete ease.',
+          'Quickly calms burning aches and throbbing joint soreness so you can walk, bend, and stand comfortably.',
         icon: 'shield',
       },
       {
-        title: 'Restores Joint Cushion & Oil',
+        title: 'Lubricates Dry, Stiff Joints',
         description:
-          'Rebuilds natural cartilage lubrication, preventing painful bone-on-bone grinding, creaking, and wear-and-tear.',
+          'Supports natural joint cushion and smoother movement, easing painful creaking and wear-and-tear.',
         icon: 'droplets',
       },
       {
         title: 'Wake Up Without Morning Stiffness',
         description:
-          'Rise from bed or stand up from low chairs effortlessly without hesitation, stiffness, or needing support.',
+          'Rise from bed or stand up from low chairs effortlessly without stiffness or needing support.',
         icon: 'clock',
       },
       {
-        title: 'NAFDAC Certified Pure Herbal Formula',
+        title: 'NAFDAC Certified Herbal Formula',
         description:
-          '100% natural and gentle on the stomach. Tested, trusted, and safe for everyday long-term use without side effects.',
+          '100% natural, gentle on digestion, and safe for comfortable everyday use.',
         icon: 'award',
       },
     ],
@@ -742,8 +742,8 @@ const PACKAGE_ENHANCED_PROFILES: Record<string, PackageProfile> = {
     badgeBg: 'bg-[#0E7490]',
     badgeText: 'text-white',
     cardBorder:
-      'border-[#0E7490]/30 ring-1 ring-[#0E7490]/15 shadow-[0_22px_60px_-15px_rgba(14,116,144,0.14)]',
-    headerGradient: 'bg-gradient-to-br from-[#F0F9FB] via-[#FDFEFE] to-[#E4F4F7]',
+      'border-[#0E7490]/30 ring-1 ring-[#0E7490]/15 shadow-[0_20px_50px_-15px_rgba(14,116,144,0.14)]',
+    headerGradient: 'bg-[#F2FAFC]',
     ctaBg: 'bg-[#0E7490]',
     ctaHover: 'hover:bg-[#155E75]',
     optionActiveBg: 'bg-[#ECF7FA]',
@@ -753,35 +753,35 @@ const PACKAGE_ENHANCED_PROFILES: Record<string, PackageProfile> = {
     pillText: 'text-[#0E7490]',
   },
   sugar: {
-    kicker: '★ HEALTHY BLOOD SUGAR & DAILY ENERGY',
-    badgeLabel: 'Natural Blood Sugar Control',
+    kicker: 'Blood Sugar & Nerve Care',
+    badgeLabel: 'Blood Sugar Support',
     subtitle:
       'Keep your blood sugar steady, stop constant fatigue, and end tingling numbness in your feet.',
     description:
-      'Stop worrying about dangerous sugar spikes, constant thirst, and frightening numbness or burning sensations in your feet and palms. This herbal blend naturally supports your pancreas, keeps your sugar readings in a healthy balance, and shields your kidneys, eyes, and heart from long-term damage — so you stay vibrant, active, and energetic all day.',
+      'Stop worrying about sudden sugar spikes, constant thirst, and tingling or burning sensations in your feet and palms. This herbal blend supports balanced daily sugar levels, boosts natural energy, and helps protect your nerves and vital organs.',
     pillars: [
       {
         title: 'Keeps Blood Sugar Steady All Day',
         description:
-          'Prevents sudden post-meal spikes and dangerous crashes, keeping your daily glucose numbers stable and balanced.',
+          'Helps smooth out post-meal sugar spikes so your daily readings stay balanced and predictable.',
         icon: 'zap',
       },
       {
-        title: 'Ends Foot Numbness & Burning',
+        title: 'Eases Foot Numbness & Tingling',
         description:
-          'Restores healthy nerve sensation and blood circulation to eliminate foot pricking, burning, and sudden pain.',
+          'Supports healthy circulation and nerve comfort to reduce pins-and-needles, burning, and heavy feet.',
         icon: 'shield',
       },
       {
-        title: 'All-Day Stamina & No Fatigue',
+        title: 'All-Day Energy Without Crashes',
         description:
-          'Stops midday exhaustion, heavy legs, and constant sleepiness so you stay energetic from morning to night.',
+          'Relieves midday fatigue and constant drowsiness so you stay active from morning till evening.',
         icon: 'droplets',
       },
       {
-        title: 'Protects Eyes, Kidneys & Heart',
+        title: 'NAFDAC Certified Herbal Blend',
         description:
-          'Strengthens your vital organs against complications, giving you total health protection and peace of mind.',
+          'Trusted, 100% natural herbs gentle enough for consistent daily wellness protection.',
         icon: 'award',
       },
     ],
@@ -789,8 +789,8 @@ const PACKAGE_ENHANCED_PROFILES: Record<string, PackageProfile> = {
     badgeBg: 'bg-[#1D4ED8]',
     badgeText: 'text-white',
     cardBorder:
-      'border-[#1D4ED8]/30 ring-1 ring-[#1D4ED8]/15 shadow-[0_22px_60px_-15px_rgba(29,78,216,0.14)]',
-    headerGradient: 'bg-gradient-to-br from-[#F2F6FE] via-[#FDFEFE] to-[#E9EFFE]',
+      'border-[#1D4ED8]/30 ring-1 ring-[#1D4ED8]/15 shadow-[0_20px_50px_-15px_rgba(29,78,216,0.14)]',
+    headerGradient: 'bg-[#F3F7FE]',
     ctaBg: 'bg-[#1D4ED8]',
     ctaHover: 'hover:bg-[#1E40AF]',
     optionActiveBg: 'bg-[#EEF4FE]',
@@ -800,35 +800,35 @@ const PACKAGE_ENHANCED_PROFILES: Record<string, PackageProfile> = {
     pillText: 'text-[#1D4ED8]',
   },
   womens: {
-    kicker: '★ TOTAL FEMININE HORMONAL BALANCE',
-    badgeLabel: 'Pain-Free Periods & Hormonal Harmony',
+    kicker: 'Women Hormonal & Cycle Care',
+    badgeLabel: 'Women Hormonal Balance',
     subtitle:
       'End painful menstrual cramps, irregular periods, hot flashes, and balance your hormones naturally.',
     description:
-      'Experience peaceful, pain-free womanhood every month. This nourishing herbal remedy eases agonizing menstrual cramps, regulates unpredictable cycles, clears stubborn hormonal acne, and soothes uncomfortable hot flashes and mood swings. Balance your reproductive health and feel radiant, confident, and full of life.',
+      'Experience calmer, pain-free months naturally. This nourishing herbal blend eases severe monthly cramps, helps regulate unpredictable cycles, cools uncomfortable hot flashes, and restores steady energy and peace of mind.',
     pillars: [
       {
-        title: 'Stops Severe Menstrual Cramps',
+        title: 'Eases Painful Menstrual Cramps',
         description:
-          'Quickly relaxes tight tummy muscles to eliminate severe monthly cramps and abdominal heaviness.',
+          'Gently relaxes tight lower-belly tension to calm heavy cramps and monthly discomfort.',
         icon: 'clock',
       },
       {
-        title: 'Regulates Irregular Periods',
+        title: 'Supports Regular Cycles',
         description:
-          'Balances natural female hormones to restore regular, predictable, and healthy monthly cycles.',
+          'Helps balance female hormones naturally for steadier, more predictable monthly rhythms.',
         icon: 'shield',
       },
       {
-        title: 'Cools Down Hot Flashes & Mood Swings',
+        title: 'Calms Hot Flashes & Night Sweats',
         description:
-          'Relieves sudden body heat, night sweats, and irritability so you feel calm, refreshed, and in control.',
+          'Cools sudden body heat and mood swings so you feel comfortable, calm, and well rested.',
         icon: 'flame',
       },
       {
-        title: 'Glowing Skin & Feminine Energy',
+        title: 'Restores Natural Glow & Energy',
         description:
-          'Pure herbal adaptogens that boost your natural glow, restful sleep, and youthful vitality from within.',
+          'Pure herbal nourishment for deeper sleep, clearer skin, and everyday vitality.',
         icon: 'award',
       },
     ],
@@ -836,8 +836,8 @@ const PACKAGE_ENHANCED_PROFILES: Record<string, PackageProfile> = {
     badgeBg: 'bg-[#BE185D]',
     badgeText: 'text-white',
     cardBorder:
-      'border-[#BE185D]/30 ring-1 ring-[#BE185D]/15 shadow-[0_22px_60px_-15px_rgba(190,24,93,0.14)]',
-    headerGradient: 'bg-gradient-to-br from-[#FDF2F7] via-[#FFFDFF] to-[#FAE4EE]',
+      'border-[#BE185D]/30 ring-1 ring-[#BE185D]/15 shadow-[0_20px_50px_-15px_rgba(190,24,93,0.14)]',
+    headerGradient: 'bg-[#FDF4F8]',
     ctaBg: 'bg-[#BE185D]',
     ctaHover: 'hover:bg-[#9D174D]',
     optionActiveBg: 'bg-[#FDF0F6]',
@@ -847,35 +847,35 @@ const PACKAGE_ENHANCED_PROFILES: Record<string, PackageProfile> = {
     pillText: 'text-[#BE185D]',
   },
   combo: {
-    kicker: '★ ALL-IN-ONE MASTER BODY RESTORATION',
-    badgeLabel: 'Ultimate Full-Body Cleanse & Power',
+    kicker: 'Full-Body Herbal Restoration',
+    badgeLabel: 'Complete Body Restoration',
     subtitle:
-      'The complete herbal regimen to renew your vital organs, supercharge stamina, and boost immunity.',
+      'Cleanse your prostate, renew vital organs, and supercharge daily strength with one complete pack.',
     description:
-      'Why treat only one symptom when you can restore your entire body? This master combination cleanses your prostate, supports healthy kidneys and liver, supercharges your bedroom stamina, and fortifies your immune system. Experience maximum whole-body revitalization with Nigeria’s most trusted comprehensive health regimen.',
+      'Why address only one symptom when you can renew your entire system? This master herbal combination supports prostate comfort, kidney and liver health, steady masculine stamina, and stronger natural immunity.',
     pillars: [
       {
-        title: 'Deep Organ Cleanse & Kidney Health',
+        title: 'Deep Organ & Kidney Cleanse',
         description:
-          'Flushes harmful toxins, supports liver and kidney vitality, and restores youthful organ function.',
+          'Helps flush daily buildup while supporting healthy prostate, kidney, and liver function.',
         icon: 'sparkles',
       },
       {
-        title: 'Maximum Stamina & Bedroom Confidence',
+        title: 'Stronger Stamina & Confidence',
         description:
-          'Combines our best vitality boosters for powerful energy, lasting endurance, and unbreakable virility.',
+          'Combines core vitality boosters for steady daily energy and lasting bedroom confidence.',
         icon: 'shield',
       },
       {
-        title: 'Unbreakable Immune Defense',
+        title: 'Stronger Natural Immunity',
         description:
-          'Builds a strong natural shield against frequent illnesses, chronic fatigue, and bodily weakness.',
+          'Builds steady resilience against constant tiredness, weak recovery, and body strain.',
         icon: 'zap',
       },
       {
         title: 'Best Value Multi-Bottle Bundle',
         description:
-          'Get our complete medical-grade herbal regimen at our biggest discounted rate with free nationwide delivery.',
+          'Complete herbal regimen at discounted pack pricing with free nationwide delivery.',
         icon: 'award',
       },
     ],
@@ -883,8 +883,8 @@ const PACKAGE_ENHANCED_PROFILES: Record<string, PackageProfile> = {
     badgeBg: 'bg-[#047857]',
     badgeText: 'text-white',
     cardBorder:
-      'border-[#047857]/30 ring-1 ring-[#047857]/15 shadow-[0_22px_60px_-15px_rgba(4,120,87,0.14)]',
-    headerGradient: 'bg-gradient-to-br from-[#F2FAF6] via-[#FAFDFB] to-[#E8F5EE]',
+      'border-[#047857]/30 ring-1 ring-[#047857]/15 shadow-[0_20px_50px_-15px_rgba(4,120,87,0.14)]',
+    headerGradient: 'bg-[#F4FAF7]',
     ctaBg: 'bg-[#047857]',
     ctaHover: 'hover:bg-[#065F46]',
     optionActiveBg: 'bg-[#EDF7F2]',
@@ -1022,180 +1022,191 @@ const PackageCard: React.FC<PackageCardProps> = ({
     }
   };
 
+  const attentionPromise =
+    enhancedProfile?.subtitle ||
+    (pkg.description ? truncateDescriptionText(pkg.description, 130).excerpt : '');
+
+  const attentionBannerConfig = isPerformanceFocus
+    ? {
+        wrapper: 'bg-[#7C2D12] text-white',
+        eyebrowColor: 'text-amber-200',
+        eyebrow: 'Erection & Stamina Promise',
+      }
+    : isProstateFocus
+      ? {
+          wrapper: 'bg-[#065F46] text-white',
+          eyebrowColor: 'text-emerald-200',
+          eyebrow: 'Prostate Relief Promise',
+        }
+      : matchesSymptomCategory(pkg, 'joints')
+        ? {
+            wrapper: 'bg-[#155E75] text-white',
+            eyebrowColor: 'text-cyan-200',
+            eyebrow: 'Joint & Mobility Promise',
+          }
+        : matchesSymptomCategory(pkg, 'sugar')
+          ? {
+              wrapper: 'bg-[#1E3A8A] text-white',
+              eyebrowColor: 'text-blue-200',
+              eyebrow: 'Blood Sugar & Nerve Promise',
+            }
+          : matchesSymptomCategory(pkg, 'womens')
+            ? {
+                wrapper: 'bg-[#831843] text-white',
+                eyebrowColor: 'text-pink-200',
+                eyebrow: 'Hormonal Balance Promise',
+              }
+            : {
+                wrapper: 'bg-[#065F46] text-white',
+                eyebrowColor: 'text-emerald-200',
+                eyebrow: 'Daily Wellness Promise',
+              };
+
+  const conditionLabel =
+    badgeLabel ||
+    enhancedProfile?.kicker ||
+    `${theme.categoryLabel} Pack`;
+
+  const ctaButtonClasses = isPerformanceFocus
+    ? 'bg-[#92400E] hover:bg-[#78350F] shadow-[#92400E]/20'
+    : 'bg-[#047857] hover:bg-[#065F46] shadow-[#047857]/20';
+
   return (
     <article
       id={`package-card-${pkg.package_code || cardIndex}`}
-      className={`relative bg-white rounded-3xl border border-slate-200/90 transition-all duration-300 flex flex-col overflow-hidden shadow-lg hover:shadow-2xl hover:-translate-y-1.5 group ${cardBorderClass} ${
-        isHeroCard ? 'ring-2 ring-emerald-500/30' : ''
+      className={`relative bg-white rounded-[26px] border border-slate-200 transition-shadow duration-300 flex flex-col overflow-hidden shadow-lg hover:shadow-2xl group ${cardBorderClass} ${
+        isHeroCard ? 'ring-1 ring-[#047857]/20' : ''
       }`}
     >
-      {/* Urgency Badge - Top Center */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 z-30 bg-red-600 text-white px-5 py-1 rounded-b-xl text-[10px] md:text-xs font-black uppercase tracking-[0.2em] shadow-md animate-bounce">
-        Limited Stock · Pay on Delivery Available
-      </div>
+      {/* 1. Clean Adult-Readable Identity Header */}
+      <div className={`${headerBgClass} px-5 sm:px-8 pt-6 sm:pt-7 pb-5 space-y-2.5`}>
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5 text-base sm:text-[17px] font-extrabold text-slate-800">
+          <span style={{ color: accentColor }}>
+            {conditionLabel}
+          </span>
+          <span className="inline-flex items-center gap-1.5 text-slate-800">
+            <ShieldCheck size={19} className="text-[#047857] shrink-0" />
+            NAFDAC Certified · Free Delivery
+          </span>
+        </div>
 
-      {/* 1. Identity Header */}
-      <div className={`${headerBgClass} px-5 sm:px-8 pt-7 sm:pt-8 pb-5 border-b border-slate-200/90 space-y-3.5`}>
-        {/* Top Badges Row */}
-        <div className="flex flex-wrap items-center justify-between gap-2.5">
-          <div className="flex flex-wrap items-center gap-2">
-            {isProstateFocus ? (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#047857] text-white text-xs font-black uppercase tracking-wider shadow-xs">
-                <Sparkles size={13} className="text-white" />
-                {badgeLabel || enhancedProfile?.badgeLabel || '#1 Best Seller for Men'}
-              </span>
-            ) : isPerformanceFocus ? (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#78350F] text-[#FDE68A] border border-[#92400E]/40 text-xs font-black uppercase tracking-wider shadow-xs">
-                <Flame size={13} className="text-[#FDE68A]" />
-                {badgeLabel || enhancedProfile?.badgeLabel || '#1 for Bedroom Power & Control'}
-              </span>
-            ) : (
-              <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-xs font-black uppercase tracking-wider ${theme.accentTextClass} shadow-2xs`}>
-                Package {indexDisplay} · {theme.categoryLabel}
+        <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1.5">
+          <h3 className="text-[26px] sm:text-[30px] lg:text-[32px] font-black text-slate-900 leading-[1.18] tracking-tight">
+            {pkg.name}
+          </h3>
+
+          <div className="tabular-nums text-left sm:text-right shrink-0">
+            <span className="text-[26px] sm:text-[32px] font-black text-slate-900 tracking-tight">
+              ₦{pricing.currentPrice.toLocaleString()}
+            </span>
+            {pricing.savings > 0 && (
+              <span className="ml-2 text-[17px] sm:text-lg text-slate-500 line-through font-bold">
+                ₦{pricing.retailPrice.toLocaleString()}
               </span>
             )}
-
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/95 border border-slate-200 text-xs font-black text-slate-800 shadow-2xs">
-              <ShieldCheck size={14} className="text-[#047857]" />
-              NAFDAC Certified
-            </span>
           </div>
-
-          <div className="flex items-center gap-1.5">
-            <span className="bg-white/95 text-slate-900 px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider border border-slate-200 shadow-xs">
-              {pkg.package_code || 'PACKAGE'}
-            </span>
-            <span className="bg-emerald-600/95 text-white px-2.5 py-1 rounded-md text-[10px] font-black border border-emerald-500 shadow-xs">
-              Free Express Dispatch
-            </span>
-          </div>
-        </div>
-
-        {/* Title, Kicker & Benefit Subtitle */}
-        <div className="space-y-1.5">
-          {enhancedProfile?.kicker && (
-            <div className="text-[11px] md:text-xs font-black text-slate-400 uppercase tracking-widest">
-              {enhancedProfile.kicker}
-            </div>
-          )}
-
-          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-            <h3 className="text-xl md:text-2xl lg:text-3xl font-black text-slate-900 leading-tight">
-              <span className={isProstateFocus ? 'text-[#047857]' : isPerformanceFocus ? 'text-[#B45309]' : 'text-emerald-600'}>
-                {isProstateFocus ? 'Wellness Pack: ' : isPerformanceFocus ? 'Performance Pack: ' : 'Wellness Pack: '}
-              </span>
-              {pkg.name}
-            </h3>
-
-            <div className="tabular-nums text-left sm:text-right shrink-0">
-              <span className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-                ₦{pricing.currentPrice.toLocaleString()}
-              </span>
-              {pricing.savings > 0 && (
-                <span className="ml-2 text-sm sm:text-base text-slate-400 line-through font-bold">
-                  ₦{pricing.retailPrice.toLocaleString()}
-                </span>
-              )}
-            </div>
-          </div>
-
-          {enhancedProfile?.subtitle && (
-            <p
-              className="text-sm sm:text-base font-semibold leading-relaxed"
-              style={{ color: accentColor }}
-            >
-              {enhancedProfile.subtitle}
-            </p>
-          )}
         </div>
       </div>
 
-      {/* 2. Studio Product Stage Gallery */}
+      {/* 2. High-Impact, Attention-Capturing Promise Callout Directly Above the Product Image */}
+      {attentionPromise && (
+        <div className={`${attentionBannerConfig.wrapper} px-5 sm:px-8 py-5 sm:py-6 space-y-2`}>
+          <div className={`inline-flex items-center gap-2 text-sm sm:text-[15px] font-extrabold uppercase tracking-wider ${attentionBannerConfig.eyebrowColor}`}>
+            <CheckCircle2 size={18} className="shrink-0" />
+            <span>{attentionBannerConfig.eyebrow}</span>
+          </div>
+          <p className="text-[22px] sm:text-[25px] lg:text-[27px] font-black leading-[1.28] tracking-tight text-white">
+            {attentionPromise}
+          </p>
+        </div>
+      )}
+
+      {/* 3. Studio Product Stage Gallery */}
       <div className="border-b border-slate-200/80 bg-slate-50/50">
         <StudioProductStage
           entries={galleryEntries}
           alt={pkg.name}
-          heightClassName="h-[280px] sm:h-[320px] md:h-[340px] lg:h-[370px]"
+          heightClassName="h-[280px] sm:h-[320px] md:h-[340px] lg:h-[360px]"
           studioGradientClass={theme.studioGradientClass}
           optimizeWidth={1200}
           onInspect={() => onInspectDetail(pkg)}
         />
       </div>
 
-      {/* 3. Package Information Body */}
+      {/* 4. Package Information Body — Generous Spacing & Clear Adult Typography */}
       <div className="p-5 sm:p-7 lg:p-8 flex-1 flex flex-col justify-between space-y-6 bg-white">
-        <div className="space-y-5">
-          {/* Solution Highlight Box */}
+        <div className="space-y-6">
+          {/* Solution Overview */}
           {displayDescription && (
-            <div className="p-4 sm:p-5 rounded-2xl bg-emerald-50/50 border border-emerald-100/80 space-y-2">
-              <div className="flex items-center gap-1.5 text-xs font-black text-emerald-800 uppercase tracking-wider">
-                <Sparkles className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>What This Solution Does For You:</span>
+            <div className="space-y-2">
+              <div
+                className="flex items-center gap-2 text-base sm:text-lg font-extrabold uppercase tracking-wide"
+                style={{ color: accentColor }}
+              >
+                <Sparkles className="w-5 h-5 shrink-0" />
+                <span>How This Helps You</span>
               </div>
-              <p className="text-base sm:text-lg text-slate-700 leading-relaxed font-medium">
+              <p className="text-[17.5px] sm:text-[19px] text-slate-900 leading-[1.68] font-medium">
                 {displayDescription}
               </p>
             </div>
           )}
 
-          {/* Ratings & Social Proof Strip */}
-          <div className="flex items-center justify-between gap-1 bg-slate-50 p-2 sm:p-2.5 rounded-xl border border-slate-200/70 font-black">
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <div className="flex items-center">
+          {/* Customer Rating & NAFDAC Trust Row */}
+          <div className="flex flex-wrap items-center justify-between gap-3 py-4 border-y border-slate-200">
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-0.5" aria-label="5 out of 5 stars">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} size={14} className="fill-amber-400 text-amber-400" />
+                  <Star key={i} size={18} className="fill-amber-400 text-amber-400" />
                 ))}
               </div>
-              <span className="text-xs sm:text-sm text-slate-700 font-black">10,000+ Satisfied Customers · 4.9/5 Rating</span>
+              <span className="text-base sm:text-[17px] text-slate-900 font-bold">
+                4.9/5 Rating · 10,000+ Satisfied Customers
+              </span>
             </div>
-            <div className="flex items-center gap-1.5 text-xs sm:text-sm font-black text-emerald-700 uppercase tracking-widest">
-              <Award size={14} />
-              100% Organic · NAFDAC Approved
+            <div className="flex items-center gap-1.5 text-base sm:text-[17px] font-bold text-[#047857]">
+              <Award size={18} className="shrink-0" />
+              <span>100% Organic · NAFDAC Approved</span>
             </div>
           </div>
 
-          {/* Key Health Benefits & Pillars (High-Converting Benefit Cards) */}
+          {/* Key Health Benefits — Clean Adult-Scale Whitespace Grid */}
           {enhancedProfile?.pillars ? (
-            <div className="space-y-3">
-              <div className="text-xs sm:text-sm font-black text-slate-900 uppercase tracking-wider flex items-center justify-between">
-                <span>What You Will Experience:</span>
-                <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">NAFDAC Certified</span>
-              </div>
+            <div className="space-y-4">
+              <h4 className="text-xl sm:text-[22px] font-black text-slate-900">
+                What You Will Experience:
+              </h4>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
                 {enhancedProfile.pillars.map((pillar, pIdx) => (
-                  <div
-                    key={pIdx}
-                    className="p-3.5 sm:p-4 rounded-xl border border-slate-200/70 bg-white hover:bg-emerald-50/30 hover:border-emerald-300 transition-all flex items-start gap-3 shadow-2xs"
-                  >
-                    <div className="p-2 rounded-lg bg-emerald-50/80 border border-emerald-100/80 shadow-2xs shrink-0 mt-0.5">
+                  <div key={pIdx} className="flex items-start gap-3.5">
+                    <div className="w-11 h-11 rounded-xl bg-[#EEF6F2] flex items-center justify-center shrink-0 mt-0.5">
                       {renderPillarIcon(pillar.icon)}
                     </div>
                     <div className="space-y-1 min-w-0">
-                      <div className="text-sm sm:text-base font-black text-slate-900 leading-snug">
+                      <div className="text-[17.5px] sm:text-[18.5px] font-black text-slate-900 leading-snug">
                         {pillar.title}
                       </div>
-                      <div className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
+                      <p className="text-base sm:text-[17px] text-slate-800 leading-[1.6] font-medium">
                         {pillar.description}
-                      </div>
+                      </p>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
           ) : rawBenefits.length > 0 ? (
-            <div className="space-y-2.5">
-              <div className="text-xs sm:text-sm font-black text-slate-900 uppercase tracking-wider flex items-center justify-between">
-                <span>What You Will Experience:</span>
-                <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">NAFDAC Certified</span>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div className="space-y-4">
+              <h4 className="text-xl sm:text-[22px] font-black text-slate-900">
+                What You Will Experience:
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {(isBenefitsExpanded ? rawBenefits : rawBenefits.slice(0, 4)).map((benefit, bIdx) => (
                   <div
                     key={bIdx}
-                    className="flex items-start gap-2 text-xs sm:text-sm text-slate-700 font-bold p-2.5 rounded-xl bg-slate-50 border border-slate-100"
+                    className="flex items-start gap-3 text-[16.5px] sm:text-[17.5px] text-slate-900 font-semibold leading-relaxed"
                   >
-                    <ShieldCheck size={16} className="text-emerald-600 flex-shrink-0 mt-0.5" />
+                    <ShieldCheck size={22} className="text-[#047857] shrink-0 mt-1" />
                     <span>{benefit}</span>
                   </div>
                 ))}
@@ -1204,23 +1215,27 @@ const PackageCard: React.FC<PackageCardProps> = ({
                 <button
                   type="button"
                   onClick={() => onToggleBenefits(pkg.id)}
-                  className="text-xs sm:text-sm font-black text-emerald-700 hover:underline cursor-pointer"
+                  className="min-h-[46px] text-[17px] font-bold text-[#047857] hover:underline cursor-pointer"
                 >
-                  {isBenefitsExpanded ? 'Show fewer benefits' : `+ Show ${rawBenefits.length - 4} more benefits`}
+                  {isBenefitsExpanded ? 'Show fewer benefits' : `Show ${rawBenefits.length - 4} more benefits`}
                 </button>
               )}
             </div>
           ) : null}
 
-          {/* 4. Treatment Duration Selector (Bottle Pack Option Pills) */}
+          {/* 5. Treatment Duration Selector */}
           {pkg.options && pkg.options.length > 0 && (
-            <div className="space-y-3 pt-3 border-t border-slate-100">
-              <div className="text-xs sm:text-sm font-black text-slate-900 uppercase tracking-wider flex items-center justify-between">
-                <span>Step 1: Choose Treatment Duration</span>
-                <span className="text-xs font-bold text-emerald-700">Multi-Bottle Savings</span>
+            <div className="space-y-4 pt-5 border-t border-slate-200">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <h4 className="text-xl sm:text-[22px] font-black text-slate-900">
+                  Step 1: Choose Pack Size
+                </h4>
+                <span className="text-base sm:text-[17px] font-bold text-[#047857]">
+                  Save More on Multi-Bottle Packs
+                </span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-1.5">
                 {pkg.options.map((opt, oIdx) => {
                   const isSel = oIdx === selectedIdx;
                   const bottleNum = extractBottleCount(opt.bottles);
@@ -1238,41 +1253,41 @@ const PackageCard: React.FC<PackageCardProps> = ({
                       key={oIdx}
                       type="button"
                       onClick={() => onSelectOption(pkg, oIdx)}
-                      className={`relative p-3.5 sm:p-4 rounded-xl border-2 text-left transition-all cursor-pointer flex flex-col justify-between ${
+                      className={`relative min-h-[126px] p-4 rounded-2xl border-2 text-left transition-all cursor-pointer flex flex-col justify-between ${
                         isSel
-                          ? 'bg-emerald-50/90 border-emerald-600 ring-2 ring-emerald-500/20 shadow-xs'
-                          : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
+                          ? 'bg-[#EDF7F2] border-[#047857] ring-2 ring-[#047857]/25 shadow-sm'
+                          : 'border-slate-300 bg-white hover:border-slate-400 hover:bg-slate-50'
                       }`}
                     >
                       {isRecommended && (
-                        <span className="absolute -top-3 left-3 px-2.5 py-0.5 rounded-full bg-emerald-600 text-white text-[9px] sm:text-[10px] font-black uppercase tracking-wider shadow-xs">
-                          ★ Most Popular Choice
+                        <span className="absolute -top-3.5 left-3 px-3 py-0.5 rounded-full bg-[#047857] text-white text-sm font-extrabold tracking-wide shadow-xs whitespace-nowrap">
+                          Most Popular Choice
                         </span>
                       )}
 
-                      <div>
-                        <div className="flex items-center justify-between gap-1">
-                          <span className="text-sm sm:text-base font-black text-slate-900">
+                      <div className="pt-1">
+                        <div className="flex items-center justify-between gap-1.5">
+                          <span className="text-[17px] sm:text-lg font-black text-slate-900">
                             {optPriceInfo.label}
                           </span>
                           {optPriceInfo.discountPercent > 0 && (
-                            <span className="text-[10px] sm:text-xs font-black text-emerald-700 bg-white px-1.5 py-0.5 rounded border border-emerald-200">
+                            <span className="text-[15px] font-extrabold text-[#047857]">
                               -{optPriceInfo.discountPercent}%
                             </span>
                           )}
                         </div>
 
-                        <div className="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">
+                        <div className="text-[15.5px] sm:text-base text-slate-800 font-semibold mt-1 leading-snug">
                           {durationLabel}
                         </div>
                       </div>
 
-                      <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-baseline justify-between gap-1">
-                        <span className="text-base sm:text-lg font-black text-slate-900">
+                      <div className="mt-3 pt-2.5 border-t border-slate-200 flex items-baseline justify-between gap-2 tabular-nums">
+                        <span className="text-[22px] sm:text-2xl font-black text-slate-900">
                           ₦{optPriceInfo.sellingPrice.toLocaleString()}
                         </span>
                         {optPriceInfo.savings > 0 && (
-                          <span className="text-xs sm:text-sm text-slate-400 line-through font-bold">
+                          <span className="text-[15px] sm:text-base text-slate-500 line-through font-semibold">
                             ₦{optPriceInfo.originalPrice.toLocaleString()}
                           </span>
                         )}
@@ -1284,11 +1299,11 @@ const PackageCard: React.FC<PackageCardProps> = ({
 
               {/* Dynamic Included in Pack Details */}
               {pricing.includedList.length > 0 && (
-                <div className="p-3 sm:p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-start gap-2 text-xs sm:text-sm text-slate-700">
-                  <Check size={16} className="text-emerald-600 shrink-0 mt-0.5" />
+                <div className="p-4 rounded-xl bg-slate-50 flex items-start gap-3 text-base sm:text-[17px] text-slate-900 leading-relaxed">
+                  <Check size={20} className="text-[#047857] shrink-0 mt-1" />
                   <div>
-                    <strong className="font-black text-slate-900">Supplements included in this parcel: </strong>
-                    <span className="font-medium text-slate-600">{pricing.includedList.join(' · ')}</span>
+                    <strong className="font-extrabold text-slate-900">Supplements inside this parcel: </strong>
+                    <span className="font-medium text-slate-800">{pricing.includedList.join(' · ')}</span>
                   </div>
                 </div>
               )}
@@ -1296,37 +1311,34 @@ const PackageCard: React.FC<PackageCardProps> = ({
           )}
         </div>
 
-        {/* 5. Pricing Section & Action Buttons */}
-        <div className="pt-3 border-t border-slate-100 mt-auto space-y-3">
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-baseline gap-2 flex-wrap">
-              <span className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900">
+        {/* 6. Pricing Summary & High-Visibility Purchase Buttons */}
+        <div className="pt-5 border-t border-slate-200 mt-auto space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-baseline gap-2.5 flex-wrap tabular-nums">
+              <span className="text-[34px] sm:text-[42px] font-black text-slate-900">
                 ₦{pricing.currentPrice.toLocaleString()}
               </span>
               {pricing.savings > 0 && (
-                <span className="text-base sm:text-lg text-slate-400 line-through font-bold">
+                <span className="text-lg sm:text-xl text-slate-500 line-through font-bold">
                   ₦{pricing.retailPrice.toLocaleString()}
                 </span>
               )}
             </div>
-            <div className="flex flex-col items-end shrink-0">
+            <div className="flex flex-col sm:items-end shrink-0">
+              <div className="text-base sm:text-[17px] font-extrabold text-red-700 flex items-center gap-1.5">
+                <Flame size={18} className="shrink-0" />
+                Only 5 Packs Remaining Today
+              </div>
               {pkg.options && pkg.options.length > 0 && (
-                <div className="bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded text-[8px] md:text-[9px] font-black uppercase tracking-widest mb-1 border border-emerald-200">
-                  {pkg.options.length} Sizes Available
+                <div className="text-[15px] sm:text-base font-bold text-slate-700 mt-0.5">
+                  {pkg.options.length} Pack Sizes Available
                 </div>
               )}
-              <div className="text-[10px] md:text-xs font-black text-red-600 uppercase tracking-tighter mb-0.5 flex items-center gap-1">
-                <Flame size={12} className="animate-pulse" />
-                Only 5 Packs Left Today!
-              </div>
-              <div className="w-20 sm:w-28 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                <div className="h-full bg-red-500 w-[85%] rounded-full" />
-              </div>
             </div>
           </div>
 
-          <div className="flex items-center justify-between gap-2 flex-wrap">
-            <div className="text-xs sm:text-sm text-emerald-700 font-black">
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <div className="text-base sm:text-[17px] text-[#047857] font-extrabold">
               {pricing.savings > 0
                 ? `Save ₦${pricing.savings.toLocaleString()} (${pricing.discount}% Off) · Free Nationwide Delivery`
                 : 'Free Nationwide Delivery · Pay on Delivery'}
@@ -1334,26 +1346,26 @@ const PackageCard: React.FC<PackageCardProps> = ({
             <button
               type="button"
               onClick={() => onInspectDetail(pkg)}
-              className="text-xs sm:text-sm font-black text-slate-500 hover:text-emerald-700 underline underline-offset-4 cursor-pointer"
+              className="min-h-[44px] inline-flex items-center text-base sm:text-[17px] font-bold text-slate-800 hover:text-[#047857] underline underline-offset-4 cursor-pointer"
             >
               View Full Pack Details
             </button>
           </div>
 
-          {/* Action Buttons - Refined Size & Clear Messaging */}
-          <div className="pt-1 flex flex-col gap-2.5">
+          {/* Primary & Secondary Action Buttons */}
+          <div className="pt-1 flex flex-col gap-3">
             <button
               type="button"
               onClick={() => onOpenCheckout(pkg, selectedIdx)}
-              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 sm:py-4 px-6 rounded-2xl font-black text-base sm:text-lg transition-all shadow-lg shadow-emerald-700/20 active:scale-[0.98] flex flex-col items-center justify-center cursor-pointer animate-shimmer"
+              className={`w-full min-h-[70px] ${ctaButtonClasses} text-white py-4 px-6 rounded-2xl font-black text-xl sm:text-[22px] transition-all shadow-lg active:scale-[0.99] flex flex-col items-center justify-center cursor-pointer`}
             >
-              <div className="flex items-center gap-2">
-                <ShoppingBag size={20} className="shrink-0" />
-                <span>Order on Delivery Now</span>
-                <ChevronRight size={18} className="transition-transform group-hover:translate-x-1" />
+              <div className="flex items-center gap-2.5">
+                <ShoppingBag size={24} className="shrink-0" />
+                <span>Order Now — Pay on Delivery</span>
+                <ChevronRight size={22} className="transition-transform group-hover:translate-x-1" />
               </div>
-              <span className="text-xs text-emerald-100 font-medium mt-0.5">
-                Pay ₦0 Upfront · Doorstep Inspection Before Payment
+              <span className="text-[15px] sm:text-base text-white/95 font-semibold mt-0.5">
+                Pay ₦0 Upfront · Inspect Sealed Bottles at Your Doorstep
               </span>
             </button>
 
@@ -1366,23 +1378,23 @@ const PackageCard: React.FC<PackageCardProps> = ({
                   trackWhatsAppClick(`Ad Package Card Chat: ${pkg.name}`);
                 } catch {}
               }}
-              className="w-full bg-white border-2 border-slate-200 text-slate-700 py-3 sm:py-3.5 px-4 rounded-2xl font-black text-xs sm:text-sm hover:bg-slate-50 hover:border-slate-300 transition-all flex items-center justify-center gap-2 uppercase tracking-wider"
+              className="w-full min-h-[56px] bg-white border-2 border-slate-300 text-slate-900 py-3 px-4 rounded-2xl font-bold text-[17px] sm:text-lg hover:bg-slate-50 hover:border-slate-400 transition-all flex items-center justify-center gap-2.5"
             >
-              <MessageCircle size={16} className="text-[#25D366] shrink-0" />
-              <span>Chat with a Health Specialist on WhatsApp</span>
+              <MessageCircle size={22} className="text-[#25D366] shrink-0" />
+              <span>Chat with a Specialist on WhatsApp</span>
             </a>
 
-            <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs font-bold text-slate-500 uppercase tracking-wider pt-1">
-              <span className="inline-flex items-center gap-1">
-                <CheckCircle2 size={13} className="text-emerald-600" /> Pay on Delivery
+            <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-[15px] sm:text-base font-bold text-slate-800 pt-1">
+              <span className="inline-flex items-center gap-1.5">
+                <CheckCircle2 size={17} className="text-[#047857]" /> Pay on Delivery
               </span>
               <span>·</span>
-              <span className="inline-flex items-center gap-1">
-                <Truck size={13} className="text-emerald-600" /> Free 24–48hr Dispatch
+              <span className="inline-flex items-center gap-1.5">
+                <Truck size={17} className="text-[#047857]" /> Free 24–48hr Dispatch
               </span>
               <span>·</span>
-              <span className="inline-flex items-center gap-1">
-                <ShieldCheck size={13} className="text-emerald-600" /> NAFDAC Certified
+              <span className="inline-flex items-center gap-1.5">
+                <ShieldCheck size={17} className="text-[#047857]" /> NAFDAC Certified
               </span>
             </div>
           </div>
@@ -1837,7 +1849,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                 {CONFIG.company.name}
               </span>
               {CONFIG.company.subtitle && (
-                <span className="text-[12px] sm:text-[13px] font-bold text-[#047857] tracking-[0.03em] leading-none mt-1 whitespace-nowrap">
+                <span className="text-sm font-bold text-[#047857] tracking-[0.02em] leading-none mt-1 whitespace-nowrap">
                   {CONFIG.company.subtitle}
                 </span>
               )}
@@ -1912,11 +1924,11 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
               {adIntent.kicker}
             </p>
 
-            <h1 className="text-2xl phablet:text-3xl sm:text-4xl lg:text-[2.85rem] font-black text-[#FAF9F5] tracking-tight leading-[1.18] [text-wrap:balance]">
+            <h1 className="text-3xl sm:text-4xl lg:text-[3.1rem] font-black text-[#FAF9F5] tracking-tight leading-[1.15] [text-wrap:balance]">
               {adIntent.headline}
             </h1>
 
-            <p className="text-base sm:text-lg lg:text-xl text-[#E4EDE7] leading-relaxed max-w-2xl font-medium">
+            <p className="text-lg sm:text-xl text-[#E4EDE7] leading-relaxed max-w-2xl font-medium">
               {adIntent.subheadline}
             </p>
 
@@ -1932,7 +1944,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
               </button>
 
               <a
-                href={getAdvisorWhatsAppHref("Men's Prostate & Stamina Formulations")}
+                href={getAdvisorWhatsAppHref("Prostate Enlargement & Weak Erection Packs")}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => recordAdvisorWhatsAppClick('Ad Hero Specialist')}
@@ -1986,13 +1998,12 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
           </div>
 
           {/* DISPLAY THE PROSTATE CARD IN HERO THEN FOLLOW BY MALE PERFORMANCE CARD */}
-          <div id="hero-cards" className="pt-4 sm:pt-6 scroll-mt-24 space-y-4">
+          <div id="hero-cards" className="pt-4 sm:pt-6 scroll-mt-24 space-y-5">
             <div className="flex flex-wrap items-center justify-between gap-3 text-white/90 pb-1">
-              <div className="flex items-center gap-2 text-xs sm:text-sm font-black tracking-wider text-[#95E4B9] uppercase font-sans">
-                <Sparkles className="w-4 h-4 shrink-0 text-[#95E4B9]" />
-                <span>★ Most Popular Formulations · Select Pack &amp; Order on Delivery</span>
-              </div>
-              <div className="text-xs sm:text-sm text-[#D4E6DC] font-semibold hidden sm:block">
+              <h2 className="text-xl sm:text-2xl font-black tracking-tight text-[#95E4B9]">
+                Choose Your Relief Pack: Prostate Enlargement or Weak Erection
+              </h2>
+              <div className="text-base text-[#D4E6DC] font-semibold hidden sm:block">
                 Free Nationwide Delivery · Inspect seals at your doorstep before payment
               </div>
             </div>
@@ -2016,7 +2027,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
               </div>
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 items-stretch">
-                {/* Card 1: Natural Prostate Care Formula */}
+                {/* Card 1: Natural Prostate Enlargement Care */}
                 {prostateBundle && (
                   <PackageCard
                     pkg={prostateBundle}
@@ -2030,13 +2041,12 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                       setExpandedBenefitsMap((prev) => ({ ...prev, [pkgId]: !prev[pkgId] }))
                     }
                     whatsappTarget={whatsappTarget}
-                    badgeLabel="Recommended First Step · Package 01"
                     badgeVariant="prostate"
                     isHeroCard={true}
                   />
                 )}
 
-                {/* Card 2: Male Performance & Stamina */}
+                {/* Card 2: Weak Erection & Male Stamina */}
                 {performanceBundle && (
                   <PackageCard
                     pkg={performanceBundle}
@@ -2050,7 +2060,6 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                       setExpandedBenefitsMap((prev) => ({ ...prev, [pkgId]: !prev[pkgId] }))
                     }
                     whatsappTarget={whatsappTarget}
-                    badgeLabel="Core Regimen · Package 02"
                     badgeVariant="performance"
                     isHeroCard={true}
                   />
@@ -2221,37 +2230,37 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10 pt-6 border-t border-[#E4EBE7]">
               <div className="space-y-3 pt-2">
-                <span className="text-xs sm:text-sm font-black text-[#047857] uppercase tracking-wider tabular-nums">
+                <span className="text-sm sm:text-base font-black text-[#047857] uppercase tracking-wider tabular-nums">
                   Step 01 · Quick Request
                 </span>
-                <h3 className="text-lg sm:text-xl font-black text-[#14261E] leading-snug">
+                <h3 className="text-xl sm:text-2xl font-black text-[#14261E] leading-snug">
                   Select Your Wellness Pack
                 </h3>
-                <p className="text-sm sm:text-base text-[#263930] leading-relaxed font-medium">
+                <p className="text-base sm:text-[17px] text-[#263930] leading-relaxed font-medium">
                   Choose your preferred pack size and enter your phone number, state, and delivery address. No ATM card or upfront payment needed.
                 </p>
               </div>
 
               <div className="space-y-3 pt-2">
-                <span className="text-xs sm:text-sm font-black text-[#047857] uppercase tracking-wider tabular-nums">
+                <span className="text-sm sm:text-base font-black text-[#047857] uppercase tracking-wider tabular-nums">
                   Step 02 · Fast Dispatch
                 </span>
-                <h3 className="text-lg sm:text-xl font-black text-[#14261E] leading-snug">
+                <h3 className="text-xl sm:text-2xl font-black text-[#14261E] leading-snug">
                   Phone &amp; Rider Confirmation
                 </h3>
-                <p className="text-sm sm:text-base text-[#263930] leading-relaxed font-medium">
+                <p className="text-base sm:text-[17px] text-[#263930] leading-relaxed font-medium">
                   Our regional fulfillment desk calls or messages you to confirm your convenient delivery time within 24 to 48 hours.
                 </p>
               </div>
 
               <div className="space-y-3 pt-2">
-                <span className="text-xs sm:text-sm font-black text-[#047857] uppercase tracking-wider tabular-nums">
+                <span className="text-sm sm:text-base font-black text-[#047857] uppercase tracking-wider tabular-nums">
                   Step 03 · Doorstep Inspection
                 </span>
-                <h3 className="text-lg sm:text-xl font-black text-[#14261E] leading-snug">
+                <h3 className="text-xl sm:text-2xl font-black text-[#14261E] leading-snug">
                   Inspect Sealed Bottles &amp; Pay
                 </h3>
-                <p className="text-sm sm:text-base text-[#263930] leading-relaxed font-medium">
+                <p className="text-base sm:text-[17px] text-[#263930] leading-relaxed font-medium">
                   Open your parcel, verify intact factory seals, NAFDAC numbers, and expiry dates, then pay the rider via Transfer, POS, or Cash.
                 </p>
               </div>
@@ -2261,7 +2270,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
           {/* Verified Customer Experiences */}
           <div id="ad-reviews" className="pt-14 border-t border-[#E4EBE7] space-y-10 sm:space-y-12 scroll-mt-20">
             <div className="max-w-2xl space-y-3">
-              <p className="text-[14px] sm:text-[15px] font-black text-[#047857] tracking-wider uppercase">
+              <p className="text-base font-black text-[#047857] tracking-wider uppercase">
                 Real Nigerian Customer Reviews
               </p>
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#14261E] tracking-tight leading-tight [text-wrap:balance]">
@@ -2281,22 +2290,22 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                       aria-label="5 out of 5 stars"
                     >
                       {[...Array(5)].map((_, sIdx) => (
-                        <Star key={sIdx} className="w-4 h-4 fill-current" />
+                        <Star key={sIdx} className="w-5 h-5 fill-current" />
                       ))}
                     </div>
-                    <p className="text-sm sm:text-base text-[#24372E] leading-relaxed font-medium">
+                    <p className="text-base sm:text-[17px] text-[#24372E] leading-relaxed font-medium">
                       &ldquo;{story.quote}&rdquo;
                     </p>
                   </div>
 
                   <footer className="pt-3.5 border-t border-[#DCE5E0]">
-                    <div className="font-black text-base text-[#14261E]">
+                    <div className="font-black text-lg text-[#14261E]">
                       {story.name}
                     </div>
-                    <div className="text-xs sm:text-sm text-[#4C6056] font-medium mt-0.5">
+                    <div className="text-sm sm:text-base text-[#4C6056] font-medium mt-0.5">
                       {story.role} · {story.location}
                     </div>
-                    <div className="text-xs font-black text-[#047857] mt-1 uppercase tracking-wider">
+                    <div className="text-sm font-black text-[#047857] mt-1 uppercase tracking-wider">
                       Verified Buyer · {story.packName}
                     </div>
                   </footer>
@@ -2380,20 +2389,20 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                       })
                     }
                   />
-                  <div className="p-6 border-t border-[#E4EBE7] space-y-3">
-                    <div className="text-xs font-medium text-[#047857]">
+                  <div className="p-6 border-t border-[#E4EBE7] space-y-3.5">
+                    <div className="text-sm sm:text-base font-bold text-[#047857]">
                       Selected for Doorstep Dispatch
                     </div>
                     <h3 className="text-xl sm:text-2xl font-black text-[#162820] leading-tight">
                       {inlineTarget.item.name}
                     </h3>
                     {inlineSummaryPricing.includedList.length > 0 && (
-                      <p className="text-[15px] text-[#33453D] leading-[1.68]">
-                        <strong className="font-semibold text-[#162820]">Includes: </strong>
+                      <p className="text-base text-[#33453D] leading-[1.68]">
+                        <strong className="font-bold text-[#162820]">Includes: </strong>
                         {inlineSummaryPricing.includedList.join(' · ')}
                       </p>
                     )}
-                    <div className="pt-3 border-t border-[#E4EBE7] space-y-2.5 text-sm text-slate-700">
+                    <div className="pt-3.5 border-t border-[#E4EBE7] space-y-2.5 text-[15px] sm:text-base text-slate-800 font-medium">
                       <div className="flex items-center gap-2.5">
                         <Truck className="w-4 h-4 text-[#047857] shrink-0" />
                         <span>Free Doorstep Delivery Across All 36 States &amp; FCT</span>
@@ -2561,17 +2570,17 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
         !activePolicyModal &&
         mobileBarItem &&
         mobileBarPricing && (
-          <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 h-[68px] bg-white/95 backdrop-blur-md border-t border-[#DCE5E0] shadow-xl px-4 sm:px-6 flex items-center justify-between gap-3">
+          <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 h-[74px] bg-white/95 backdrop-blur-md border-t border-[#DCE5E0] shadow-xl px-4 sm:px-6 flex items-center justify-between gap-3">
             <div className="min-w-0">
-              <div className="text-[13.5px] sm:text-[14.5px] font-bold text-slate-900 truncate">
+              <div className="text-[15px] sm:text-base font-extrabold text-slate-900 truncate">
                 {mobileBarItem.name}
               </div>
               <div className="flex items-baseline gap-2 tabular-nums">
-                <span className="text-[17.5px] sm:text-[19px] font-black text-slate-900">
+                <span className="text-lg sm:text-xl font-black text-slate-900">
                   ₦{mobileBarPricing.currentPrice.toLocaleString()}
                 </span>
                 {mobileBarPricing.savings > 0 && (
-                  <span className="text-[12.5px] sm:text-[13px] text-slate-400 line-through">
+                  <span className="text-sm text-slate-500 line-through font-semibold">
                     ₦{mobileBarPricing.retailPrice.toLocaleString()}
                   </span>
                 )}
@@ -2586,9 +2595,9 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                   recordAdvisorWhatsAppClick(`Ad Sticky Bar Chat: ${mobileBarItem.name}`)
                 }
                 aria-label="Chat with us on WhatsApp"
-                className="min-h-[46px] px-3.5 py-2.5 rounded-xl border border-[#BBD6C8] bg-[#F4FAF7] hover:bg-[#E7F4ED] text-[#065F46] font-bold text-[13.5px] sm:text-[14.5px] flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer"
+                className="min-h-[48px] px-3.5 py-2.5 rounded-xl border border-[#BBD6C8] bg-[#F4FAF7] hover:bg-[#E7F4ED] text-[#065F46] font-bold text-[15px] flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer"
               >
-                <MessageCircle className="w-4.5 h-4.5 text-[#25D366] shrink-0" />
+                <MessageCircle className="w-5 h-5 text-[#25D366] shrink-0" />
                 <span className="hidden phablet:inline">WhatsApp</span>
               </a>
               <button
@@ -2600,7 +2609,7 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
                     inlineTarget.item ? inlineTarget.optionIdx : defaultBundleOptIdx
                   )
                 }
-                className="min-h-[46px] px-4 sm:px-5 py-2.5 rounded-xl bg-[#047857] hover:bg-[#065F46] text-white font-extrabold text-[14.5px] sm:text-[15.5px] whitespace-nowrap shrink-0 cursor-pointer shadow-sm"
+                className="min-h-[48px] px-4 sm:px-5 py-2.5 rounded-xl bg-[#047857] hover:bg-[#065F46] text-white font-extrabold text-[15px] sm:text-base whitespace-nowrap shrink-0 cursor-pointer shadow-sm"
               >
                 Order on Delivery
               </button>
