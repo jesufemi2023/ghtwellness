@@ -1951,165 +1951,183 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
         </div>
       </header>
 
-      {/* 2. Refined Botanical Hero Section — Background Image Carousel + Package Showcase */}
+      {/* 2. Refined Botanical Hero Section — Tablet/Laptop Background Carousel + Package Showcase */}
       <section className="relative bg-[#0E261D] text-[#FAF9F5] border-b border-[#1D3E31] overflow-hidden">
-        {/* Hero Background Image Carousel Container */}
-        <div className="relative overflow-hidden border-b border-white/15 bg-[#091A13]">
-          {/* Animated 2-Slide Background Carousel */}
-          <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-            {heroCarouselSlides.map((slide, idx) => {
-              const isActive = idx === heroSlideIdx;
-              return (
-                <img
-                  key={slide.src}
-                  src={slide.src}
-                  alt={slide.alt}
-                  loading="eager"
-                  decoding="async"
-                  className={`absolute inset-0 w-full h-full object-cover object-center sm:object-[72%_25%] transition-all duration-1000 ease-out ${
-                    isActive ? 'opacity-100 scale-100' : 'opacity-0 scale-[1.03]'
-                  }`}
-                />
-              );
-            })}
-            {/* Multi-stop Contrast Scrims for Clear Adult Text Legibility */}
-            <div className="absolute inset-0 bg-[#091B14]/70 sm:bg-[#091B14]/45" />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#091B14]/95 via-[#0C2219]/82 to-[#0C2219]/50" />
-            <div className="absolute inset-0 bg-gradient-to-b from-[#091B14]/45 via-transparent to-[#091B14]/88" />
+        {/* Top Hero Banner */}
+        <div className="relative overflow-hidden border-b border-white/15 bg-gradient-to-br from-[#091A13] via-[#0D231B] to-[#081711]">
+          {/* Mobile-Only Transparent Bottle Trio Background Image (Removed on md+ Tablet & Laptop) */}
+          <div
+            aria-hidden="true"
+            className="md:hidden pointer-events-none absolute inset-0 flex items-center justify-center px-3 py-6"
+          >
+            <img
+              src="/assets/aistudio/mobile_hero_bottles.png"
+              alt="GHT Zinc, Reodoe Capsules, and Vigor Max Softgel Herbal Pack"
+              loading="eager"
+              decoding="async"
+              className="w-full h-full max-w-full max-h-full object-contain opacity-35 drop-shadow-[0_18px_36px_rgba(0,0,0,0.45)]"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-[#091A13]/65 via-[#091A13]/35 to-[#091A13]/85" />
           </div>
 
-          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 lg:py-16 space-y-8 sm:space-y-10">
-            {/* Hero Editorial Heading & Value Proposition */}
-            <div className="max-w-3xl space-y-4 sm:space-y-5">
-              <p className="text-[15px] sm:text-[16.5px] font-bold text-[#95E4B9] tracking-[0.03em] uppercase leading-snug">
-                {adIntent.kicker}
-              </p>
-
-              <h1 className="text-3xl sm:text-4xl lg:text-[2.95rem] xl:text-[3.15rem] font-black text-[#FAF9F5] tracking-tight leading-[1.14] [text-wrap:balance] drop-shadow-xs">
-                {adIntent.headline}
-              </h1>
-
-              <p className="text-lg sm:text-[20px] text-[#EDF4F0] leading-relaxed font-medium">
-                {adIntent.subheadline}
-              </p>
-
-              {/* Direct Assurance Actions */}
-              <div className="pt-2.5 flex flex-wrap items-center gap-3.5 sm:gap-4">
-                <button
-                  type="button"
-                  onClick={() => scrollToSection('express-order')}
-                  className="min-h-[58px] sm:min-h-[62px] px-6 sm:px-8 py-3.5 rounded-2xl bg-[#F5FAF7] hover:bg-white text-[#0E261D] text-[17.5px] sm:text-[18.5px] font-extrabold transition-all inline-flex items-center justify-center gap-2.5 whitespace-nowrap cursor-pointer shadow-lg"
-                >
-                  <span>Order on Delivery Form</span>
-                  <ArrowDown className="w-5 h-5 text-[#047857] shrink-0" />
-                </button>
-
-                <a
-                  href={getAdvisorWhatsAppHref("Prostate Enlargement & Weak Erection Packs")}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => recordAdvisorWhatsAppClick('Ad Hero Specialist')}
-                  className="min-h-[58px] sm:min-h-[62px] px-5 sm:px-7 py-3.5 rounded-2xl border border-white/40 bg-[#091B14]/65 hover:bg-[#091B14]/85 text-[#FAF9F5] text-[17px] sm:text-[18px] font-bold transition-colors inline-flex items-center justify-center gap-2.5 whitespace-nowrap cursor-pointer backdrop-blur-xs"
-                >
-                  <MessageCircle className="w-5 h-5 text-[#95E4B9] shrink-0" />
-                  <span>Speak with a Specialist</span>
-                </a>
-
-                <a
-                  href={`tel:${contactPhone.replace(/\s+/g, '')}`}
-                  className="inline-flex items-center gap-2 text-[16.5px] sm:text-[17.5px] font-bold text-[#E6F1EB] hover:text-white transition-colors py-2 sm:pl-1 tabular-nums whitespace-nowrap"
-                >
-                  <Phone className="w-4.5 h-4.5 text-[#95E4B9] shrink-0" />
-                  <span>Call {contactPhone}</span>
-                </a>
-              </div>
-            </div>
-
-            {/* Carousel Controls + Architectural 3-Column Doorstep Assurance Ledger */}
-            <div className="space-y-5">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div className="flex items-center gap-4" role="tablist" aria-label="Hero showcase slides">
+          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-9 sm:py-12 lg:py-14 space-y-8 sm:space-y-10">
+            {/* Hero Main Stage: Left Editorial Copy + Tablet/Laptop Uncropped Background Carousel */}
+            <div className="relative md:min-h-[430px] lg:min-h-[480px] flex flex-col justify-center">
+              {/* Right-Side Tablet & Laptop Background Carousel — Removed Completely on Mobile (< md) */}
+              <div
+                aria-hidden="true"
+                className="hidden md:flex pointer-events-none absolute inset-y-0 right-0 md:w-[45%] lg:w-[43%] xl:w-[42%] items-center justify-end"
+              >
+                <div className="relative w-full h-full flex items-center justify-center">
                   {heroCarouselSlides.map((slide, idx) => {
                     const isActive = idx === heroSlideIdx;
                     return (
-                      <button
+                      <img
                         key={slide.src}
-                        type="button"
-                        role="tab"
-                        aria-selected={isActive}
-                        onClick={() => setHeroSlideIdx(idx)}
-                        className={`min-h-[44px] inline-flex items-center gap-2 text-sm sm:text-base font-bold transition-colors cursor-pointer pb-1 border-b-2 ${
-                          isActive
-                            ? 'text-[#FAF9F5] border-[#95E4B9]'
-                            : 'text-[#B9D2C4] border-transparent hover:text-white'
+                        src={slide.src}
+                        alt={slide.alt}
+                        loading="eager"
+                        decoding="async"
+                        className={`max-w-full max-h-full w-auto h-auto object-contain rounded-2xl shadow-2xl border border-white/15 transition-opacity duration-700 ease-in-out ${
+                          isActive ? 'opacity-100 relative' : 'opacity-0 absolute inset-0 m-auto pointer-events-none'
                         }`}
-                      >
-                        <span
-                          className={`w-2.5 h-2.5 rounded-full transition-colors ${
-                            isActive ? 'bg-[#95E4B9]' : 'bg-white/40'
-                          }`}
-                        />
-                        <span>{slide.label}</span>
-                      </button>
+                      />
                     );
                   })}
                 </div>
+              </div>
 
-                <div className="flex items-center gap-2">
+              {/* Left Hero Editorial Heading & Value Proposition */}
+              <div className="relative z-10 w-full md:w-[53%] lg:w-[55%] xl:w-[56%] space-y-4 sm:space-y-5">
+                <p className="text-[15px] sm:text-[16.5px] font-bold text-[#95E4B9] tracking-[0.03em] uppercase leading-snug">
+                  {adIntent.kicker}
+                </p>
+
+                <h1 className="text-3xl sm:text-4xl lg:text-[2.75rem] xl:text-[3rem] font-black text-[#FAF9F5] tracking-tight leading-[1.14] [text-wrap:balance]">
+                  {adIntent.headline}
+                </h1>
+
+                <p className="text-lg sm:text-[19px] text-[#EDF4F0] leading-relaxed font-medium">
+                  {adIntent.subheadline}
+                </p>
+
+                {/* Direct Assurance Actions */}
+                <div className="pt-2 flex flex-wrap items-center gap-3.5 sm:gap-4">
                   <button
                     type="button"
-                    aria-label="Previous hero background"
-                    onClick={() =>
-                      setHeroSlideIdx((prev) =>
-                        (prev - 1 + heroCarouselSlides.length) % heroCarouselSlides.length
-                      )
-                    }
-                    className="w-11 h-11 rounded-xl border border-white/30 bg-[#091B14]/65 hover:bg-[#091B14]/90 text-white flex items-center justify-center transition-colors cursor-pointer"
+                    onClick={() => scrollToSection('express-order')}
+                    className="min-h-[58px] sm:min-h-[62px] px-6 sm:px-7 py-3.5 rounded-2xl bg-[#F5FAF7] hover:bg-white text-[#0E261D] text-[17.5px] sm:text-[18.5px] font-extrabold transition-all inline-flex items-center justify-center gap-2.5 whitespace-nowrap cursor-pointer shadow-lg"
                   >
-                    <ChevronLeft className="w-5 h-5" />
+                    <span>Order on Delivery Form</span>
+                    <ArrowDown className="w-5 h-5 text-[#047857] shrink-0" />
                   </button>
-                  <button
-                    type="button"
-                    aria-label="Next hero background"
-                    onClick={() =>
-                      setHeroSlideIdx((prev) => (prev + 1) % heroCarouselSlides.length)
-                    }
-                    className="w-11 h-11 rounded-xl border border-white/30 bg-[#091B14]/65 hover:bg-[#091B14]/90 text-white flex items-center justify-center transition-colors cursor-pointer"
+
+                  <a
+                    href={getAdvisorWhatsAppHref("Prostate Enlargement & Weak Erection Packs")}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => recordAdvisorWhatsAppClick('Ad Hero Specialist')}
+                    className="min-h-[58px] sm:min-h-[62px] px-5 sm:px-6 py-3.5 rounded-2xl border border-white/40 bg-white/[0.08] hover:bg-white/[0.16] text-[#FAF9F5] text-[17px] sm:text-[18px] font-bold transition-colors inline-flex items-center justify-center gap-2.5 whitespace-nowrap cursor-pointer"
                   >
-                    <ChevronRight className="w-5 h-5" />
-                  </button>
+                    <MessageCircle className="w-5 h-5 text-[#95E4B9] shrink-0" />
+                    <span>Speak with a Specialist</span>
+                  </a>
+
+                  <a
+                    href={`tel:${contactPhone.replace(/\s+/g, '')}`}
+                    className="inline-flex items-center gap-2 text-[16.5px] sm:text-[17.5px] font-bold text-[#E6F1EB] hover:text-white transition-colors py-2 tabular-nums whitespace-nowrap"
+                  >
+                    <Phone className="w-4.5 h-4.5 text-[#95E4B9] shrink-0" />
+                    <span>Call {contactPhone}</span>
+                  </a>
+                </div>
+
+                {/* Slide Controls — Tablet & Laptop Only (Hidden on Mobile) */}
+                <div className="hidden md:flex flex-wrap items-center justify-between gap-3 pt-2">
+                  <div className="flex items-center gap-4" role="tablist" aria-label="Hero showcase slides">
+                    {heroCarouselSlides.map((slide, idx) => {
+                      const isActive = idx === heroSlideIdx;
+                      return (
+                        <button
+                          key={slide.src}
+                          type="button"
+                          role="tab"
+                          aria-selected={isActive}
+                          onClick={() => setHeroSlideIdx(idx)}
+                          className={`min-h-[44px] inline-flex items-center gap-2 text-sm lg:text-[15px] font-bold transition-colors cursor-pointer pb-1 border-b-2 ${
+                            isActive
+                              ? 'text-[#FAF9F5] border-[#95E4B9]'
+                              : 'text-[#B9D2C4] border-transparent hover:text-white'
+                          }`}
+                        >
+                          <span
+                            className={`w-2.5 h-2.5 rounded-full transition-colors ${
+                              isActive ? 'bg-[#95E4B9]' : 'bg-white/40'
+                            }`}
+                          />
+                          <span>{slide.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      aria-label="Previous hero background"
+                      onClick={() =>
+                        setHeroSlideIdx((prev) =>
+                          (prev - 1 + heroCarouselSlides.length) % heroCarouselSlides.length
+                        )
+                      }
+                      className="w-11 h-11 rounded-xl border border-white/30 bg-white/[0.08] hover:bg-white/[0.16] text-white flex items-center justify-center transition-colors cursor-pointer"
+                    >
+                      <ChevronLeft className="w-5 h-5" />
+                    </button>
+                    <button
+                      type="button"
+                      aria-label="Next hero background"
+                      onClick={() =>
+                        setHeroSlideIdx((prev) => (prev + 1) % heroCarouselSlides.length)
+                      }
+                      className="w-11 h-11 rounded-xl border border-white/30 bg-white/[0.08] hover:bg-white/[0.16] text-white flex items-center justify-center transition-colors cursor-pointer"
+                    >
+                      <ChevronRight className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Architectural 3-Column Doorstep Assurance Ledger */}
+            <div className="pt-6 sm:pt-7 border-t border-white/20 grid grid-cols-3 gap-3 sm:gap-8 divide-x divide-white/20">
+              <div className="pr-1.5 sm:pr-4">
+                <div className="text-[15.5px] phablet:text-[17px] sm:text-[18.5px] font-bold text-[#FAF9F5] leading-snug">
+                  <span className="hidden lg:inline">Pay ₦0 Upfront — </span>
+                  <span>Pay on Delivery</span>
+                </div>
+                <div className="text-[14px] sm:text-[15.5px] text-[#DCEBE2] leading-snug mt-1.5">
+                  Inspect seals before paying
                 </div>
               </div>
 
-              <div className="pt-6 sm:pt-7 border-t border-white/20 grid grid-cols-3 gap-3 sm:gap-8 divide-x divide-white/20">
-                <div className="pr-1.5 sm:pr-4">
-                  <div className="text-[15.5px] phablet:text-[17px] sm:text-[18.5px] font-bold text-[#FAF9F5] leading-snug">
-                    <span className="hidden lg:inline">Pay ₦0 Upfront — </span>
-                    <span>Pay on Delivery</span>
-                  </div>
-                  <div className="text-[14px] sm:text-[15.5px] text-[#DCEBE2] leading-snug mt-1.5">
-                    Inspect seals before paying
-                  </div>
+              <div className="pl-3 sm:pl-8 pr-1.5 sm:pr-4">
+                <div className="text-[15.5px] phablet:text-[17px] sm:text-[18.5px] font-bold text-[#FAF9F5] leading-snug">
+                  <span className="sm:hidden">Free Dispatch</span>
+                  <span className="hidden sm:inline">Free Nationwide Delivery</span>
                 </div>
-
-                <div className="pl-3 sm:pl-8 pr-1.5 sm:pr-4">
-                  <div className="text-[15.5px] phablet:text-[17px] sm:text-[18.5px] font-bold text-[#FAF9F5] leading-snug">
-                    <span className="sm:hidden">Free Dispatch</span>
-                    <span className="hidden sm:inline">Free Nationwide Delivery</span>
-                  </div>
-                  <div className="text-[14px] sm:text-[15.5px] text-[#DCEBE2] leading-snug mt-1.5 tabular-nums">
-                    24–48 hrs to all 36 states
-                  </div>
+                <div className="text-[14px] sm:text-[15.5px] text-[#DCEBE2] leading-snug mt-1.5 tabular-nums">
+                  24–48 hrs to all 36 states
                 </div>
+              </div>
 
-                <div className="pl-3 sm:pl-8">
-                  <div className="text-[15.5px] phablet:text-[17px] sm:text-[18.5px] font-bold text-[#FAF9F5] leading-snug">
-                    <span className="phablet:hidden">NAFDAC Reg.</span>
-                    <span className="hidden phablet:inline">NAFDAC Certified</span>
-                  </div>
-                  <div className="text-[14px] sm:text-[15.5px] text-[#DCEBE2] leading-snug mt-1.5">
-                    Genuine GHT herbal packs
-                  </div>
+              <div className="pl-3 sm:pl-8">
+                <div className="text-[15.5px] phablet:text-[17px] sm:text-[18.5px] font-bold text-[#FAF9F5] leading-snug">
+                  <span className="phablet:hidden">NAFDAC Reg.</span>
+                  <span className="hidden phablet:inline">NAFDAC Certified</span>
+                </div>
+                <div className="text-[14px] sm:text-[15.5px] text-[#DCEBE2] leading-snug mt-1.5">
+                  Genuine GHT herbal packs
                 </div>
               </div>
             </div>

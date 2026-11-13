@@ -17,7 +17,7 @@ export const CONFIG = {
   company: {
     name: getEnv('VITE_COMPANY_NAME', "SD GHT HEALTH CARE"),
     subtitle: getEnv('VITE_COMPANY_SUBTITLE', "NIGERIA LTD"),
-    phone: getEnv('VITE_CONTACT_PHONE', "+234 706 073 4773"),
+    phone: getEnv('VITE_CONTACT_PHONE', "+234 904 775 2410"),
     email: getEnv('VITE_CONTACT_EMAIL', "support@ghtwellness.com"),
     address: getEnv('VITE_COMPANY_ADDRESS', "Ikeja, Lagos, Nigeria (Nationwide Dispatch)"),
     logoUrl: (() => {
@@ -34,7 +34,7 @@ export const CONFIG = {
     }
   },
   whatsapp: {
-    number: getEnv('VITE_WHATSAPP_NUMBER', "2347060734773"),
+    number: getEnv('VITE_WHATSAPP_NUMBER', "2349047752410"),
     defaultMessage: getEnv('VITE_WHATSAPP_DEFAULT_MESSAGE', "Hello SD GHT Health Care, I would like to make an inquiry.")
   },
   defaults: {

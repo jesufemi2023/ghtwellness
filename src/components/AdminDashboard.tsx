@@ -1371,7 +1371,7 @@ const SettingsAdminView = ({ adminPassword }: { adminPassword: string }) => {
               placeholder={`Default env: ${CONFIG.whatsapp.number} (or paste https://wa.me/message/...)`}
             />
             <p className="text-[11px] text-slate-500 font-medium leading-relaxed pl-1">
-              Enter an active WhatsApp phone number (e.g. <code className="font-bold text-slate-700">07060734773</code>) <strong>OR</strong> paste your official WhatsApp Business Short Link (<code className="font-bold text-slate-700">https://wa.me/message/...</code> from WhatsApp Business → Settings → Business Tools → Short Link). Leave blank to use Vercel <code className="font-bold text-slate-700">VITE_WHATSAPP_NUMBER</code>.
+              Enter an active WhatsApp phone number (e.g. <code className="font-bold text-slate-700">09047752410</code>) <strong>OR</strong> paste your official WhatsApp Business Short Link (<code className="font-bold text-slate-700">https://wa.me/message/...</code> from WhatsApp Business → Settings → Business Tools → Short Link). Leave blank to use Vercel <code className="font-bold text-slate-700">VITE_WHATSAPP_NUMBER</code>.
             </p>
           </div>
 

@@ -24,7 +24,7 @@ export const getActiveWhatsAppTarget = (): string => {
       return runtimeTarget.trim();
     }
   }
-  return CONFIG?.whatsapp?.number || "2347060734773";
+  return CONFIG?.whatsapp?.number || "2349047752410";
 };
 
 /**
@@ -39,7 +39,7 @@ export const getActiveContactPhone = (): string => {
       return runtimePhone.trim();
     }
   }
-  return CONFIG?.company?.phone || "+234 706 073 4773";
+  return CONFIG?.company?.phone || "+234 904 775 2410";
 };
 
 /**
@@ -186,7 +186,7 @@ export const cleanWhatsAppNumber = (phoneNumber?: string): string => {
   // If number is a placeholder or too short, fallback to configured business number
   if (!digits || digits.includes("123456789") || digits.length < 8) {
     const cleanFallback = fallbackRaw.split(/[,/|]/)[0].replace(/\D/g, "");
-    digits = cleanFallback && cleanFallback.length >= 8 ? cleanFallback : "2347060734773";
+    digits = cleanFallback && cleanFallback.length >= 8 ? cleanFallback : "2349047752410";
   }
 
   // 2. Handle Nigerian & international prefix edge cases
