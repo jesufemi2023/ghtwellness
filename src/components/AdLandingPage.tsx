@@ -8,6 +8,7 @@ import {
   Mail,
   MapPin,
   ChevronDown,
+  ChevronLeft,
   ChevronRight,
   X,
   ShoppingBag,
@@ -1074,7 +1075,7 @@ const PackageCard: React.FC<PackageCardProps> = ({
   return (
     <article
       id={`package-card-${pkg.package_code || cardIndex}`}
-      className={`relative bg-white rounded-[26px] border border-slate-200 transition-shadow duration-300 flex flex-col overflow-hidden shadow-lg hover:shadow-2xl group ${cardBorderClass} ${
+      className={`relative scroll-mt-24 bg-white rounded-[26px] border border-slate-200 transition-shadow duration-300 flex flex-col overflow-hidden shadow-lg hover:shadow-2xl group ${cardBorderClass} ${
         isHeroCard ? 'ring-1 ring-[#047857]/20' : ''
       }`}
     >
@@ -1584,6 +1585,45 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  const heroCarouselSlides = useMemo(
+    () =>
+      adIntent.category === 'vitality'
+        ? [
+            {
+              src: '/assets/aistudio/weak_erection_ed8cd2e6.jpeg',
+              alt: 'Reodoe Capsules for Weak Erection and 45+ Minutes Stamina',
+              label: 'Weak Erection & Stamina',
+            },
+            {
+              src: '/assets/aistudio/prostate_2014f415.jpeg',
+              alt: 'Prostabeta Tablets for Frequent Urination and Prostate Enlargement',
+              label: 'Prostate Enlargement Relief',
+            },
+          ]
+        : [
+            {
+              src: '/assets/aistudio/prostate_2014f415.jpeg',
+              alt: 'Prostabeta Tablets for Frequent Urination and Prostate Enlargement',
+              label: 'Prostate Enlargement Relief',
+            },
+            {
+              src: '/assets/aistudio/weak_erection_ed8cd2e6.jpeg',
+              alt: 'Reodoe Capsules for Weak Erection and 45+ Minutes Stamina',
+              label: 'Weak Erection & Stamina',
+            },
+          ],
+    [adIntent.category]
+  );
+
+  const [heroSlideIdx, setHeroSlideIdx] = useState(0);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setHeroSlideIdx((prev) => (prev + 1) % heroCarouselSlides.length);
+    }, 5000);
+    return () => window.clearInterval(timer);
+  }, [heroCarouselSlides.length, heroSlideIdx]);
+
   const defaultBundle = useMemo<PackageData | null>(() => {
     if (allBundles.length === 0) return null;
     if (adIntent.requestedPackageCode) {
@@ -1686,7 +1726,8 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
   const scrollToSection = (id: string) => {
     const el = document.getElementById(id);
     if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const top = el.getBoundingClientRect().top + window.scrollY - 84;
+      window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
     }
   };
 
@@ -1812,9 +1853,9 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#FAFBF9] text-[#14261E] font-[family-name:var(--font-soft-body)] antialiased pb-20 lg:pb-0">
-      {/* 1. Strict 3-Zone Top Bar — Official Company Logo & Name + Calm Adult Navigation */}
-      <header className="lg:sticky lg:top-0 z-40 h-[64px] sm:h-[72px] bg-white/95 backdrop-blur-xs border-b border-[#DCE5E0]">
+    <div className="min-h-screen bg-[#FAFBF9] text-[#14261E] font-[family-name:var(--font-soft-body)] antialiased pt-[64px] sm:pt-[72px] pb-24 lg:pb-0">
+      {/* 1. Strict 3-Zone Top Bar — Fixed to Top Across Mobile & Desktop */}
+      <header className="fixed top-0 inset-x-0 z-50 h-[64px] sm:h-[72px] bg-white/95 backdrop-blur-md border-b border-[#DCE5E0] shadow-xs">
         <div className="max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-3 sm:gap-6 lg:gap-8">
           {/* Zone 1: Official Company Logo + Company Name Lockup */}
           <button
@@ -1910,95 +1951,174 @@ export const AdLandingPage: React.FC<AdLandingPageProps> = ({
         </div>
       </header>
 
-      {/* 2. Refined Botanical Hero Section — Right Hero Heading + Prostate Card #1 + Male Performance Card #2 */}
+      {/* 2. Refined Botanical Hero Section — Background Image Carousel + Package Showcase */}
       <section className="relative bg-[#0E261D] text-[#FAF9F5] border-b border-[#1D3E31] overflow-hidden">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(95%_120%_at_90%_0%,rgba(16,185,129,0.18)_0%,rgba(14,38,29,0)_60%),radial-gradient(65%_90%_at_5%_100%,rgba(217,185,120,0.09)_0%,rgba(14,38,29,0)_55%)]"
-        />
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16 space-y-8 sm:space-y-10">
-          {/* Hero Editorial Heading & Value Proposition */}
-          <div className="max-w-3xl space-y-4 sm:space-y-5">
-            <p className="text-[15px] sm:text-[16.5px] font-bold text-[#95E4B9] tracking-[0.03em] uppercase leading-snug">
-              {adIntent.kicker}
-            </p>
-
-            <h1 className="text-3xl sm:text-4xl lg:text-[3.1rem] font-black text-[#FAF9F5] tracking-tight leading-[1.15] [text-wrap:balance]">
-              {adIntent.headline}
-            </h1>
-
-            <p className="text-lg sm:text-xl text-[#E4EDE7] leading-relaxed max-w-2xl font-medium">
-              {adIntent.subheadline}
-            </p>
-
-            {/* Direct Assurance Actions */}
-            <div className="pt-2.5 flex flex-wrap items-center gap-3.5 sm:gap-4.5">
-              <button
-                type="button"
-                onClick={() => scrollToSection('express-order')}
-                className="min-h-[58px] sm:min-h-[62px] px-7 sm:px-8 py-3.5 rounded-2xl bg-[#F5FAF7] hover:bg-white text-[#0E261D] text-[17.5px] sm:text-[18.5px] font-extrabold transition-all inline-flex items-center justify-center gap-2.5 whitespace-nowrap cursor-pointer shadow-md hover:shadow-lg"
-              >
-                <span>Order on Delivery Form</span>
-                <ArrowDown className="w-5 h-5 text-[#047857] shrink-0" />
-              </button>
-
-              <a
-                href={getAdvisorWhatsAppHref("Prostate Enlargement & Weak Erection Packs")}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => recordAdvisorWhatsAppClick('Ad Hero Specialist')}
-                className="min-h-[58px] sm:min-h-[62px] px-6 sm:px-7 py-3.5 rounded-2xl border border-white/35 bg-white/[0.1] hover:bg-white/[0.18] text-[#FAF9F5] text-[17px] sm:text-[18px] font-bold transition-colors inline-flex items-center justify-center gap-2.5 whitespace-nowrap cursor-pointer"
-              >
-                <MessageCircle className="w-5 h-5 text-[#95E4B9] shrink-0" />
-                <span>Speak with a Specialist</span>
-              </a>
-
-              <a
-                href={`tel:${contactPhone.replace(/\s+/g, '')}`}
-                className="inline-flex items-center gap-2 text-[16.5px] sm:text-[17.5px] font-bold text-[#D7E8DE] hover:text-white transition-colors py-2 sm:pl-1 tabular-nums whitespace-nowrap"
-              >
-                <Phone className="w-4.5 h-4.5 text-[#95E4B9] shrink-0" />
-                <span>Call {contactPhone}</span>
-              </a>
-            </div>
+        {/* Hero Background Image Carousel Container */}
+        <div className="relative overflow-hidden border-b border-white/15 bg-[#091A13]">
+          {/* Animated 2-Slide Background Carousel */}
+          <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+            {heroCarouselSlides.map((slide, idx) => {
+              const isActive = idx === heroSlideIdx;
+              return (
+                <img
+                  key={slide.src}
+                  src={slide.src}
+                  alt={slide.alt}
+                  loading="eager"
+                  decoding="async"
+                  className={`absolute inset-0 w-full h-full object-cover object-center sm:object-[72%_25%] transition-all duration-1000 ease-out ${
+                    isActive ? 'opacity-100 scale-100' : 'opacity-0 scale-[1.03]'
+                  }`}
+                />
+              );
+            })}
+            {/* Multi-stop Contrast Scrims for Clear Adult Text Legibility */}
+            <div className="absolute inset-0 bg-[#091B14]/70 sm:bg-[#091B14]/45" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#091B14]/95 via-[#0C2219]/82 to-[#0C2219]/50" />
+            <div className="absolute inset-0 bg-gradient-to-b from-[#091B14]/45 via-transparent to-[#091B14]/88" />
           </div>
 
-          {/* Architectural 3-Column Doorstep Assurance Ledger */}
-          <div className="pt-6 sm:pt-7 border-t border-white/16 grid grid-cols-3 gap-3 sm:gap-8 divide-x divide-white/16">
-            <div className="pr-1.5 sm:pr-4">
-              <div className="text-[15.5px] phablet:text-[17px] sm:text-[18.5px] font-bold text-[#FAF9F5] leading-snug">
-                <span className="hidden lg:inline">Pay ₦0 Upfront — </span>
-                <span>Pay on Delivery</span>
-              </div>
-              <div className="text-[14px] sm:text-[15.5px] text-[#CDE2D6] leading-snug mt-1.5">
-                Inspect seals before paying
+          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 lg:py-16 space-y-8 sm:space-y-10">
+            {/* Hero Editorial Heading & Value Proposition */}
+            <div className="max-w-3xl space-y-4 sm:space-y-5">
+              <p className="text-[15px] sm:text-[16.5px] font-bold text-[#95E4B9] tracking-[0.03em] uppercase leading-snug">
+                {adIntent.kicker}
+              </p>
+
+              <h1 className="text-3xl sm:text-4xl lg:text-[2.95rem] xl:text-[3.15rem] font-black text-[#FAF9F5] tracking-tight leading-[1.14] [text-wrap:balance] drop-shadow-xs">
+                {adIntent.headline}
+              </h1>
+
+              <p className="text-lg sm:text-[20px] text-[#EDF4F0] leading-relaxed font-medium">
+                {adIntent.subheadline}
+              </p>
+
+              {/* Direct Assurance Actions */}
+              <div className="pt-2.5 flex flex-wrap items-center gap-3.5 sm:gap-4">
+                <button
+                  type="button"
+                  onClick={() => scrollToSection('express-order')}
+                  className="min-h-[58px] sm:min-h-[62px] px-6 sm:px-8 py-3.5 rounded-2xl bg-[#F5FAF7] hover:bg-white text-[#0E261D] text-[17.5px] sm:text-[18.5px] font-extrabold transition-all inline-flex items-center justify-center gap-2.5 whitespace-nowrap cursor-pointer shadow-lg"
+                >
+                  <span>Order on Delivery Form</span>
+                  <ArrowDown className="w-5 h-5 text-[#047857] shrink-0" />
+                </button>
+
+                <a
+                  href={getAdvisorWhatsAppHref("Prostate Enlargement & Weak Erection Packs")}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => recordAdvisorWhatsAppClick('Ad Hero Specialist')}
+                  className="min-h-[58px] sm:min-h-[62px] px-5 sm:px-7 py-3.5 rounded-2xl border border-white/40 bg-[#091B14]/65 hover:bg-[#091B14]/85 text-[#FAF9F5] text-[17px] sm:text-[18px] font-bold transition-colors inline-flex items-center justify-center gap-2.5 whitespace-nowrap cursor-pointer backdrop-blur-xs"
+                >
+                  <MessageCircle className="w-5 h-5 text-[#95E4B9] shrink-0" />
+                  <span>Speak with a Specialist</span>
+                </a>
+
+                <a
+                  href={`tel:${contactPhone.replace(/\s+/g, '')}`}
+                  className="inline-flex items-center gap-2 text-[16.5px] sm:text-[17.5px] font-bold text-[#E6F1EB] hover:text-white transition-colors py-2 sm:pl-1 tabular-nums whitespace-nowrap"
+                >
+                  <Phone className="w-4.5 h-4.5 text-[#95E4B9] shrink-0" />
+                  <span>Call {contactPhone}</span>
+                </a>
               </div>
             </div>
 
-            <div className="pl-3 sm:pl-8 pr-1.5 sm:pr-4">
-              <div className="text-[15.5px] phablet:text-[17px] sm:text-[18.5px] font-bold text-[#FAF9F5] leading-snug">
-                <span className="sm:hidden">Free Dispatch</span>
-                <span className="hidden sm:inline">Free Nationwide Delivery</span>
-              </div>
-              <div className="text-[14px] sm:text-[15.5px] text-[#CDE2D6] leading-snug mt-1.5 tabular-nums">
-                24–48 hrs to all 36 states
-              </div>
-            </div>
+            {/* Carousel Controls + Architectural 3-Column Doorstep Assurance Ledger */}
+            <div className="space-y-5">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-4" role="tablist" aria-label="Hero showcase slides">
+                  {heroCarouselSlides.map((slide, idx) => {
+                    const isActive = idx === heroSlideIdx;
+                    return (
+                      <button
+                        key={slide.src}
+                        type="button"
+                        role="tab"
+                        aria-selected={isActive}
+                        onClick={() => setHeroSlideIdx(idx)}
+                        className={`min-h-[44px] inline-flex items-center gap-2 text-sm sm:text-base font-bold transition-colors cursor-pointer pb-1 border-b-2 ${
+                          isActive
+                            ? 'text-[#FAF9F5] border-[#95E4B9]'
+                            : 'text-[#B9D2C4] border-transparent hover:text-white'
+                        }`}
+                      >
+                        <span
+                          className={`w-2.5 h-2.5 rounded-full transition-colors ${
+                            isActive ? 'bg-[#95E4B9]' : 'bg-white/40'
+                          }`}
+                        />
+                        <span>{slide.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
 
-            <div className="pl-3 sm:pl-8">
-              <div className="text-[15.5px] phablet:text-[17px] sm:text-[18.5px] font-bold text-[#FAF9F5] leading-snug">
-                <span className="phablet:hidden">NAFDAC Reg.</span>
-                <span className="hidden phablet:inline">NAFDAC Certified</span>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    aria-label="Previous hero background"
+                    onClick={() =>
+                      setHeroSlideIdx((prev) =>
+                        (prev - 1 + heroCarouselSlides.length) % heroCarouselSlides.length
+                      )
+                    }
+                    className="w-11 h-11 rounded-xl border border-white/30 bg-[#091B14]/65 hover:bg-[#091B14]/90 text-white flex items-center justify-center transition-colors cursor-pointer"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Next hero background"
+                    onClick={() =>
+                      setHeroSlideIdx((prev) => (prev + 1) % heroCarouselSlides.length)
+                    }
+                    className="w-11 h-11 rounded-xl border border-white/30 bg-[#091B14]/65 hover:bg-[#091B14]/90 text-white flex items-center justify-center transition-colors cursor-pointer"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
-              <div className="text-[14px] sm:text-[15.5px] text-[#CDE2D6] leading-snug mt-1.5">
-                Genuine GHT herbal packs
+
+              <div className="pt-6 sm:pt-7 border-t border-white/20 grid grid-cols-3 gap-3 sm:gap-8 divide-x divide-white/20">
+                <div className="pr-1.5 sm:pr-4">
+                  <div className="text-[15.5px] phablet:text-[17px] sm:text-[18.5px] font-bold text-[#FAF9F5] leading-snug">
+                    <span className="hidden lg:inline">Pay ₦0 Upfront — </span>
+                    <span>Pay on Delivery</span>
+                  </div>
+                  <div className="text-[14px] sm:text-[15.5px] text-[#DCEBE2] leading-snug mt-1.5">
+                    Inspect seals before paying
+                  </div>
+                </div>
+
+                <div className="pl-3 sm:pl-8 pr-1.5 sm:pr-4">
+                  <div className="text-[15.5px] phablet:text-[17px] sm:text-[18.5px] font-bold text-[#FAF9F5] leading-snug">
+                    <span className="sm:hidden">Free Dispatch</span>
+                    <span className="hidden sm:inline">Free Nationwide Delivery</span>
+                  </div>
+                  <div className="text-[14px] sm:text-[15.5px] text-[#DCEBE2] leading-snug mt-1.5 tabular-nums">
+                    24–48 hrs to all 36 states
+                  </div>
+                </div>
+
+                <div className="pl-3 sm:pl-8">
+                  <div className="text-[15.5px] phablet:text-[17px] sm:text-[18.5px] font-bold text-[#FAF9F5] leading-snug">
+                    <span className="phablet:hidden">NAFDAC Reg.</span>
+                    <span className="hidden phablet:inline">NAFDAC Certified</span>
+                  </div>
+                  <div className="text-[14px] sm:text-[15.5px] text-[#DCEBE2] leading-snug mt-1.5">
+                    Genuine GHT herbal packs
+                  </div>
+                </div>
               </div>
             </div>
           </div>
+        </div>
 
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
           {/* DISPLAY THE PROSTATE CARD IN HERO THEN FOLLOW BY MALE PERFORMANCE CARD */}
-          <div id="hero-cards" className="pt-4 sm:pt-6 scroll-mt-24 space-y-5">
+          <div id="hero-cards" className="scroll-mt-24 space-y-5">
             <div className="flex flex-wrap items-center justify-between gap-3 text-white/90 pb-1">
               <h2 className="text-xl sm:text-2xl font-black tracking-tight text-[#95E4B9]">
                 Choose Your Relief Pack: Prostate Enlargement or Weak Erection
