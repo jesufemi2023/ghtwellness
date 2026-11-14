@@ -290,7 +290,7 @@ export async function createServer() {
   app.get("/api/settings", async (req, res) => {
     const defaultSettings: Record<string, string> = {
       google_tag_id: "AW-18237021036",
-      google_conversion_label: "uMelCPiLyLYdEOy2i_hD",
+      google_conversion_label: "ew85CImHpLgdEOy2i_hD",
     };
 
     if (!supabase) return res.json(defaultSettings);

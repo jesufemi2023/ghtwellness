@@ -1262,7 +1262,8 @@ const SettingsAdminView = ({ adminPassword }: { adminPassword: string }) => {
     account_number: "",
     account_name: "",
     meta_pixel_id: "",
-    google_tag_id: ""
+    google_tag_id: "",
+    google_conversion_label: ""
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -1464,16 +1465,19 @@ const SettingsAdminView = ({ adminPassword }: { adminPassword: string }) => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Google Ads Purchase Conversion Label (Optional)</label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Google Ads Purchase Conversion Label</label>
+                <span className="text-[9px] bg-emerald-100 text-emerald-700 font-extrabold px-2 py-0.5 rounded-full uppercase tracking-widest">Purchase Event</span>
+              </div>
               <input 
                 type="text"
                 value={settings.google_conversion_label || ""}
                 onChange={e => setSettings({ ...settings, google_conversion_label: e.target.value })}
                 className="w-full h-14 bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 font-bold text-slate-900 focus:border-emerald-500 outline-none transition-all font-mono"
-                placeholder="e.g. AbCdEfGhIjKlMnOpQr"
+                placeholder="e.g. ew85CImHpLgdEOy2i_hD"
               />
               <p className="text-[10px] text-slate-400 font-medium leading-relaxed pl-1">
-                Optional: Paste the Conversion Label from your Google Ads Purchase Conversion Action (the part after AW-1234567890/ in send_to) to track exact Naira order values on checkout completion.
+                Paste the Conversion Label from your Google Ads Purchase Conversion Action (the part after <code className="font-bold text-slate-600">AW-18237021036/</code> in <code className="font-bold text-slate-600">send_to</code>) to track exact Naira order values on checkout completion.
               </p>
             </div>
           </div>

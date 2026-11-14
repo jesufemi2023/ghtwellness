@@ -143,6 +143,15 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [copiedBank, setCopiedBank] = useState(false);
+  const [validationModal, setValidationModal] = useState<{
+    isOpen: boolean;
+    errors: string[];
+    firstFieldId: string | null;
+  }>({
+    isOpen: false,
+    errors: [],
+    firstFieldId: null,
+  });
 
   const [bankSettings, setBankSettings] = useState({
     bank_name: CONFIG.company.bankDetails.bankName,
@@ -177,7 +186,8 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
     setImgStage('optimized');
     setSubmitError(null);
     setIsSuccess(false);
-  }, [selectedItem, itemType, selectedOptionIdx, initialQuantity]);
+    setValidationModal({ isOpen: false, errors: [], firstFieldId: null });
+  }, [selectedItem, itemType, selectedOptionIdx, initialQuantity, isOpen]);
 
   const itemOptions = activeItem.options || [];
   const parentDiscountPercent =
@@ -299,16 +309,6 @@ export const ExpressPodCheckout: React.FC<ExpressPodCheckoutProps> = ({
     };
     reader.readAsDataURL(file);
   };
-
-  const [validationModal, setValidationModal] = useState<{
-    isOpen: boolean;
-    errors: string[];
-    firstFieldId: string | null;
-  }>({
-    isOpen: false,
-    errors: [],
-    firstFieldId: null,
-  });
 
   const validateFields = (): boolean => {
     const errors: Record<string, string> = {};

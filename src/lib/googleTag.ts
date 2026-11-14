@@ -1,5 +1,5 @@
 export const DEFAULT_GOOGLE_TAG_ID = "AW-18237021036";
-export const DEFAULT_GOOGLE_CONVERSION_LABEL = "uMelCPiLyLYdEOy2i_hD";
+export const DEFAULT_GOOGLE_CONVERSION_LABEL = "ew85CImHpLgdEOy2i_hD";
 export const DEFAULT_SEND_TO = `${DEFAULT_GOOGLE_TAG_ID}/${DEFAULT_GOOGLE_CONVERSION_LABEL}`;
 
 declare global {
@@ -151,13 +151,15 @@ export const trackGoogleAdsConversion = (value: number, transactionId?: string) 
     DEFAULT_GOOGLE_TAG_ID
   ).trim();
 
-  const convLabel = (
+  const rawConvLabel = (
     window.__ghtConversionLabel ||
     import.meta.env.VITE_GOOGLE_CONVERSION_LABEL ||
     DEFAULT_GOOGLE_CONVERSION_LABEL
   ).trim();
 
-  const sendTo = `${tagId}/${convLabel}`;
+  const sendTo = rawConvLabel.includes("/")
+    ? rawConvLabel
+    : `${tagId}/${rawConvLabel}`;
 
   const txId =
     transactionId && transactionId.trim()
