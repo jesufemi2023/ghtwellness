@@ -949,6 +949,46 @@ export async function createServer() {
         };
         return res.json(OptionsStorage.attachOptionsToItem('recommended_packages', item));
       }
+
+      const toSlug = (val: string) =>
+        val.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+      const stripSuffix = (slug: string) =>
+        slug.replace(/-(?:packages?|combo|formula|pack)$/g, '');
+      const targetSlug = toSlug(id);
+      const targetTokens = targetSlug ? targetSlug.split('-').filter(Boolean) : [];
+
+      if (targetSlug) {
+        const { data: allRows } = await supabase
+          .from('recommended_packages')
+          .select(`
+            *,
+            package_products (
+              products (*)
+            )
+          `);
+
+        if (Array.isArray(allRows) && allRows.length > 0) {
+          const slugMatch =
+            allRows.find((r: any) => toSlug(r.name || '') === targetSlug) ||
+            allRows.find((r: any) => stripSuffix(toSlug(r.name || '')) === targetSlug) ||
+            allRows
+              .filter((r: any) => {
+                const nameTokens = toSlug(r.name || '').split('-').filter(Boolean);
+                return targetTokens.length > 0 && targetTokens.every((t) => nameTokens.includes(t));
+              })
+              .sort((a: any, b: any) => (a.name || '').length - (b.name || '').length)[0];
+
+          if (slugMatch) {
+            const item = {
+              ...slugMatch,
+              is_combo: slugMatch.is_combo || false,
+              products: slugMatch.package_products?.map((pp: any) => pp.products).filter(Boolean) || []
+            };
+            return res.json(OptionsStorage.attachOptionsToItem('recommended_packages', item));
+          }
+        }
+      }
+
       return res.status(404).json({ error: "Package not found" });
     }
 

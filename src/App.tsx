@@ -581,14 +581,41 @@ export default function App() {
       // 2. Handle Package / Buy Package / Combo / Buy Combo
       const targetPackageId = buyPackageId || packageId || buyComboId || comboId;
       const isBuyAction = !!buyPackageId || !!buyComboId;
+      const preferCombo = !!buyComboId || !!comboId;
       if (targetPackageId) {
         setActiveTab("package-detail");
+        const toSlug = (val: string) =>
+          val.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+        const stripSuffix = (slug: string) =>
+          slug.replace(/-(?:packages?|combo|formula|pack)$/g, '');
+
+        const targetLower = targetPackageId.toLowerCase().trim();
+        const targetSlug = toSlug(targetPackageId);
+        const targetTokens = targetSlug ? targetSlug.split('-').filter(Boolean) : [];
+
         const allPkgs = [...recommendedPackages, ...comboPackages];
-        let pkg = allPkgs.find(p => 
-          p.id?.toLowerCase() === targetPackageId.toLowerCase() || 
-          p.package_code?.toLowerCase() === targetPackageId.toLowerCase()
+        let pkg = allPkgs.find(p =>
+          p.id?.toLowerCase() === targetLower ||
+          p.package_code?.toLowerCase() === targetLower
         );
-        
+
+        if (!pkg && targetSlug) {
+          pkg =
+            allPkgs.find(p => toSlug(p.name || '') === targetSlug) ||
+            allPkgs.find(p => stripSuffix(toSlug(p.name || '')) === targetSlug) ||
+            allPkgs
+              .filter(p => {
+                const nameTokens = toSlug(p.name || '').split('-').filter(Boolean);
+                return targetTokens.length > 0 && targetTokens.every(t => nameTokens.includes(t));
+              })
+              .sort((a, b) => {
+                const comboScoreA = preferCombo && a.is_combo ? 1 : 0;
+                const comboScoreB = preferCombo && b.is_combo ? 1 : 0;
+                if (comboScoreA !== comboScoreB) return comboScoreB - comboScoreA;
+                return (a.name || '').length - (b.name || '').length;
+              })[0];
+        }
+
         if (pkg) {
           setViewingPackage(pkg);
           if (isBuyAction) openOrderDrawer(pkg, 'package');
